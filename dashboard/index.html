@@ -466,25 +466,29 @@
   /* ---------- live quotes (Finnhub) ---------- */
   dash.calc('live', {
     title: 'מצב חי מול הרמות',
-    description: 'משווה את המחיר העדכני מ-Finnhub לרמות של כל תוכנית: מעל/מתחת לטריגר, יעדים וסטופ ביומי; מתחת/באזור/מעל אזור הקנייה בסווינג.',
+    description: 'משווה את המחיר העדכני מ-Finnhub לרמות של כל תוכנית: מעל/מתחת לטריגר, פריצה שנכשלה, יעדים וסטופ ביומי; מתחת/באזור/מעל אזור הקנייה בסווינג; מיקום בטווח היומי ורווח ב-R מהכניסה.',
     inputs: ['quotes', 'daytrade', 'swing_setups'],
     fn: (quotes, daytrade, swing_setups) => {
       const q = Object.fromEntries(quotes.filter((r) => r.price != null).map((r) => [r.symbol, r]));
+      const rangePos = (x) => (x.high > x.low ? Math.round(((x.price - x.low) / (x.high - x.low)) * 100) : null);
       const day = daytrade.filter((r) => q[r.symbol]).map((r) => {
-        const p = q[r.symbol].price;
-        const status = p <= r.stop ? 'stop' : p >= r.t2 ? 't2' : p >= r.t1 ? 't1' : p >= r.trigger ? 'in' : 'wait';
-        return {key: 'day:' + r.symbol, symbol: r.symbol, kind: 'day', price: p, change_pct: q[r.symbol].change_pct, status, dist_pct: Math.round((p / r.trigger - 1) * 1000) / 10};
+        const x = q[r.symbol], p = x.price;
+        const status = p <= r.stop ? 'stop' : p >= r.t2 ? 't2' : p >= r.t1 ? 't1' : p >= r.trigger ? 'in' : (x.high >= r.trigger ? 'failed' : 'wait');
+        return {key: 'day:' + r.symbol, symbol: r.symbol, kind: 'day', price: p, change_pct: x.change_pct, status,
+          dist_pct: Math.round((p / r.trigger - 1) * 1000) / 10, r_now: Math.round(((p - r.trigger) / (r.trigger - r.stop)) * 100) / 100,
+          day_high: x.high, day_low: x.low, range_pos: rangePos(x), hit_stop_today: x.low <= r.stop, above_open: p >= x.open};
       });
       const sw = swing_setups.filter((r) => q[r.symbol]).map((r) => {
-        const p = q[r.symbol].price;
+        const x = q[r.symbol], p = x.price;
         const status = p <= r.stop ? 'below_stop' : p < r.pivot ? 'wait' : p <= r.zone_top ? 'zone' : 'extended';
-        return {key: 'swing:' + r.symbol, symbol: r.symbol, kind: 'swing', price: p, change_pct: q[r.symbol].change_pct, status, dist_pct: Math.round((p / r.pivot - 1) * 1000) / 10};
+        return {key: 'swing:' + r.symbol, symbol: r.symbol, kind: 'swing', price: p, change_pct: x.change_pct, status,
+          dist_pct: Math.round((p / r.pivot - 1) * 1000) / 10, day_high: x.high, day_low: x.low, range_pos: rangePos(x), above_open: p >= x.open};
       });
       return day.concat(sw);
     }
   });
   const LIVE_TXT = {stop: ['מתחת לסטופ', 'stop'], t2: ['הגיע ליעד 2', 'go'], t1: ['מעל יעד 1', 'go'], in: ['מעל הטריגר', 'go'], wait: ['מתחת לטריגר', 'caution'],
-    below_stop: ['מתחת לסטופ', 'stop'], zone: ['באזור הקנייה', 'go'], extended: ['מתוח: לא לרדוף', 'stop']};
+    below_stop: ['מתחת לסטופ', 'stop'], zone: ['באזור הקנייה', 'go'], extended: ['מתוח: לא לרדוף', 'stop'], failed: ['פרץ ונכשל', 'stop']};
   const SWING_WAIT = ['ממתין לפריצה', 'caution'];
   const liveRow = (kind, sym) => { const l = dash.data('live'); return l.status === 'ok' ? (l.data || []).find((r) => r.key === kind + ':' + sym) : null; };
   const quote = (sym) => { const d = dash.data('quotes'); return d.status === 'ok' ? (d.data || []).find((r) => r.symbol === sym && r.price != null) : null; };
@@ -684,7 +688,7 @@
       seg.title = r.name + ' · ' + r.start + '–' + r.end + ' NY';
       parts.push(seg);
     });
-    [240, 570, 600, 690, 840, 900, 960].forEach((m) => {
+    ((tl.clientWidth || 600) < 560 ? [240, 570, 690, 840, 960] : [240, 570, 600, 690, 840, 900, 960]).forEach((m) => {
       const t = el('div', 'mc-tl-t'); t.style.left = X(m) + '%';
       t.append(el('div', null, hm(m)), el('div', null, hm(m + n.offset)));
       parts.push(t);
@@ -696,13 +700,51 @@
   /* ---------- plain-language instructions ---------- */
   const pctFrom = (v, base) => (v / base - 1) * 100;
   const nyMin = () => window.mcNow().ny;
+  function market() {
+    const spy = quote('SPY'), qqq = quote('QQQ');
+    if (!spy) return {ok: true, weak: false, bad: false, note: ''};
+    const c = spy.change_pct, n = qqq ? qqq.change_pct : c;
+    const worst = Math.min(c, n);
+    return {ok: true, weak: worst <= -0.5, bad: worst <= -1.0, note: 'S&P ' + fmtPct(c) + ' · נאסד״ק ' + fmtPct(n)};
+  }
   function dayInstruction(r) {
+    const ins = dayInstructionBase(r), lr = liveRow('day', r.symbol), mk = market();
+    ins.sizeMult = 1;
+    if (ins.st === 'go' && mk.bad) { ins.st = 'stop'; ins.title = 'השוק נופל: לא נכנסים'; ins.text = ['המדדים יורדים חזק (' + mk.note + '). לא קונים לונג עד שהשוק מתייצב.']; }
+    else if (ins.st === 'go' && mk.weak) { ins.sizeMult = 0.5; ins.text = ins.text.concat([' השוק חלש: חצי גודל.']); }
+    const m = nyMin();
+    if (ins.st === 'go' && m >= 690 && m < 840) { ins.sizeMult = (ins.sizeMult ?? 1) * 0.5; ins.title = 'אפשר לקנות (חצי גודל)'; ins.text = ins.text.concat([' שעות הצהריים: תנודות שווא, ולכן חצי גודל.']); }
+    if (lr && ins.st === 'go' && lr.range_pos != null && lr.range_pos < 35) { ins.st = 'caution'; ins.title = 'המתן לאישור'; ins.text = ['המחיר מעל הטריגר אבל נסחר בתחתית הטווח היומי. קונים רק אם הוא חוזר ומחזיק מעל ', fmtP(r.trigger), ' לכמה דקות.']; }
+    return ins;
+  }
+  function pulse(kind, r) {
+    const lr = liveRow(kind, r.symbol);
+    if (!lr) return null;
+    const parts = [];
+    if (kind === 'day') {
+      if (lr.status === 'in' || lr.status === 't1' || lr.status === 't2') {
+        const z = size(r.trigger, r.stop, GRADE_MULT[r.grade] ?? 1);
+        parts.push('אם נכנסת בטריגר: ' + (lr.r_now >= 0 ? '+' : '') + d3.format('.2f')(lr.r_now) + 'R' + (z && z.shares ? ' (' + (lr.r_now >= 0 ? '+' : '−') + usd(Math.abs(z.shares * (lr.price - r.trigger))) + ')' : ''));
+      } else if (lr.status === 'wait') parts.push('חסרים ' + fmtPct(-lr.dist_pct, 1) + ' עד הטריגר');
+      if (lr.range_pos != null) parts.push('במיקום ' + lr.range_pos + '% מהטווח היומי');
+      parts.push(lr.above_open ? 'מעל מחיר הפתיחה' : 'מתחת למחיר הפתיחה');
+    } else {
+      if (lr.status === 'wait') parts.push('חסרים ' + fmtPct(-lr.dist_pct, 1) + ' עד נקודת הקנייה');
+      else parts.push(fmtPct(lr.dist_pct, 1) + ' מנקודת הקנייה');
+      if (lr.range_pos != null) parts.push('במיקום ' + lr.range_pos + '% מהטווח היומי');
+    }
+    const p = el('p', 'mc-note', 'עכשיו: ' + parts.join(' · '));
+    p.style.margin = '-4px 2px 0';
+    return p;
+  }
+  function dayInstructionBase(r) {
     const lr = liveRow('day', r.symbol), m = nyMin(), wk = window.mcNow().wk;
     const maxEntry = +(r.trigger + (r.t1 - r.trigger) * 0.5).toFixed(2);
     const P = fmtP;
     if (wk || m >= 960 || m < 240) return {st: 'caution', title: 'השוק סגור', text: ['תוכנית לפתיחה הבאה: קנה רק מעל ', P(r.trigger), '. סטופ ', P(r.stop), '.'], maxEntry};
     if (lr && lr.status === 'stop') return {st: 'stop', title: 'בוטל: לא נכנסים', text: ['המחיר ירד מתחת לסטופ (', P(r.stop), '). העסקה לא רלוונטית היום.'], maxEntry};
     if (lr && (lr.status === 't1' || lr.status === 't2')) return {st: 'stop', title: 'פספסנו: לא נכנסים', text: ['המחיר כבר ליד היעד. מי שבפנים: מוכרים חצי ב-', P(r.t1), ' ואת השאר ב-', P(r.t2), '.'], maxEntry};
+    if (lr && lr.status === 'failed') return {st: 'stop', title: 'פרץ ונכשל', text: ['היום הגיע ל-', P(lr.day_high), ', מעל הטריגר, וחזר מתחת. נכנסים רק אם הוא חוזר מעל ', P(r.trigger), ' והשוק ירוק.'], maxEntry};
     if (m < 575) return {st: 'caution', title: 'חכה לפתיחה', text: ['אחרי 09:35 (' + hm(575 + window.mcNow().offset) + ' ישראל), קנה רק אם המחיר עולה מעל ', P(r.trigger), '.'], maxEntry};
     if (m >= 930) return {st: 'stop', title: 'מאוחר מדי היום', text: ['לא פותחים עסקה יומית חדשה אחרי 15:30. מי שבפנים: סוגרים עד 15:55.'], maxEntry};
     if (lr && lr.status === 'in') {
@@ -716,8 +758,12 @@
     if (r.action === 'avoid') return {st: 'stop', title: 'לא לקנות', text: [String(r.reason).split('.')[0] + '.']};
     if (lr && lr.status === 'below_stop') return {st: 'stop', title: 'בוטל', text: ['המחיר מתחת לסטופ (', P(r.stop), '). לא נכנסים.']};
     if (r.action === 'buy_close') {
-      if (lr && lr.price >= r.pivot) return {st: 'go', title: 'קנה לקראת הסגירה', text: ['ב-15:50–16:00 (' + hm(950 + window.mcNow().offset) + ' ישראל), קנה רק אם המחיר עדיין מעל ', P(r.pivot), '.']};
-      return {st: 'caution', title: 'חכה לסגירה', text: ['קונים רק אם המניה נסגרת מעל ', P(r.pivot), '. כרגע היא מתחת.']};
+      const m = nyMin();
+      if (lr && lr.price >= r.pivot && (lr.range_pos ?? 100) >= 50) {
+        if (m >= 945 && m < 960) return {st: 'go', title: 'קנה עכשיו (לקראת סגירה)', text: ['המחיר מעל ', P(r.pivot), ' ובחצי העליון של הטווח. זה התנאי, אפשר לקנות.']};
+        return {st: 'caution', title: 'נראה טוב, חכה לסגירה', text: ['כרגע מעל ', P(r.pivot), '. קונים רק ב-15:45–16:00 (' + hm(945 + window.mcNow().offset) + ' ישראל), אם זה עדיין כך.']};
+      }
+      return {st: 'caution', title: 'חכה לסגירה', text: ['קונים רק אם המניה נסגרת מעל ', P(r.pivot), ' ובחצי העליון של הטווח היומי. כרגע התנאי לא מתקיים.']};
     }
     if (lr && lr.status === 'zone') return {st: 'go', title: 'אפשר לקנות', text: ['המחיר באזור הקנייה. קנה עד ', P(r.zone_top), ' ולא מעל.']};
     if (lr && lr.status === 'extended') return {st: 'stop', title: 'אל תרדוף', text: ['המחיר מעל אזור הקנייה (', P(r.pivot), '–', P(r.zone_top), '). מחכים לחזרה.']};
@@ -780,14 +826,16 @@
       r.addEventListener('click', onClick); r.addEventListener('keydown', (e) => { if (e.key === 'Enter') onClick(); });
       return r;
     };
+    const ORD = {go: 0, caution: 1, stop: 2};
     if (dd.status === 'ok') {
-      buy.replaceChildren(...dd.data.filter((r) => r.grade !== 'C').map((r) => {
-        const z = size(r.trigger, r.stop, GRADE_MULT[r.grade] ?? 1);
-        return row(r.symbol, dayInstruction(r), 'SL ' + fmtP(r.stop) + ' · TP ' + fmtP(r.t1) + ' / ' + fmtP(r.t2) + (z && z.shares ? ' · ' + z.shares + ' מניות ≈ ' + usdK(z.pos) : ''), () => goTo('day', 'day-' + r.symbol), 'daytrade');
+      const ORD_ = {go: 0, caution: 1, stop: 2};
+      buy.replaceChildren(...dd.data.filter((r) => r.grade !== 'C').sort((a, b) => ORD[dayInstruction(a).st] - ORD[dayInstruction(b).st]).map((r) => {
+        const ins = dayInstruction(r), z = size(r.trigger, r.stop, (GRADE_MULT[r.grade] ?? 1) * (ins.sizeMult ?? 1));
+        return row(r.symbol, ins, 'SL ' + fmtP(r.stop) + ' · TP ' + fmtP(r.t1) + ' / ' + fmtP(r.t2) + (z && z.shares ? ' · ' + z.shares + ' מניות ≈ ' + usdK(z.pos) : ''), () => goTo('day', 'day-' + r.symbol), 'daytrade');
       }));
     } else if (dd.status === 'error') fail(buy); else skel(buy, 3, '2.5rem');
     if (sw.status === 'ok') {
-      wait.replaceChildren(...sw.data.filter((r) => r.action !== 'avoid').map((r) => {
+      wait.replaceChildren(...sw.data.filter((r) => r.action !== 'avoid').sort((a, b) => ORD[swingInstruction(a).st] - ORD[swingInstruction(b).st]).map((r) => {
         const z = size(r.pivot, r.stop);
         return row(r.symbol, swingInstruction(r), 'SL ' + fmtP(r.stop) + ' · TP ' + fmtP(r.target) + (z && z.shares ? ' · ' + z.shares + ' מניות ≈ ' + usdK(z.pos) : ''), () => goTo('swing', 'swing-' + r.symbol), 'swing_setups');
       }));
@@ -835,7 +883,8 @@
       const n = nums('כניסה', r.trigger, [['סטופ (SL)', r.stop, r.trigger, 'sl', ['daytrade', 'stop', w]], ['יעד 1 (TP1)', r.t1, r.trigger, 'tp', ['daytrade', 't1', w]], ['יעד 2 (TP2)', r.t2, r.trigger, 'tp', ['daytrade', 't2', w]]]);
       mark(n.firstChild.querySelector('b'), 'daytrade', 'trigger', w);
       const mult = GRADE_MULT[r.grade] ?? 1;
-      const pos = posLine(size(r.trigger, r.stop, mult), mult === 1 ? null : mult === 0.75 ? 'גודל 75% (ציון B)' : 'רבע גודל (ציון C)');
+      const zm = mult * (ins.sizeMult ?? 1);
+      const pos = posLine(size(r.trigger, r.stop, zm), [mult === 1 ? null : mult === 0.75 ? 'ציון B: 75%' : 'ציון C: רבע', ins.sizeMult === 0.5 ? 'שוק חלש: חצי' : null].filter(Boolean).join(' · ') || null);
       // details
       const checks = el('div', 'mc-checks'); mark(checks, 'daytrade', null, null);
       r.checks.split('|').forEach((p) => { const [k, v] = p.split(':'); const ch = el('span', 'mc-chk', (v === '1' ? '✓ ' : '✗ ') + k); ch.dataset.v = v; checks.append(ch); });
@@ -855,7 +904,7 @@
       const meta = el('p', 'mc-note', (q ? 'מחיר מ-' + (q.time_ny || '').slice(11, 16) + ' NY · טווח היום ' + fmtP(q.low) + '–' + fmtP(q.high) + ' · ' : '') + 'גאפ בפרה-מרקט ' + fmtPct(r.gap_pct, 1) + ' · סיכוי/סיכון 1:' + r.r_t1 + ' / 1:' + r.r_t2);
       const bt = el('button', 'mc-btn-s', 'פתח במחשבון'); bt.type = 'button'; bt.style.alignSelf = 'flex-start';
       bt.addEventListener('click', () => fillCalc(r.trigger, r.stop, r.t2, r.symbol));
-      c.append(head, doBox(ins), n, pos, moreBox('day-' + r.symbol, [bar, cat, rules, plan, av, checks, meta, bt]));
+      c.append(head, doBox(ins), ...[pulse('day', r)].filter(Boolean), n, pos, moreBox('day-' + r.symbol, [bar, cat, rules, plan, av, checks, meta, bt]));
       return c;
     }));
   }
@@ -905,7 +954,7 @@
       idb.append(mark(el('div', 'mc-sym', r.symbol), 'swing_setups', 'symbol', w), mark(el('div', 'mc-name', r.name), 'swing_setups', 'name', w));
       head.append(idb, headPrice(r.symbol));
       const ins = swingInstruction(r);
-      const kids = [head, doBox(ins)];
+      const kids = [head, doBox(ins), ...[r.action === 'avoid' ? null : pulse('swing', r)].filter(Boolean)];
       if (r.action !== 'avoid') {
         const n = nums('כניסה', r.pivot, [['קנה עד', r.zone_top, r.pivot, '', ['swing_setups', 'zone_top', w]], ['סטופ (SL)', r.stop, r.pivot, 'sl', ['swing_setups', 'stop', w]], ['יעד (TP)', r.target, r.pivot, 'tp', ['swing_setups', 'target', w]]]);
         mark(n.firstChild.querySelector('b'), 'swing_setups', 'pivot', w);
