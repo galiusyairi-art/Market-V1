@@ -1,0 +1,65 @@
+[
+ {
+  "key": "overall",
+  "label": "מצב השוק",
+  "status": "caution",
+  "title": "מגמת עלייה תחת לחץ",
+  "text": "ה-S&P במרחק של פחות מ-0.5% משיא כל הזמנים ומעל הממוצעים, אבל רוחב השוק חלש, התשואות מעל 5%, הנפט מעל 100$ והסנטימנט בשפל. לכן: קונים רק את המובילות עם קטליזטור, בפוזיציה מוקטנת, ולא רודפים.",
+  "day_exposure": 0.75,
+  "swing_exposure": 0.5
+ },
+ {
+  "key": "trend",
+  "label": "מגמה",
+  "status": "go",
+  "title": "S&P ליד שיא, מעל ממוצע 50 ו-200",
+  "text": "שיא סגירה ביום שלישי (6.10), שני ימי מימוש, היום ריבאונד של ‎+0.3%",
+  "day_exposure": null,
+  "swing_exposure": null
+ },
+ {
+  "key": "breadth",
+  "label": "רוחב שוק",
+  "status": "stop",
+  "title": "רוב המניות לא משתתפות",
+  "text": "3 מכל 4 מניות ב-S&P ירדו בספטמבר · העליות מרוכזות במגה-קאפ AI",
+  "day_exposure": null,
+  "swing_exposure": null
+ },
+ {
+  "key": "rates",
+  "label": "ריבית ואג״ח",
+  "status": "stop",
+  "title": "10Y ‏5.23%, הפד מעלה",
+  "text": "שיא מאז 2002 · לחץ על מכפילים ועל Small-cap",
+  "day_exposure": null,
+  "swing_exposure": null
+ },
+ {
+  "key": "volatility",
+  "label": "תנודתיות",
+  "status": "go",
+  "title": "VIX סביב 15, רגוע",
+  "text": "אין פאניקה · סטופים רגילים עובדים",
+  "day_exposure": null,
+  "swing_exposure": null
+ },
+ {
+  "key": "sentiment",
+  "label": "סנטימנט",
+  "status": "caution",
+  "title": "הקמעונאים בולשיים מאוד, הצרכנים בשפל",
+  "text": "Stocktwits: SPY/QQQ 'בולשי מאוד' (איתות נגדי) · מישיגן 46.3",
+  "day_exposure": null,
+  "swing_exposure": null
+ },
+ {
+  "key": "events",
+  "label": "אירועים",
+  "status": "caution",
+  "title": "CPI ביום שלישי 14.10",
+  "text": "להקטין סווינג חדש לפני ה-CPI · FOMC ב-28.10 · בחירות 3.11",
+  "day_exposure": null,
+  "swing_exposure": null
+ }
+]

@@ -3,239 +3,351 @@
 .mc{direction:rtl;font-family:var(--font-anthropic-sans);color:var(--color-fg);display:grid;gap:var(--cds-gap-md);font-variant-numeric:tabular-nums}
 .mc *{box-sizing:border-box}
 .mc-card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);min-width:0}
-.mc-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--cds-gap-sm);margin:0 0 var(--cds-gap-sm)}
+.mc-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--cds-gap-sm);margin:0 0 var(--cds-gap-sm);flex-wrap:wrap}
 .mc-h h2{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0}
 .mc-note{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin:0}
 .mc-muted{color:var(--color-fg-muted)}
 .mc-ok{color:var(--color-ok)}.mc-bad{color:var(--color-bad)}.mc-warn{color:var(--color-warn)}
 .mc-ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
-.mc-serif{font-family:var(--font-anthropic-serif);font-weight:400}
+.mc-grid2{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr))}
+.mc-grid3{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr))}
 
-/* top bar */
+/* top bar + tabs */
 .mc-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--cds-gap-md)}
-.mc-title{display:flex;flex-direction:column;gap:2px}
 .mc-title h1{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-title);margin:0;line-height:1.15}
 .mc-asof{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
 .mc-ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:var(--cds-gap-sm)}
 .mc-session{display:flex;align-items:center;gap:var(--cds-gap-sm);padding:var(--cds-pad-xs) var(--cds-pad-md);border:1px solid var(--color-border-line);border-radius:999px;background:var(--color-panel);font-size:var(--cds-font-size-caption)}
 .mc-dot{width:.55rem;height:.55rem;border-radius:50%;background:var(--color-fg-muted);flex:none}
-.mc-session[data-phase=regular] .mc-dot{background:var(--color-ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-ok) 25%,transparent)}
+.mc-session[data-phase=regular] .mc-dot{background:var(--color-ok)}
 .mc-session[data-phase=pre] .mc-dot,.mc-session[data-phase=after] .mc-dot{background:var(--color-warn)}
-.mc-session b{font-weight:600}
 .mc-btn{font:inherit;font-size:var(--cds-font-size-body);font-weight:600;padding:var(--cds-pad-sm) var(--cds-pad-lg);border-radius:999px;border:0;cursor:pointer;background:var(--color-fg);color:var(--color-bg);display:inline-flex;align-items:center;gap:8px}
 .mc-btn:hover{opacity:.88}
 .mc-btn svg{width:16px;height:16px}
-.mc-tip{font-size:var(--cds-font-size-caption);background:var(--cds-surface-popover);border:1px solid var(--cds-border);border-radius:var(--cds-radius);box-shadow:var(--cds-shadow-popover);padding:var(--cds-pad-sm) var(--cds-pad-md);max-width:30rem}
+.mc-btn-s{font:inherit;font-size:var(--cds-font-size-caption);padding:4px 10px;border-radius:999px;border:1px solid var(--color-border-line);background:transparent;color:var(--color-fg);cursor:pointer}
+.mc-btn-s:hover{background:color-mix(in srgb,var(--color-fg) 6%,transparent)}
+.mc-tip{font-size:var(--cds-font-size-caption);background:var(--cds-surface-popover);border:1px solid var(--cds-border);border-radius:var(--cds-radius);box-shadow:var(--cds-shadow-popover);padding:var(--cds-pad-sm) var(--cds-pad-md)}
 .mc-tip[hidden]{display:none}
-
-/* row: brief + gauges */
-.mc-row1{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr))}
-.mc-headline{font-family:var(--font-anthropic-serif);font-size:calc(var(--cds-font-size-heading) * 1.15);line-height:1.45;margin:0 0 var(--cds-gap-md)}
-.mc-tabs{display:flex;gap:4px;border-bottom:1px solid var(--color-border-line);margin-bottom:var(--cds-gap-sm)}
-.mc-tab{font:inherit;font-size:var(--cds-font-size-caption);background:none;border:0;border-bottom:2px solid transparent;padding:6px 10px;color:var(--color-fg-muted);cursor:pointer;margin-bottom:-1px}
+.mc-tabs{display:flex;gap:2px;border-bottom:1px solid var(--color-border-line);overflow-x:auto;scrollbar-width:none}
+.mc-tab{font:inherit;font-size:var(--cds-font-size-body);background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;color:var(--color-fg-muted);cursor:pointer;margin-bottom:-1px;white-space:nowrap}
 .mc-tab[aria-selected=true]{color:var(--color-fg);border-bottom-color:var(--color-fg);font-weight:600}
-.mc-brieftext{line-height:1.7;margin:0;min-height:6.5em}
-.mc-gauges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--cds-gap-sm)}
-.mc-gauge{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;min-width:0}
-.mc-gauge svg{width:100%;max-width:150px;height:auto;overflow:visible}
-.mc-gauge .mc-glabel{font-weight:600}
-.mc-gauge .mc-gbias{font-size:var(--cds-font-size-caption)}
-.mc-gauge .mc-gdrv{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.4}
-
-/* indices */
-.mc-idx{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr))}
-.mc-ix .mc-ixname{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);display:flex;justify-content:space-between}
-.mc-ix .mc-ixval{font-family:var(--font-anthropic-serif);font-size:var(--cds-font-size-title);line-height:1.2;margin:2px 0 6px}
-.mc-chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
-.mc-chip{border-radius:calc(var(--cds-radius) * .7);padding:4px 6px;background:color-mix(in srgb,var(--color-fg) 5%,transparent);display:flex;flex-direction:column;gap:1px;min-width:0}
-.mc-chip small{font-size:10.5px;color:var(--color-fg-muted);white-space:nowrap}
-.mc-chip span{font-size:var(--cds-font-size-caption);font-weight:600}
-
-/* section header */
-.mc-sec{display:flex;align-items:baseline;gap:var(--cds-gap-sm);margin:var(--cds-gap-sm) 0 0}
+.mc-page{display:grid;gap:var(--cds-gap-md)}
+.mc-page[hidden]{display:none}
+.mc-sec{display:flex;align-items:baseline;gap:var(--cds-gap-sm);flex-wrap:wrap;margin-top:var(--cds-gap-sm)}
 .mc-sec h2{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0}
 
-/* pick cards */
-.mc-picks{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fill,minmax(min(100%,17.5rem),1fr))}
-.mc-pk{display:flex;flex-direction:column;gap:10px;position:relative}
-.mc-pk-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+/* status colors */
+[data-st=go]{--st:var(--color-ok)}[data-st=caution]{--st:var(--color-warn)}[data-st=stop]{--st:var(--color-bad)}
+.mc-pill{display:inline-flex;align-items:center;gap:6px;font-size:var(--cds-font-size-caption);font-weight:600;padding:2px 10px;border-radius:999px;color:var(--st,var(--color-fg-muted));border:1px solid color-mix(in srgb,var(--st,var(--color-fg-muted)) 45%,transparent);background:color-mix(in srgb,var(--st,var(--color-fg-muted)) 10%,transparent);white-space:nowrap}
+.mc-pill::before{content:"";width:.45rem;height:.45rem;border-radius:50%;background:currentColor}
+
+/* regime hero */
+.mc-hero{display:grid;gap:var(--cds-gap-lg);grid-template-columns:auto 1fr;align-items:center}
+@media (max-width:640px){.mc-hero{grid-template-columns:1fr}}
+.mc-light{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:999px;background:color-mix(in srgb,var(--color-fg) 6%,transparent);width:max-content}
+.mc-light i{width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--color-fg) 10%,transparent)}
+.mc-light[data-st=stop] i:nth-child(1){background:var(--color-bad);box-shadow:0 0 14px var(--color-bad)}
+.mc-light[data-st=caution] i:nth-child(2){background:var(--color-warn);box-shadow:0 0 14px var(--color-warn)}
+.mc-light[data-st=go] i:nth-child(3){background:var(--color-ok);box-shadow:0 0 14px var(--color-ok)}
+.mc-hero h3{font-family:var(--font-anthropic-serif);font-weight:400;font-size:calc(var(--cds-font-size-title) * .9);margin:4px 0 6px;line-height:1.2}
+.mc-hero p{margin:0;line-height:1.65}
+.mc-expo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--cds-gap-md);margin-top:var(--cds-gap-md)}
+.mc-expo-l{display:flex;justify-content:space-between;font-size:var(--cds-font-size-caption);margin-bottom:4px}
+.mc-expo-l b{font-family:var(--font-anthropic-serif);font-weight:400;font-size:1.25rem}
+.mc-meter{height:8px;border-radius:4px;background:color-mix(in srgb,var(--color-fg) 9%,transparent);overflow:hidden;direction:ltr}
+.mc-meter i{display:block;height:100%;border-radius:4px;background:var(--color-fg)}
+.mc-factors{display:grid;gap:var(--cds-gap-sm);grid-template-columns:repeat(auto-fill,minmax(min(100%,15rem),1fr))}
+.mc-factor{padding:var(--cds-pad-md);border-radius:var(--cds-radius);border:1px solid var(--color-border-line);border-inline-start:3px solid var(--st);background:var(--color-panel);display:flex;flex-direction:column;gap:3px}
+.mc-factor small{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.mc-factor b{font-weight:600;font-size:var(--cds-font-size-body)}
+.mc-factor span{font-size:11.5px;color:var(--color-fg-muted);line-height:1.4}
+
+/* now + timeline */
+.mc-now{display:flex;gap:var(--cds-gap-md);align-items:flex-start;flex-wrap:wrap}
+.mc-now-badge{font-size:var(--cds-font-size-caption);font-weight:700;padding:4px 12px;border-radius:999px;color:var(--color-bg);background:var(--st,var(--color-fg-muted))}
+.mc-now h3{margin:0 0 4px;font-size:var(--cds-font-size-heading);font-weight:600}
+.mc-now p{margin:0;line-height:1.6}
+.mc-tl{position:relative;direction:ltr;margin-top:var(--cds-gap-md);height:58px}
+.mc-tl-seg{position:absolute;top:18px;height:14px;border-radius:3px;cursor:default}
+.mc-tl-seg[data-a=go]{background:color-mix(in srgb,var(--color-ok) 55%,transparent)}
+.mc-tl-seg[data-a=wait]{background:color-mix(in srgb,var(--color-bad) 35%,transparent)}
+.mc-tl-seg[data-a=plan]{background:color-mix(in srgb,var(--color-fg) 14%,transparent)}
+.mc-tl-t{position:absolute;top:38px;font-size:10px;color:var(--color-fg-muted);transform:translateX(-50%);white-space:nowrap;text-align:center;line-height:1.25}
+.mc-tl-now{position:absolute;top:8px;width:2px;height:34px;background:var(--color-fg);transform:translateX(-1px)}
+.mc-tl-now::after{content:attr(data-l);position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;white-space:nowrap}
+.mc-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.mc-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-inline-end:5px;vertical-align:middle}
+
+/* decision columns */
+.mc-dcol h3{margin:0 0 var(--cds-gap-sm);font-size:var(--cds-font-size-body);font-weight:700;display:flex;align-items:center;gap:8px}
+.mc-dcol h3::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--st)}
+.mc-drow{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;padding:8px 0;border-top:1px solid var(--color-border-line);font-size:var(--cds-font-size-caption);cursor:pointer}
+.mc-drow:first-of-type{border-top:0}
+.mc-drow:hover .mc-dsym{text-decoration:underline}
+.mc-dsym{font-weight:700;font-size:var(--cds-font-size-body);direction:ltr}
+.mc-dline{color:var(--color-fg-muted);line-height:1.45}
+
+/* trade cards */
+.mc-cards{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fill,minmax(min(100%,21rem),1fr))}
+.mc-tc{display:flex;flex-direction:column;gap:10px}
+.mc-tc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .mc-sym{font-size:1.35rem;font-weight:700;letter-spacing:.02em;direction:ltr}
-.mc-rank{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
 .mc-name{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
-.mc-conf{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
-.mc-conf b{font-size:var(--cds-font-size-caption)}
-.mc-confbar{width:64px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--color-fg) 10%,transparent);overflow:hidden;direction:ltr}
-.mc-confbar i{display:block;height:100%;background:var(--color-ok);border-radius:3px}
-.mc-price{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.mc-price .mc-now{font-family:var(--font-anthropic-serif);font-size:1.9rem;line-height:1}
-.mc-tgt{text-align:left;font-size:var(--cds-font-size-caption)}
-.mc-tgt strong{font-size:var(--cds-font-size-body);display:block}
-.mc-sess{display:grid;grid-template-columns:auto 1fr auto;gap:2px 8px;font-size:var(--cds-font-size-caption);align-items:center;padding:6px 8px;border-radius:calc(var(--cds-radius) * .7);background:color-mix(in srgb,var(--color-fg) 4%,transparent)}
-.mc-sess .mc-live{font-weight:700}
-.mc-sess .mc-livebadge{font-size:10px;padding:0 5px;border-radius:999px;background:var(--color-ok);color:var(--color-bg);margin-inline-start:4px}
-.mc-bar{direction:ltr;position:relative;height:46px;margin-top:4px}
-.mc-track{position:absolute;left:0;right:0;top:20px;height:8px;border-radius:4px;background:color-mix(in srgb,var(--color-fg) 9%,transparent);overflow:hidden}
-.mc-zone{position:absolute;top:0;bottom:0}
-.mc-fill{position:absolute;top:20px;height:8px;border-radius:4px}
-.mc-mk{position:absolute;top:14px;width:2px;height:20px;transform:translateX(-1px);border-radius:1px}
-.mc-mk-l{position:absolute;font-size:10px;line-height:1;white-space:nowrap;transform:translateX(-50%);color:var(--color-fg-muted)}
-.mc-cur{position:absolute;top:16px;width:16px;height:16px;border-radius:50%;transform:translateX(-8px);border:3px solid var(--color-panel);box-shadow:0 0 0 1.5px currentColor}
+.mc-grade{font-family:var(--font-anthropic-serif);font-size:1.6rem;line-height:1;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;border:2px solid var(--st);color:var(--st)}
+.mc-gap{font-family:var(--font-anthropic-serif);font-size:1.5rem;line-height:1}
+.mc-cat{font-size:var(--cds-font-size-caption);line-height:1.5;margin:0}
+.mc-checks{display:flex;flex-wrap:wrap;gap:4px}
+.mc-chk{font-size:10.5px;padding:2px 7px;border-radius:999px;border:1px solid var(--color-border-line)}
+.mc-chk[data-v="1"]{color:var(--color-ok);border-color:color-mix(in srgb,var(--color-ok) 40%,transparent)}
+.mc-chk[data-v="0"]{color:var(--color-fg-muted);text-decoration:line-through;opacity:.75}
 .mc-levels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;text-align:center}
 .mc-lv{padding:5px 2px;border-radius:calc(var(--cds-radius) * .7);background:color-mix(in srgb,var(--color-fg) 4%,transparent);min-width:0}
 .mc-lv small{display:block;font-size:10.5px;color:var(--color-fg-muted)}
 .mc-lv span{font-size:var(--cds-font-size-caption);font-weight:600}
-.mc-lv.stop span{color:var(--color-bad)}.mc-lv.tp span,.mc-lv.tg span{color:var(--color-ok)}
+.mc-lv.stop span{color:var(--color-bad)}.mc-lv.tp span{color:var(--color-ok)}
+.mc-plan{font-size:var(--cds-font-size-caption);line-height:1.55;margin:0;padding:8px 10px;border-radius:calc(var(--cds-radius) * .7);background:color-mix(in srgb,var(--color-ok) 7%,transparent)}
+.mc-plan b,.mc-avoid b{font-weight:700}
+.mc-avoid{font-size:var(--cds-font-size-caption);line-height:1.55;margin:0;padding:8px 10px;border-radius:calc(var(--cds-radius) * .7);background:color-mix(in srgb,var(--color-bad) 7%,transparent)}
+.mc-tc-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* price ladder */
+.mc-bar{direction:ltr;position:relative;height:50px;margin-top:2px}
+.mc-track{position:absolute;left:0;right:0;top:20px;height:8px;border-radius:4px;background:color-mix(in srgb,var(--color-fg) 9%,transparent);overflow:hidden}
+.mc-zone{position:absolute;top:0;bottom:0}
+.mc-mk{position:absolute;top:14px;width:2px;height:20px;transform:translateX(-1px);border-radius:1px}
+.mc-mk-l{position:absolute;font-size:10px;line-height:1;white-space:nowrap;transform:translateX(-50%);color:var(--color-fg-muted)}
+.mc-cur{position:absolute;top:16px;width:16px;height:16px;border-radius:50%;transform:translateX(-8px);border:3px solid var(--color-panel);background:var(--color-fg);box-shadow:0 0 0 1.5px var(--color-fg)}
+
+/* calculator */
+.mc-calc{display:grid;gap:var(--cds-gap-sm);grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr))}
+.mc-calc label{display:flex;flex-direction:column;gap:3px;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.mc-calc input{font:inherit;font-size:var(--cds-font-size-body);padding:7px 9px;border-radius:calc(var(--cds-radius) * .7);border:1px solid var(--color-border-line);background:var(--color-bg);color:var(--color-fg);direction:ltr;text-align:right;width:100%}
+.mc-out{display:grid;gap:var(--cds-gap-sm);grid-template-columns:repeat(auto-fit,minmax(8rem,1fr));margin-top:var(--cds-gap-md)}
+.mc-out div{padding:10px;border-radius:var(--cds-radius);background:color-mix(in srgb,var(--color-fg) 4%,transparent)}
+.mc-out small{display:block;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.mc-out b{font-family:var(--font-anthropic-serif);font-weight:400;font-size:1.45rem;direction:ltr;display:inline-block}
+.mc-warnline{font-size:var(--cds-font-size-caption);margin:var(--cds-gap-sm) 0 0}
+
+/* swing */
+.mc-rules{display:grid;gap:var(--cds-gap-sm);grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr))}
+.mc-rule{padding:var(--cds-pad-md);border-radius:var(--cds-radius);border:1px dashed var(--color-border-line);font-size:var(--cds-font-size-caption);line-height:1.5}
+.mc-rule b{display:block;font-size:var(--cds-font-size-body);margin-bottom:2px}
+.mc-meta{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:var(--cds-font-size-caption)}
+.mc-meta dt{color:var(--color-fg-muted)}
+.mc-meta dd{margin:0}
+
+/* market tab (kept from v1) */
+.mc-headline{font-family:var(--font-anthropic-serif);font-size:calc(var(--cds-font-size-heading) * 1.15);line-height:1.45;margin:0 0 var(--cds-gap-md)}
+.mc-btabs{display:flex;gap:4px;border-bottom:1px solid var(--color-border-line);margin-bottom:var(--cds-gap-sm)}
+.mc-btab{font:inherit;font-size:var(--cds-font-size-caption);background:none;border:0;border-bottom:2px solid transparent;padding:6px 10px;color:var(--color-fg-muted);cursor:pointer;margin-bottom:-1px}
+.mc-btab[aria-selected=true]{color:var(--color-fg);border-bottom-color:var(--color-fg);font-weight:600}
+.mc-brieftext{line-height:1.7;margin:0;min-height:6.5em}
 .mc-thesis{font-size:var(--cds-font-size-caption);line-height:1.55;margin:0}
-.mc-tags{display:flex;flex-wrap:wrap;gap:4px}
-.mc-tag{font-size:10.5px;padding:2px 7px;border-radius:999px;border:1px solid var(--color-border-line);color:var(--color-fg-muted)}
-.mc-prog{font-size:var(--cds-font-size-caption);display:flex;justify-content:space-between}
-
-/* buzz */
-.mc-row-buzz{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr))}
-.mc-buzzgrid{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fill,minmax(min(100%,15rem),1fr))}
-.mc-bz{display:flex;flex-direction:column;gap:8px;border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-md);background:var(--color-bg)}
-.mc-risk{font-size:10.5px;font-weight:600;color:var(--color-bad);border:1px solid color-mix(in srgb,var(--color-bad) 45%,transparent);border-radius:999px;padding:1px 7px;align-self:flex-start}
-.mc-heat{display:flex;gap:2px;direction:ltr}
-.mc-heat i{flex:1;height:6px;border-radius:2px;background:color-mix(in srgb,var(--color-fg) 10%,transparent)}
-.mc-heat i.on{background:var(--color-warn)}
-.mc-jump{font-family:var(--font-anthropic-serif);font-size:1.6rem;line-height:1}
-
-/* social */
-.mc-social svg{display:block}
-.mc-legend{display:flex;gap:12px;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);flex-wrap:wrap}
-.mc-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-inline-end:4px;vertical-align:middle}
-
-/* macro */
+.mc-gauges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--cds-gap-sm)}
+.mc-gauge{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;min-width:0}
+.mc-gauge svg{width:100%;max-width:150px;height:auto;overflow:visible}
+.mc-glabel{font-weight:600}.mc-gbias{font-size:var(--cds-font-size-caption)}
+.mc-gdrv{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.4}
+.mc-idx{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr))}
+.mc-ixname{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);display:flex;justify-content:space-between}
+.mc-ixval{font-family:var(--font-anthropic-serif);font-size:var(--cds-font-size-title);line-height:1.2;margin:2px 0 6px}
+.mc-chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.mc-chip{border-radius:calc(var(--cds-radius) * .7);padding:4px 6px;background:color-mix(in srgb,var(--color-fg) 5%,transparent);display:flex;flex-direction:column;gap:1px;min-width:0}
+.mc-chip small{font-size:10.5px;color:var(--color-fg-muted);white-space:nowrap}
+.mc-chip span{font-size:var(--cds-font-size-caption);font-weight:600}
 .mc-macro{display:grid;gap:var(--cds-gap-sm);grid-template-columns:repeat(auto-fill,minmax(min(100%,11.5rem),1fr))}
 .mc-mt{padding:var(--cds-pad-md);display:flex;flex-direction:column;gap:3px;min-height:8.2rem}
-.mc-mt .mc-ml{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);display:flex;align-items:center;gap:6px}
-.mc-mt .mc-mv{font-family:var(--font-anthropic-serif);font-size:1.65rem;line-height:1.15;direction:ltr;text-align:right}
-.mc-mt .mc-mn{font-size:11.5px;line-height:1.4}
-.mc-mt .mc-mx{font-size:11px;color:var(--color-fg-muted);line-height:1.35;margin-top:auto}
+.mc-ml{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);display:flex;align-items:center;gap:6px}
+.mc-mv{font-family:var(--font-anthropic-serif);font-size:1.65rem;line-height:1.15;direction:ltr;text-align:right}
+.mc-mn{font-size:11.5px;line-height:1.4}
+.mc-mx{font-size:11px;color:var(--color-fg-muted);line-height:1.35;margin-top:auto}
 .mc-tone{width:.5rem;height:.5rem;border-radius:50%;flex:none;background:var(--color-fg-muted)}
 .mc-tone[data-tone=ok]{background:var(--color-ok)}.mc-tone[data-tone=bad]{background:var(--color-bad)}.mc-tone[data-tone=warn]{background:var(--color-warn)}
-
-/* bottom */
-.mc-bottom{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr))}
 .mc-tbl{width:100%;border-collapse:collapse;font-size:var(--cds-font-size-caption)}
 .mc-tbl th{text-align:right;font-weight:600;color:var(--color-fg-muted);padding:6px 4px;border-bottom:1px solid var(--color-border-line);position:sticky;top:0;background:var(--color-panel)}
 .mc-tbl td{padding:7px 4px;border-bottom:1px solid var(--color-border-line);vertical-align:top;line-height:1.45}
 .mc-tbl tr:last-child td{border-bottom:0}
 .mc-wbar{display:inline-block;height:6px;border-radius:3px;background:var(--color-fg);opacity:.75;vertical-align:middle;margin-inline-start:6px}
-.mc-imp{display:inline-block;width:7px;height:7px;border-radius:50%;margin-inline-end:6px;vertical-align:middle}
+.mc-imp{display:inline-block;width:7px;height:7px;border-radius:50%;margin-inline-end:6px;vertical-align:middle;background:var(--color-fg-muted)}
 .mc-imp[data-i=high]{background:var(--color-bad)}.mc-imp[data-i=med]{background:var(--color-warn)}
-.mc-cal-today td{font-weight:600}
 .mc-disc{font-size:11px;color:var(--color-fg-muted);text-align:center;line-height:1.5;margin:var(--cds-gap-sm) 0 0}
 
 .mc-fail{display:flex;align-items:center;justify-content:center;gap:8px;min-height:5rem;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
 .mc-fail::before{content:"";width:.375rem;height:.375rem;border-radius:50%;background:var(--color-bad)}
 [data-dash-source-state=empty]{color:transparent}
 [data-dash-source-state=refreshing]{opacity:.5;transition:opacity var(--cds-dur-slow)}
+.mc-flash{animation:none}
 @media (prefers-reduced-motion:no-preference){
-  .mc-anim .mc-fill,.mc-anim .mc-cur{animation:mc-in var(--cds-dur-slow) var(--cds-ease-out) both}
-  .mc-anim .mc-garc{animation:mc-arc 1.1s var(--cds-ease-out) both}
-  @keyframes mc-in{from{opacity:0}to{opacity:1}}
-  @keyframes mc-arc{from{stroke-dashoffset:var(--len)}}
-  .mc-session[data-phase=regular] .mc-dot{animation:mc-pulse 2s infinite}
-  @keyframes mc-pulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--color-ok) 0%,transparent)}}
+  .mc-flash{animation:mc-fl 1.2s var(--cds-ease-out)}
+  @keyframes mc-fl{0%{box-shadow:0 0 0 3px var(--color-fg)}100%{box-shadow:0 0 0 0 transparent}}
 }
 </style>
 
 <div class="mc" id="cockpit">
-  <!-- top bar -->
   <header class="mc-top" id="top">
     <div class="mc-title">
       <h1>תא הטייס של השוק</h1>
       <span class="mc-asof">ניתוח אחרון: <span id="asof" class="dash-skeleton" data-source="brief" data-field="text" data-where="key=as_of">—</span> <span id="asof-age" class="mc-muted"></span></span>
     </div>
     <div class="mc-ctrl">
-      <div class="mc-session" id="session" data-phase="closed"><span class="mc-dot"></span><b id="sess-name">—</b><span id="sess-clock" class="mc-ltr mc-muted"></span><span id="sess-next" class="mc-muted"></span></div>
+      <div class="mc-session" id="session" data-phase="closed"><span class="mc-dot"></span><b id="sess-name">—</b><span id="sess-clock" class="mc-ltr mc-muted"></span></div>
       <button class="mc-btn" id="analyze" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>תן ניתוח</button>
     </div>
   </header>
-  <div class="mc-tip" id="analyze-tip" hidden>הנתונים נטענו מחדש. כדי להריץ סריקה ומחקר חדשים (חדשות, מאקרו, פורומים ורשתות), כתוב <b>„תן ניתוח”</b> בצ׳אט. המוח יסרוק את כל המקורות, יעדכן את התחזיות ואת המניות, והדף יתעדכן כאן.</div>
+  <div class="mc-tip" id="analyze-tip" hidden>הנתונים נטענו מחדש. כדי להריץ מחקר חדש (חדשות, מאקרו, פורומים, רמות מסחר), כתוב <b>„תן ניתוח”</b> בצ׳אט והדף יתעדכן.</div>
 
-  <!-- brief + probability -->
-  <section class="mc-row1" id="overview">
-    <div class="mc-card" id="brief-card">
-      <div class="mc-h"><h2>מה קורה בשוק</h2><p class="mc-note">סינתזה של חדשות, מאקרו ורשתות</p></div>
-      <p class="mc-headline dash-skeleton" id="headline" data-source="brief" data-field="text" data-where="key=headline">—</p>
-      <div class="mc-tabs" role="tablist" id="brief-tabs">
-        <button class="mc-tab" role="tab" data-k="today" aria-selected="true">היום</button>
-        <button class="mc-tab" role="tab" data-k="week" aria-selected="false">מתחילת השבוע</button>
-        <button class="mc-tab" role="tab" data-k="month" aria-selected="false">מתחילת החודש</button>
+  <nav class="mc-tabs" role="tablist" id="tabs">
+    <button class="mc-tab" role="tab" data-page="decide" aria-selected="true">ההחלטה עכשיו</button>
+    <button class="mc-tab" role="tab" data-page="day" aria-selected="false">מסחר יומי</button>
+    <button class="mc-tab" role="tab" data-page="swing" aria-selected="false">סווינג</button>
+    <button class="mc-tab" role="tab" data-page="market" aria-selected="false">שוק ומאקרו</button>
+  </nav>
+
+  <!-- ===================== DECIDE ===================== -->
+  <section class="mc-page" id="decide">
+    <div class="mc-card" id="regime-card">
+      <div class="mc-hero" id="regime-hero" data-source="regime">
+        <div class="mc-light" id="light"><i></i><i></i><i></i></div>
+        <div>
+          <span class="mc-note" id="regime-label">—</span>
+          <h3 class="dash-skeleton" id="regime-title">—</h3>
+          <p class="dash-skeleton" id="regime-text">—</p>
+          <div class="mc-expo">
+            <div><div class="mc-expo-l"><span>חשיפה למסחר יומי</span><b class="mc-ltr" id="expo-day">—</b></div><div class="mc-meter"><i id="expo-day-bar" style="width:0"></i></div></div>
+            <div><div class="mc-expo-l"><span>חשיפה לסווינג</span><b class="mc-ltr" id="expo-swing">—</b></div><div class="mc-meter"><i id="expo-swing-bar" style="width:0"></i></div></div>
+          </div>
+        </div>
       </div>
-      <p class="mc-brieftext dash-skeleton" id="brieftext" data-source="brief" data-field="text" data-where="key=today">—</p>
     </div>
-    <div class="mc-card" id="odds-card">
-      <div class="mc-h"><h2>סבירות לעלייה (S&amp;P 500)</h2><p class="mc-note">מודל משוקלל · מעל 50% = הטיה לעלייה</p></div>
-      <div class="mc-gauges" id="gauges" data-source="outlook"></div>
+    <div class="mc-factors" id="factors" data-source="regime"></div>
+
+    <div class="mc-card" id="now-card" data-source="timing">
+      <div class="mc-h"><h2>מה עושים עכשיו</h2><p class="mc-note" id="now-clock"></p></div>
+      <div class="mc-now" id="now-box"></div>
+      <div class="mc-tl" id="timeline"></div>
+      <div class="mc-legend"><span><i style="background:color-mix(in srgb,var(--color-ok) 55%,transparent)"></i>זמן מסחר</span><span><i style="background:color-mix(in srgb,var(--color-bad) 35%,transparent)"></i>להמתין</span><span><i style="background:color-mix(in srgb,var(--color-fg) 14%,transparent)"></i>תכנון</span><span>שעות ניו יורק, ובשורה השנייה שעון ישראל</span></div>
+    </div>
+
+    <div class="mc-sec"><h2>ההחלטות להיום</h2><p class="mc-note">לחיצה על מניה פותחת את תוכנית המסחר המלאה</p></div>
+    <div class="mc-grid3" id="decisions">
+      <div class="mc-card mc-dcol" data-st="go" id="dec-buy"><h3>קנייה בטריגר (יומי)</h3><div data-source="daytrade" id="dec-buy-list"></div></div>
+      <div class="mc-card mc-dcol" data-st="caution" id="dec-wait"><h3>סווינג: לחכות לנקודת קנייה</h3><div data-source="swing_setups" id="dec-wait-list"></div></div>
+      <div class="mc-card mc-dcol" data-st="stop" id="dec-avoid"><h3>לא לגעת</h3><div data-source="swing_setups daytrade" id="dec-avoid-list"></div></div>
     </div>
   </section>
 
-  <!-- indices -->
-  <section class="mc-idx" id="indices" data-source="indices"></section>
-
-  <!-- picks -->
-  <div class="mc-sec" id="picks-head"><h2>5 המניות להיום</h2><p class="mc-note">הכי סבירות לסגור בירוק · הבר: סטופ ← כניסה ← טייק פרופיט ← יעד</p></div>
-  <section class="mc-picks" id="picks" data-source="picks"></section>
-
-  <!-- buzz + social -->
-  <section class="mc-row-buzz" id="buzz-row">
-    <div class="mc-card" id="buzz-card">
-      <div class="mc-h"><h2>3 מניות הבאזז</h2><p class="mc-note">הכי מדוברות + תנועה חדה</p></div>
-      <p class="mc-note" style="margin-bottom:var(--cds-gap-sm)">מדורגות לפי עוצמת הדיון ברשתות. מניות קטנות הן ספקולציה טהורה: פוזיציה קטנה וסטופ קשיח.</p>
-      <div class="mc-buzzgrid" id="buzz" data-source="buzz"></div>
+  <!-- ===================== DAY ===================== -->
+  <section class="mc-page" id="day" hidden>
+    <div class="mc-sec"><h2>מניות במשחק: תוכנית מסחר יומית</h2><p class="mc-note">ציון A–C לפי קטליזטור, נפח, גאפ, נזילות, סקטור ו-VWAP · הרמות מתמונת הפרה-מרקט</p></div>
+    <div class="mc-cards" id="daycards" data-source="daytrade"></div>
+    <div class="mc-card" id="calc-card">
+      <div class="mc-h"><h2>מחשבון פוזיציה</h2><p class="mc-note">לחיצה על "חשב פוזיציה" בכרטיס ממלאת את הנתונים</p></div>
+      <div class="mc-calc">
+        <label>גודל חשבון ($)<input id="c-acct" type="number" min="0" step="1000" value="100000"></label>
+        <label>סיכון לעסקה (%)<input id="c-risk" type="number" min="0" step="0.1" value="0.5"></label>
+        <label>מחיר כניסה<input id="c-entry" type="number" min="0" step="0.01"></label>
+        <label>סטופ לוס<input id="c-stop" type="number" min="0" step="0.01"></label>
+        <label>יעד<input id="c-target" type="number" min="0" step="0.01"></label>
+      </div>
+      <div class="mc-out">
+        <div><small>כמות מניות</small><b id="o-shares">—</b></div>
+        <div><small>סכום בסיכון</small><b id="o-risk">—</b></div>
+        <div><small>גודל פוזיציה</small><b id="o-pos">—</b></div>
+        <div><small>רווח ביעד</small><b id="o-gain">—</b></div>
+        <div><small>סיכון/סיכוי</small><b id="o-rr">—</b></div>
+      </div>
+      <p class="mc-warnline mc-muted" id="o-warn"></p>
     </div>
-    <div class="mc-card mc-social" id="social-card">
-      <div class="mc-h"><h2>הדופק ברשתות</h2><p class="mc-note">WallStreetBets · Reddit · Stocktwits · X</p></div>
-      <p class="mc-thesis dash-skeleton" id="social-brief" data-source="brief" data-field="text" data-where="key=social" style="margin-bottom:var(--cds-gap-sm)">—</p>
-      <div class="mc-legend" id="social-legend"></div>
-      <p class="mc-note" style="margin:6px 0 2px">אזכורים ב-r/wallstreetbets, 24 שעות</p>
-      <div id="social" data-source="social" style="min-height:230px"></div>
-      <p class="mc-note" style="margin:var(--cds-gap-sm) 0 4px">על מה מדברים עכשיו, בכל הפלטפורמות</p>
-      <div style="max-height:19rem;overflow:auto">
-        <table class="mc-tbl" id="chatter" data-source="chatter" data-row-key="symbol">
-          <thead><tr><th data-field="symbol">מניה</th><th data-field="theme">על מה מדברים</th><th data-field="platforms">איפה</th></tr></thead>
+  </section>
+
+  <!-- ===================== SWING ===================== -->
+  <section class="mc-page" id="swing" hidden>
+    <div class="mc-rules" id="swing-rules">
+      <div class="mc-rule"><b>קונים רק באזור הקנייה</b>מנקודת הקנייה (Pivot) ועד 5% מעליה. מעל זה המניה "מתוחה", ולא רודפים.</div>
+      <div class="mc-rule"><b>סטופ של 7–8% לכל היותר</b>מתחת למחיר הכניסה. נקבע ברגע הקנייה, בלי לזוז.</div>
+      <div class="mc-rule"><b>מממשים חלק ב-‎+20–25%</b>ומשאירים את השאר עם סטופ נגרר מתחת לממוצע 21.</div>
+      <div class="mc-rule"><b>לא מחזיקים דרך דוח</b>בלי כרית רווח. דוח בתוך שבועיים = מקטינים או ממתינים.</div>
+    </div>
+    <div class="mc-grid2">
+      <div class="mc-card" id="sectors-card">
+        <div class="mc-h"><h2>חוזק סקטורים</h2><p class="mc-note">שבוע אחרון (עמודה) · מתחילת השנה (מספר)</p></div>
+        <div id="sectors" data-source="sectors" style="min-height:200px"></div>
+      </div>
+      <div class="mc-card" id="swing-summary">
+        <div class="mc-h"><h2>איך לקרוא את הכרטיסים</h2></div>
+        <p class="mc-thesis">הבר מציג את המחיר האחרון (נקודה שחורה) ביחס לסטופ, לנקודת הקנייה, לסוף אזור הקנייה (‎+5%) וליעד. אם הנקודה משמאל לנקודת הקנייה, ממתינים לפריצה. אם היא בתוך האזור הירוק, אפשר לקנות. מימין לאזור כבר מאוחר מדי.</p>
+        <p class="mc-thesis" style="margin-top:8px"><b>תבנית מגמה (X/5):</b> מעל ממוצע 50, מעל ממוצע 150, ממוצע 150 מעל 200, ממוצע 200 עולה, וקרוב לשיא שנתי (Minervini). 5/5 היא מניה מובילה, ומתחת ל-3 לא קונים לסווינג.</p>
+      </div>
+    </div>
+    <div class="mc-cards" id="swingcards" data-source="swing_setups"></div>
+  </section>
+
+  <!-- ===================== MARKET ===================== -->
+  <section class="mc-page" id="market" hidden>
+    <div class="mc-grid2">
+      <div class="mc-card" id="brief-card">
+        <div class="mc-h"><h2>מה קורה בשוק</h2><p class="mc-note">סינתזה של חדשות, מאקרו ורשתות</p></div>
+        <p class="mc-headline dash-skeleton" id="headline" data-source="brief" data-field="text" data-where="key=headline">—</p>
+        <div class="mc-btabs" role="tablist" id="brief-tabs">
+          <button class="mc-btab" role="tab" data-k="today" aria-selected="true">היום</button>
+          <button class="mc-btab" role="tab" data-k="week" aria-selected="false">מתחילת השבוע</button>
+          <button class="mc-btab" role="tab" data-k="month" aria-selected="false">מתחילת החודש</button>
+        </div>
+        <p class="mc-brieftext dash-skeleton" id="brieftext" data-source="brief" data-field="text" data-where="key=today">—</p>
+      </div>
+      <div class="mc-card" id="odds-card">
+        <div class="mc-h"><h2>סבירות לעלייה (S&amp;P 500)</h2><p class="mc-note">מעל 50% = הטיה לעלייה</p></div>
+        <div class="mc-gauges" id="gauges" data-source="outlook"></div>
+      </div>
+    </div>
+    <section class="mc-idx" id="indices" data-source="indices"></section>
+    <div class="mc-grid2">
+      <div class="mc-card" id="social-card">
+        <div class="mc-h"><h2>הדופק ברשתות</h2><p class="mc-note">WallStreetBets · Reddit · Stocktwits · X</p></div>
+        <p class="mc-thesis dash-skeleton" id="social-brief" data-source="brief" data-field="text" data-where="key=social" style="margin-bottom:var(--cds-gap-sm)">—</p>
+        <div class="mc-legend" id="social-legend"></div>
+        <p class="mc-note" style="margin:6px 0 2px">אזכורים ב-r/wallstreetbets, 24 שעות</p>
+        <div id="social" data-source="social" style="min-height:230px"></div>
+      </div>
+      <div class="mc-card" id="chatter-card">
+        <div class="mc-h"><h2>על מה מדברים עכשיו</h2><p class="mc-note">בכל הפלטפורמות</p></div>
+        <div style="max-height:26rem;overflow:auto">
+          <table class="mc-tbl" id="chatter" data-source="chatter" data-row-key="symbol">
+            <thead><tr><th data-field="symbol">מניה</th><th data-field="theme">על מה מדברים</th><th data-field="platforms">איפה</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="mc-sec"><h2>מאקרו</h2><p class="mc-note">ריבית, אינפלציה, תעסוקה, מסים וסחורות</p></div>
+    <section class="mc-macro" id="macro" data-source="macro"></section>
+    <div class="mc-grid3">
+      <div class="mc-card" id="calendar-card">
+        <div class="mc-h"><h2>אירועים קרובים</h2><p class="mc-note">שעון ניו יורק</p></div>
+        <table class="mc-tbl" id="calendar" data-source="calendar" data-row-key="event">
+          <thead><tr><th data-field="date">תאריך</th><th data-field="event">אירוע</th><th data-field="time">שעה</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
-    </div>
-  </section>
-
-  <!-- macro -->
-  <div class="mc-sec" id="macro-head"><h2>מאקרו: הנתונים שמזיזים את השוק</h2><p class="mc-note">ריבית, אינפלציה, תעסוקה, מסים וסחורות</p></div>
-  <section class="mc-macro" id="macro" data-source="macro"></section>
-
-  <!-- brain / calendar / sources -->
-  <section class="mc-bottom" id="brain-row">
-    <div class="mc-card" id="brain-card">
-      <div class="mc-h"><h2>המוח: איך הוחלט</h2><p class="mc-note">שיטות מסחר ומשקלן בציון</p></div>
-      <div style="max-height:22rem;overflow:auto">
+      <div class="mc-card" id="brain-card">
+        <div class="mc-h"><h2>המוח: שיטות ומשקל</h2></div>
         <table class="mc-tbl" id="methods" data-source="methods" data-row-key="school">
           <thead><tr><th data-field="school">אסכולה</th><th data-field="read">הקריאה היום</th><th data-field="weight">משקל</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
-    </div>
-    <div class="mc-card" id="calendar-card">
-      <div class="mc-h"><h2>אירועים קרובים</h2><p class="mc-note">שעון ניו יורק</p></div>
-      <table class="mc-tbl" id="calendar" data-source="calendar" data-row-key="event">
-        <thead><tr><th data-field="date">תאריך</th><th data-field="event">אירוע</th><th data-field="time">שעה</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <div class="mc-card" id="sources-card">
-      <div class="mc-h"><h2>מקורות שנסרקו</h2><p class="mc-note">מה כל מקור תרם לניתוח</p></div>
-      <div style="max-height:22rem;overflow:auto">
-        <table class="mc-tbl" id="sources" data-source="sources" data-row-key="name">
-          <thead><tr><th data-field="group">סוג</th><th data-field="name">מקור</th><th data-field="signal">אות</th></tr></thead>
-          <tbody></tbody>
-        </table>
+      <div class="mc-card" id="sources-card">
+        <div class="mc-h"><h2>מקורות שנסרקו</h2></div>
+        <div style="max-height:24rem;overflow:auto">
+          <table class="mc-tbl" id="sources" data-source="sources" data-row-key="name">
+            <thead><tr><th data-field="group">סוג</th><th data-field="name">מקור</th><th data-field="signal">אות</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </section>
-  <p class="mc-disc">התחזיות הן הערכה סטטיסטית מבוססת מקורות פתוחים ואינן ייעוץ השקעות. מחירי הפרה-מרקט הם תמונת מצב מרגע הניתוח.</p>
+  <p class="mc-disc">כלי תומך החלטה, לא ייעוץ השקעות. הרמות מבוססות על מחירי פרה-מרקט וסגירה מרגע הניתוח, ולפני כניסה צריך לאמת אותן מול הגרף החי.</p>
 </div>
 
 <script>
@@ -247,303 +359,385 @@
   const fmtP = (v) => v == null ? '—' : (Math.abs(v) < 1 ? '$' + d3.format('.4~f')(v) : '$' + d3.format(',.2f')(v));
   const fmtPct = (v, dp = 2) => v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + d3.format('.' + dp + 'f')(Math.abs(v)) + '%';
   const cls = (v) => v == null ? 'mc-muted' : v > 0 ? 'mc-ok' : v < 0 ? 'mc-bad' : 'mc-muted';
-  const fail = (box) => { box.replaceChildren(el('div', 'mc-fail', 'Failed to load')); };
-  const skel = (box, n, h) => { box.replaceChildren(...Array.from({length: n}, () => { const d = el('div', 'mc-card dash-skeleton'); d.style.minHeight = h; return d; })); };
+  const fail = (box) => box.replaceChildren(el('div', 'mc-fail', 'Failed to load'));
+  const skel = (box, n, h) => box.replaceChildren(...Array.from({length: n}, () => { const d = el('div', 'mc-card dash-skeleton'); d.style.minHeight = h; return d; }));
+  const ST = {go: 'go', caution: 'caution', stop: 'stop'};
 
-  /* ---------- session clock (New York) ---------- */
-  const fmtET = new Intl.DateTimeFormat('en-US', {timeZone: 'America/New_York', weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'});
-  const PH = [
-    {k: 'pre', s: 240, e: 570, n: 'פרה-מרקט'},
-    {k: 'regular', s: 570, e: 960, n: 'מסחר פעיל'},
-    {k: 'after', s: 960, e: 1200, n: 'אפטר-מרקט'}
-  ];
-  window.mcPhase = () => {
-    const p = Object.fromEntries(fmtET.formatToParts(new Date()).map((x) => [x.type, x.value]));
-    const mins = (+p.hour) * 60 + (+p.minute) + (+p.second) / 60;
-    const wk = p.weekday === 'Sat' || p.weekday === 'Sun';
-    const cur = wk ? null : PH.find((x) => mins >= x.s && mins < x.e);
-    return {cur, mins, wk, clock: p.hour + ':' + p.minute + ':' + p.second};
+  /* ---------- clocks ---------- */
+  const fmtNY = new Intl.DateTimeFormat('en-US', {timeZone: 'America/New_York', weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'});
+  const fmtIL = new Intl.DateTimeFormat('en-US', {timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'});
+  window.mcNow = () => {
+    const d = new Date();
+    const p = Object.fromEntries(fmtNY.formatToParts(d).map((x) => [x.type, x.value]));
+    const q = Object.fromEntries(fmtIL.formatToParts(d).map((x) => [x.type, x.value]));
+    const ny = (+p.hour) * 60 + (+p.minute) + (+p.second) / 60;
+    const il = (+q.hour) * 60 + (+q.minute);
+    return {ny, wk: p.weekday === 'Sat' || p.weekday === 'Sun', clock: p.hour + ':' + p.minute, ilClock: q.hour + ':' + q.minute, offset: ((il - Math.floor(ny)) % 1440 + 1440) % 1440};
   };
+  const hm = (m) => { m = ((Math.round(m) % 1440) + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+  const toMin = (s) => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
   const tick = () => {
-    const {cur, mins, wk, clock} = window.mcPhase();
-    const box = $('#session');
-    box.dataset.phase = cur ? cur.k : 'closed';
-    $('#sess-name').textContent = cur ? cur.n : 'השוק סגור';
-    $('#sess-clock').textContent = clock + ' NY';
-    let next = '';
-    if (cur) { const left = Math.max(0, Math.round(cur.e - mins)); next = '· נסגר בעוד ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0'); }
-    else if (!wk && mins < 240) { const left = Math.round(240 - mins); next = '· פרה-מרקט בעוד ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0'); }
-    $('#sess-next').textContent = next;
-    if (window.mcLastPhase !== box.dataset.phase) { window.mcLastPhase = box.dataset.phase; document.querySelectorAll('[data-sess-row]').forEach((r) => r.classList.toggle('mc-live', r.dataset.sessRow === (box.dataset.phase === 'regular' ? 'reg' : 'pre'))); }
+    const n = window.mcNow();
+    const ph = n.wk ? 'closed' : n.ny >= 240 && n.ny < 570 ? 'pre' : n.ny >= 570 && n.ny < 960 ? 'regular' : n.ny >= 960 && n.ny < 1200 ? 'after' : 'closed';
+    $('#session').dataset.phase = ph;
+    $('#sess-name').textContent = {pre: 'פרה-מרקט', regular: 'מסחר פעיל', after: 'אפטר-מרקט', closed: 'השוק סגור'}[ph];
+    $('#sess-clock').textContent = 'NY ' + n.clock + ' · ישראל ' + n.ilClock;
+    const mins = Math.floor(n.ny);
+    if (window.mcLastMin !== mins) { window.mcLastMin = mins; drawNow(); }
   };
-  tick(); setInterval(tick, 1000);
 
-  /* ---------- analyze button ---------- */
-  const ALL = ['brief', 'outlook', 'indices', 'picks', 'buzz', 'macro', 'social', 'chatter', 'methods', 'sources', 'calendar'];
+  /* ---------- tabs ---------- */
+  const PAGES = ['decide', 'day', 'swing', 'market'];
+  function show(id, link = true) {
+    if (!PAGES.includes(id)) id = 'decide';
+    document.querySelectorAll('#tabs .mc-tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.page === id)));
+    PAGES.forEach((p) => { document.getElementById(p).hidden = p !== id; });
+    window.mcPage = id;
+    if (link) dash.setLink(id);
+    drawAll();
+  }
+  document.querySelectorAll('#tabs .mc-tab').forEach((t) => t.addEventListener('click', () => show(t.dataset.page)));
+  function goTo(page, cardId) {
+    show(page);
+    const c = document.getElementById(cardId);
+    if (c) { c.scrollIntoView({behavior: 'smooth', block: 'center'}); c.classList.remove('mc-flash'); void c.offsetWidth; c.classList.add('mc-flash'); }
+  }
+
+  /* ---------- analyze ---------- */
+  const ALL = ['brief', 'regime', 'timing', 'daytrade', 'swing_setups', 'sectors', 'outlook', 'indices', 'macro', 'social', 'chatter', 'methods', 'sources', 'calendar'];
   $('#analyze').addEventListener('click', () => {
     ALL.forEach((id) => dash.refresh(id));
     const t = $('#analyze-tip'); t.hidden = false;
     clearTimeout(window.mcTipT); window.mcTipT = setTimeout(() => { t.hidden = true; }, 9000);
   });
 
-  /* ---------- brief tabs ---------- */
-  window.mcBriefKey = 'today';
-  document.querySelectorAll('#brief-tabs .mc-tab').forEach((b) => b.addEventListener('click', () => {
-    window.mcBriefKey = b.dataset.k;
-    document.querySelectorAll('#brief-tabs .mc-tab').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
-    drawBrief();
-  }));
-  function drawBrief() {
-    const d = dash.data('brief');
-    const tx = $('#brieftext'), hl = $('#headline'), asof = $('#asof');
-    tx.setAttribute('data-where', 'key=' + window.mcBriefKey);
-    if (d.status !== 'ok') {
-      [tx, hl, asof].forEach((e) => { if (d.status === 'error') { e.classList.remove('dash-skeleton'); e.textContent = '—'; } else e.classList.add('dash-skeleton'); });
-      if (d.status === 'error') fail(tx);
-      return;
-    }
-    const get = (k) => (d.data.find((r) => r.key === k) || {}).text;
-    [tx, hl, asof].forEach((e) => e.classList.remove('dash-skeleton'));
-    hl.textContent = get('headline') ?? '—';
-    const sb = $('#social-brief'); sb.classList.remove('dash-skeleton'); sb.textContent = get('social') ?? '—';
-    tx.textContent = get(window.mcBriefKey) ?? '—';
-    const a = get('as_of');
-    asof.textContent = '—';
-    if (a) {
-      const dt = new Date(a);
-      const parts = new Intl.DateTimeFormat('he-IL', {timeZone: 'America/New_York', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit'}).format(dt);
-      asof.title = a;
-      asof.textContent = parts + ' NY';
-      const mins = Math.round((Date.now() - dt) / 60000);
-      $('#asof-age').textContent = '(' + (mins < 60 ? 'לפני ' + Math.max(mins, 0) + ' דק׳' : mins < 1440 ? 'לפני ' + Math.round(mins / 60) + ' שע׳' : 'לפני ' + Math.round(mins / 1440) + ' ימים') + ')';
-    }
+  /* ---------- as-of ---------- */
+  function drawAsOf() {
+    const d = dash.data('brief'), a = $('#asof');
+    if (d.status !== 'ok') { a.classList.toggle('dash-skeleton', d.status !== 'error'); return; }
+    a.classList.remove('dash-skeleton');
+    const v = (d.data.find((r) => r.key === 'as_of') || {}).text;
+    if (!v) return;
+    const dt = new Date(v);
+    a.title = v;
+    a.textContent = new Intl.DateTimeFormat('he-IL', {timeZone: 'America/New_York', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit'}).format(dt) + ' NY';
+    const mins = Math.round((Date.now() - dt) / 60000);
+    $('#asof-age').textContent = '(' + (mins < 60 ? 'לפני ' + Math.max(mins, 0) + ' דק׳' : mins < 1440 ? 'לפני ' + Math.round(mins / 60) + ' שע׳' : 'לפני ' + Math.round(mins / 1440) + ' ימים') + ')';
   }
 
-  /* ---------- gauges ---------- */
-  function drawGauges() {
-    const d = dash.data('outlook'), box = $('#gauges');
-    if (d.status === 'error') return fail(box);
-    if (d.status !== 'ok') { box.replaceChildren(...[0, 1, 2].map(() => { const g = el('div', 'mc-gauge dash-skeleton'); g.style.minHeight = '9rem'; return g; })); return; }
-    const first = !box.dataset.drawn; box.dataset.drawn = '1';
-    box.classList.toggle('mc-anim', first);
-    box.replaceChildren(...d.data.map((r) => {
-      const g = el('div', 'mc-gauge');
-      const W2 = 140, R = 56, cx = 70, cy = 66, sw = 11;
-      const ns = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(ns, 'svg');
-      svg.setAttribute('viewBox', '0 0 ' + W2 + ' 84'); svg.setAttribute('width', '100%');
-      const arc = d3.arc().innerRadius(R - sw / 2).outerRadius(R + sw / 2).cornerRadius(sw / 2);
-      const bg = document.createElementNS(ns, 'path');
-      bg.setAttribute('d', arc({startAngle: -Math.PI / 2, endAngle: Math.PI / 2}));
-      bg.setAttribute('transform', `translate(${cx},${cy})`);
-      bg.style.fill = 'var(--cds-chart-grid)';
-      svg.appendChild(bg);
-      const col = r.p_up >= 0.55 ? 'var(--color-ok)' : r.p_up <= 0.45 ? 'var(--color-bad)' : 'var(--color-warn)';
-      // value arc as a stroked path so it can animate
-      const a1 = -Math.PI / 2, a2 = -Math.PI / 2 + Math.PI * r.p_up;
-      const p = document.createElementNS(ns, 'path');
-      const x1 = cx + R * Math.sin(a1), y1 = cy - R * Math.cos(a1), x2 = cx + R * Math.sin(a2), y2 = cy - R * Math.cos(a2);
-      p.setAttribute('d', `M${x1},${y1} A${R},${R} 0 0 1 ${x2},${y2}`);
-      p.setAttribute('fill', 'none'); p.setAttribute('stroke-width', sw); p.setAttribute('stroke-linecap', 'round');
-      p.style.stroke = col; p.setAttribute('class', 'mc-garc');
-      const len = Math.PI * R * r.p_up; p.style.strokeDasharray = len; p.style.setProperty('--len', len); p.style.strokeDashoffset = 0;
-      svg.appendChild(p);
-      // 50% tick
-      const t = document.createElementNS(ns, 'line');
-      t.setAttribute('x1', cx); t.setAttribute('x2', cx); t.setAttribute('y1', cy - R - sw / 2 - 3); t.setAttribute('y2', cy - R + sw / 2 + 3);
-      t.style.stroke = 'var(--cds-chart-reference)'; t.setAttribute('stroke-width', 1.5);
-      svg.appendChild(t);
-      const tx = document.createElementNS(ns, 'text');
-      tx.setAttribute('x', cx); tx.setAttribute('y', cy - 6); tx.setAttribute('text-anchor', 'middle');
-      tx.style.fontFamily = 'var(--font-anthropic-serif)'; tx.style.fontSize = '26px'; tx.style.fill = 'var(--color-fg)';
-      tx.textContent = d3.format('.0%')(r.p_up);
-      mark(tx, 'outlook', 'p_up', W('horizon', r.horizon));
-      svg.appendChild(tx);
-      const dn = document.createElementNS(ns, 'text');
-      dn.setAttribute('x', cx); dn.setAttribute('y', cy + 14); dn.setAttribute('text-anchor', 'middle');
-      dn.style.fontSize = '10px'; dn.style.fill = 'var(--color-fg-muted)';
-      dn.textContent = 'ירידה ' + d3.format('.0%')(1 - r.p_up);
-      svg.appendChild(dn);
-      g.append(svg,
-        mark(el('div', 'mc-glabel', r.label), 'outlook', 'label', W('horizon', r.horizon)),
-        mark(el('div', 'mc-gbias ' + (r.p_up >= 0.55 ? 'mc-ok' : r.p_up <= 0.45 ? 'mc-bad' : 'mc-warn'), r.bias), 'outlook', 'bias', W('horizon', r.horizon)),
-        mark(el('div', 'mc-gdrv', r.drivers), 'outlook', 'drivers', W('horizon', r.horizon)));
-      return g;
+  /* ---------- regime ---------- */
+  function drawRegime() {
+    const d = dash.data('regime'), f = $('#factors');
+    const ids = ['#regime-title', '#regime-text'];
+    if (d.status !== 'ok') {
+      ids.forEach((i) => $(i).classList.toggle('dash-skeleton', d.status !== 'error'));
+      if (d.status === 'error') fail(f); else skel(f, 6, '5.5rem');
+      return;
+    }
+    const o = d.data.find((r) => r.key === 'overall');
+    const w = W('key', 'overall');
+    ids.forEach((i) => $(i).classList.remove('dash-skeleton'));
+    $('#light').dataset.st = ST[o.status] || 'caution';
+    mark($('#regime-label'), 'regime', 'label', w).textContent = o.label;
+    mark($('#regime-title'), 'regime', 'title', w).textContent = o.title;
+    mark($('#regime-text'), 'regime', 'text', w).textContent = o.text;
+    mark($('#expo-day'), 'regime', 'day_exposure', w).textContent = d3.format('.0%')(o.day_exposure);
+    mark($('#expo-swing'), 'regime', 'swing_exposure', w).textContent = d3.format('.0%')(o.swing_exposure);
+    $('#expo-day-bar').style.width = (o.day_exposure * 100) + '%';
+    $('#expo-swing-bar').style.width = (o.swing_exposure * 100) + '%';
+    f.replaceChildren(...d.data.filter((r) => r.key !== 'overall').map((r) => {
+      const ww = W('key', r.key);
+      const c = el('div', 'mc-factor'); c.dataset.st = ST[r.status] || 'caution'; c.id = 'factor-' + r.key;
+      const top = el('div'); top.style.display = 'flex'; top.style.justifyContent = 'space-between'; top.style.gap = '6px';
+      const pill = el('span', 'mc-pill', {go: 'תומך', caution: 'זהירות', stop: 'נגד'}[r.status] || r.status);
+      top.append(mark(el('small', null, r.label), 'regime', 'label', ww), pill);
+      c.append(top, mark(el('b', null, r.title), 'regime', 'title', ww), mark(el('span', null, r.text), 'regime', 'text', ww));
+      return c;
     }));
   }
 
-  /* ---------- indices ---------- */
+  /* ---------- now + timeline ---------- */
+  function drawNow() {
+    const d = dash.data('timing'), box = $('#now-box'), tl = $('#timeline');
+    if (!box) return;
+    if (d.status !== 'ok') { if (d.status === 'error') fail(box); else { box.replaceChildren(el('div', 'dash-skeleton', '—')); } return; }
+    const n = window.mcNow();
+    $('#now-clock').textContent = 'עכשיו: ' + n.clock + ' ניו יורק · ' + n.ilClock + ' ישראל';
+    const rows = d.data.map((r) => ({...r, s: toMin(r.start), e: toMin(r.end)}));
+    const cur = n.wk ? null : rows.find((r) => n.ny >= r.s && n.ny < r.e);
+    const next = n.wk ? null : rows.find((r) => r.s > n.ny);
+    const badge = el('span', 'mc-now-badge');
+    const body = el('div'); body.style.flex = '1'; body.style.minWidth = '14rem';
+    if (cur) {
+      const st = {go: 'go', wait: 'stop', plan: 'caution'}[cur.action];
+      badge.dataset.st = st; badge.textContent = {go: 'זמן מסחר', wait: 'להמתין', plan: 'תכנון'}[cur.action];
+      const w = W('start', cur.start);
+      const h = el('h3'); h.append(mark(el('span', null, cur.name), 'timing', 'name', w), ' ', el('span', 'mc-muted mc-ltr', cur.start + '–' + cur.end + ' NY'));
+      const left = Math.max(0, Math.round(cur.e - n.ny));
+      body.append(h, mark(el('p', null, cur.what), 'timing', 'what', w), el('p', 'mc-note', 'נותרו ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0') + ' לחלון הזה' + (next ? ' · הבא: ' + next.name + ' ב-' + next.start + ' NY (' + hm(next.s + n.offset) + ' ישראל)' : '')));
+    } else {
+      badge.dataset.st = 'caution'; badge.textContent = 'השוק סגור';
+      const first = rows[0];
+      body.append(el('h3', null, 'מחוץ לשעות המסחר'), el('p', null, 'זה הזמן לעבור על לשונית הסווינג, לסמן רמות ולהכין רשימה למחר.'),
+        el('p', 'mc-note', 'הפרה-מרקט נפתח ב-' + first.start + ' NY (' + hm(first.s + n.offset) + ' ישראל)'));
+    }
+    box.replaceChildren(badge, body);
+    // timeline 04:00–16:00
+    const x0 = 240, x1 = 960, X = (m) => ((m - x0) / (x1 - x0)) * 100;
+    const parts = [];
+    rows.forEach((r) => {
+      const seg = el('div', 'mc-tl-seg'); seg.dataset.a = r.action;
+      seg.style.left = X(r.s) + '%'; seg.style.width = `calc(${X(r.e) - X(r.s)}% - 2px)`;
+      seg.title = r.name + ' · ' + r.start + '–' + r.end + ' NY';
+      parts.push(seg);
+    });
+    [240, 570, 600, 690, 840, 900, 960].forEach((m) => {
+      const t = el('div', 'mc-tl-t'); t.style.left = X(m) + '%';
+      t.append(el('div', null, hm(m)), el('div', null, hm(m + n.offset)));
+      parts.push(t);
+    });
+    if (!n.wk && n.ny >= x0 && n.ny <= x1) { const nw = el('div', 'mc-tl-now'); nw.style.left = X(n.ny) + '%'; nw.dataset.l = 'עכשיו'; parts.push(nw); }
+    tl.replaceChildren(...parts);
+  }
+
+  /* ---------- decisions ---------- */
+  function drawDecisions() {
+    const dd = dash.data('daytrade'), sw = dash.data('swing_setups');
+    const buy = $('#dec-buy-list'), wait = $('#dec-wait-list'), avoid = $('#dec-avoid-list');
+    const row = (sym, line1, line2, onClick, src, field, w) => {
+      const r = el('div', 'mc-drow'); r.tabIndex = 0;
+      r.append(mark(el('span', 'mc-dsym', sym), src, 'symbol', w), mark(el('span', 'mc-dline', line1), src, field, w));
+      if (line2) { r.append(el('span'), el('span', 'mc-dline', line2)); }
+      r.addEventListener('click', onClick); r.addEventListener('keydown', (e) => { if (e.key === 'Enter') onClick(); });
+      return r;
+    };
+    if (dd.status === 'ok') {
+      buy.replaceChildren(...dd.data.filter((r) => r.grade !== 'C').map((r) => {
+        const w = W('symbol', r.symbol);
+        return row(r.symbol, r.catalyst, 'ציון ' + r.grade + ' · טריגר ' + fmtP(r.trigger) + ' · סטופ ' + fmtP(r.stop) + ' · יעד ' + fmtP(r.t2), () => goTo('day', 'day-' + r.symbol), 'daytrade', 'catalyst', w);
+      }));
+    } else if (dd.status === 'error') fail(buy); else skel(buy, 3, '2.5rem');
+    if (sw.status === 'ok') {
+      wait.replaceChildren(...sw.data.filter((r) => r.action !== 'avoid').map((r) => {
+        const w = W('symbol', r.symbol);
+        const l2 = r.action === 'buy_close' ? 'קנייה מותנית בסגירה חזקה · סטופ ' + fmtP(r.stop) : 'נקודת קנייה ' + fmtP(r.pivot) + ' (‎' + fmtPct(r.dist_pivot_pct, 1) + ' ממנה) · סטופ ' + fmtP(r.stop);
+        return row(r.symbol, r.status, l2, () => goTo('swing', 'swing-' + r.symbol), 'swing_setups', 'status', w);
+      }));
+    } else if (sw.status === 'error') fail(wait); else skel(wait, 3, '2.5rem');
+    const av = [];
+    if (sw.status === 'ok') sw.data.filter((r) => r.action === 'avoid').forEach((r) => av.push(row(r.symbol, r.reason, 'סווינג · ' + r.status, () => goTo('swing', 'swing-' + r.symbol), 'swing_setups', 'reason', W('symbol', r.symbol))));
+    if (dd.status === 'ok') dd.data.filter((r) => r.grade === 'C').forEach((r) => av.push(row(r.symbol, r.avoid, 'יומי · ספקולציה, ציון C', () => goTo('day', 'day-' + r.symbol), 'daytrade', 'avoid', W('symbol', r.symbol))));
+    if (sw.status === 'ok' || dd.status === 'ok') avoid.replaceChildren(...av); else skel(avoid, 2, '2.5rem');
+  }
+
+  /* ---------- price ladder ---------- */
+  function ladder(levels, cur, zone) {
+    const vals = levels.map((l) => l.v).concat(cur != null ? [cur] : []);
+    const lo = Math.min(...vals), hi = Math.max(...vals), pad = (hi - lo) * 0.05 || 1;
+    const x = d3.scaleLinear([lo - pad, hi + pad], [0, 100]).clamp(true);
+    const bar = el('div', 'mc-bar'), track = el('div', 'mc-track');
+    zone.forEach(([a, b, c, o]) => { const z = el('div', 'mc-zone'); z.style.left = x(Math.min(a, b)) + '%'; z.style.width = Math.abs(x(b) - x(a)) + '%'; z.style.background = `color-mix(in srgb, ${c} ${o}%, transparent)`; track.append(z); });
+    bar.append(track);
+    let flip = false;
+    levels.forEach((l) => {
+      const m = el('div', 'mc-mk'); m.style.left = x(l.v) + '%'; m.style.background = l.c; bar.append(m);
+      const t = el('div', 'mc-mk-l', l.label); t.style.left = x(l.v) + '%'; t.style.top = (l.top ?? flip) ? '0px' : '38px'; flip = !flip; bar.append(t);
+    });
+    if (cur != null) { const dot = el('div', 'mc-cur'); dot.style.left = x(cur) + '%'; dot.title = 'מחיר אחרון ' + fmtP(cur); bar.append(dot); }
+    return bar;
+  }
+
+  /* ---------- day cards ---------- */
+  const GRADE_ST = {A: 'go', B: 'caution', C: 'stop'};
+  function drawDay() {
+    const d = dash.data('daytrade'), box = $('#daycards');
+    if (d.status === 'error') return fail(box);
+    if (d.status !== 'ok') return skel(box, 3, '26rem');
+    box.replaceChildren(...d.data.map((r) => {
+      const w = W('symbol', r.symbol);
+      const c = el('article', 'mc-card mc-tc'); c.id = 'day-' + r.symbol;
+      const top = el('div', 'mc-tc-top');
+      const idb = el('div');
+      idb.append(mark(el('div', 'mc-sym', r.symbol), 'daytrade', 'symbol', w), mark(el('div', 'mc-name', r.name), 'daytrade', 'name', w));
+      const mid = el('div'); mid.style.textAlign = 'center';
+      mid.append(mark(el('div', 'mc-gap mc-ltr ' + cls(r.gap_pct), fmtPct(r.gap_pct, 1)), 'daytrade', 'gap_pct', w), el('div', 'mc-note', 'גאפ בפרה-מרקט'));
+      const g = mark(el('div', 'mc-grade', r.grade), 'daytrade', 'grade', w); g.dataset.st = GRADE_ST[r.grade] || 'caution'; g.title = 'ציון הסטאפ';
+      top.append(idb, mid, g);
+      const checks = el('div', 'mc-checks'); mark(checks, 'daytrade', null, null);
+      r.checks.split('|').forEach((p) => { const [k, v] = p.split(':'); const ch = el('span', 'mc-chk', (v === '1' ? '✓ ' : '✗ ') + k); ch.dataset.v = v; checks.append(ch); });
+      const lv = el('div', 'mc-levels');
+      [['trigger', 'טריגר כניסה', ''], ['stop', 'סטופ', 'stop'], ['t1', 'יעד 1', 'tp'], ['t2', 'יעד 2', 'tp']].forEach(([f, l, k]) => {
+        const b = el('div', 'mc-lv ' + k); b.append(el('small', null, l), mark(el('span', 'mc-ltr', fmtP(r[f])), 'daytrade', f, w)); lv.append(b);
+      });
+      const bar = ladder([
+        {v: r.stop, c: 'var(--color-bad)', label: 'סטופ', top: false},
+        {v: r.prev_close, c: 'var(--color-fg-muted)', label: 'סגירה', top: true},
+        {v: r.trigger, c: 'var(--color-fg)', label: 'טריגר', top: false},
+        {v: r.t1, c: 'var(--color-ok)', label: 'T1', top: true},
+        {v: r.t2, c: 'var(--color-ok)', label: 'T2', top: false}
+      ], r.pm_price, [[r.stop, r.trigger, 'var(--color-bad)', 20], [r.trigger, r.t1, 'var(--color-ok)', 18], [r.t1, r.t2, 'var(--color-ok)', 36]]);
+      mark(bar, 'daytrade', null, null);
+      const plan = el('p', 'mc-plan'); plan.append(el('b', null, 'התוכנית: '), mark(el('span', null, r.plan), 'daytrade', 'plan', w));
+      const av = el('p', 'mc-avoid'); av.append(el('b', null, 'לא נכנסים אם: '), mark(el('span', null, r.avoid), 'daytrade', 'avoid', w));
+      const foot = el('div', 'mc-tc-foot');
+      const rr = el('span', 'mc-note'); rr.append('סיכוי/סיכון: T1 ', mark(el('span', 'mc-ltr', r.r_t1 + 'R'), 'daytrade', 'r_t1', w), ' · T2 ', mark(el('span', 'mc-ltr', r.r_t2 + 'R'), 'daytrade', 'r_t2', w));
+      const bt = el('button', 'mc-btn-s', 'חשב פוזיציה'); bt.type = 'button';
+      bt.addEventListener('click', () => fillCalc(r.trigger, r.stop, r.t2, r.symbol));
+      foot.append(rr, bt);
+      c.append(top, mark(el('p', 'mc-cat', r.catalyst), 'daytrade', 'catalyst', w), checks, bar, lv, plan, av, foot);
+      return c;
+    }));
+  }
+
+  /* ---------- calculator ---------- */
+  const fmtUsd = (v) => '$' + d3.format(',.0f')(v);
+  function calc() {
+    const acct = +$('#c-acct').value, risk = +$('#c-risk').value, en = +$('#c-entry').value, st = +$('#c-stop').value, tg = +$('#c-target').value;
+    const out = (id, t) => { $(id).textContent = t; };
+    if (!(acct > 0 && risk > 0 && en > 0 && st > 0) || en === st) { ['#o-shares', '#o-risk', '#o-pos', '#o-gain', '#o-rr'].forEach((i) => out(i, '—')); $('#o-warn').textContent = 'מלא כניסה וסטופ, או לחץ "חשב פוזיציה" על אחד הכרטיסים.'; return; }
+    const perShare = Math.abs(en - st), riskCash = acct * risk / 100;
+    let sh = Math.floor(riskCash / perShare);
+    const capped = sh * en > acct * 0.25;
+    if (capped) sh = Math.floor(acct * 0.25 / en);
+    out('#o-shares', d3.format(',')(sh));
+    out('#o-risk', fmtUsd(sh * perShare));
+    out('#o-pos', fmtUsd(sh * en));
+    out('#o-gain', tg > 0 ? fmtUsd(sh * Math.abs(tg - en)) : '—');
+    out('#o-rr', tg > 0 ? '1:' + d3.format('.1f')(Math.abs(tg - en) / perShare) : '—');
+    $('#o-warn').textContent = (capped ? 'הפוזיציה הוגבלה ל-25% מהחשבון. ' : '') + 'סטופ במרחק ' + d3.format('.2%')(perShare / en) + ' מהכניסה.' + (window.mcCalcSym ? ' (' + window.mcCalcSym + ')' : '');
+  }
+  function fillCalc(en, st, tg, sym) {
+    $('#c-entry').value = en; $('#c-stop').value = st; $('#c-target').value = tg; window.mcCalcSym = sym;
+    calc();
+    $('#calc-card').scrollIntoView({behavior: 'smooth', block: 'center'});
+  }
+  ['#c-acct', '#c-risk', '#c-entry', '#c-stop', '#c-target'].forEach((i) => $(i).addEventListener('input', () => { window.mcCalcSym = null; calc(); }));
+  calc();
+
+  /* ---------- swing ---------- */
+  const VERDICT = {watch: ['לחכות לפריצה', 'caution'], conditional: ['קנייה מותנית', 'go'], avoid: ['לא לגעת', 'stop']};
+  function drawSwing() {
+    const d = dash.data('swing_setups'), box = $('#swingcards');
+    if (d.status === 'error') return fail(box);
+    if (d.status !== 'ok') return skel(box, 3, '22rem');
+    box.replaceChildren(...d.data.map((r) => {
+      const w = W('symbol', r.symbol);
+      const c = el('article', 'mc-card mc-tc'); c.id = 'swing-' + r.symbol;
+      const top = el('div', 'mc-tc-top');
+      const idb = el('div');
+      idb.append(mark(el('div', 'mc-sym', r.symbol), 'swing_setups', 'symbol', w), mark(el('div', 'mc-name', r.name), 'swing_setups', 'name', w));
+      const [vt, vs] = VERDICT[r.verdict] || [r.verdict, 'caution'];
+      const pill = el('span', 'mc-pill', vt); pill.dataset.st = vs;
+      top.append(idb, pill);
+      const price = el('div'); price.style.display = 'flex'; price.style.justifyContent = 'space-between'; price.style.alignItems = 'baseline'; price.style.gap = '8px';
+      const pl = el('div'); pl.append(el('div', 'mc-note', 'מחיר אחרון'), mark(el('div', 'mc-gap mc-ltr', fmtP(r.last)), 'swing_setups', 'last', w));
+      const pr = el('div'); pr.style.textAlign = 'left';
+      pr.append(el('div', 'mc-note', 'מנקודת הקנייה'), mark(el('div', 'mc-ltr ' + (r.dist_pivot_pct < 0 ? 'mc-warn' : r.dist_pivot_pct <= 5 ? 'mc-ok' : 'mc-bad'), fmtPct(r.dist_pivot_pct, 1)), 'swing_setups', 'dist_pivot_pct', w));
+      price.append(pl, pr);
+      const bar = ladder([
+        {v: r.stop, c: 'var(--color-bad)', label: 'סטופ', top: false},
+        {v: r.pivot, c: 'var(--color-fg)', label: 'קנייה', top: true},
+        {v: r.zone_top, c: 'var(--color-ok)', label: '+5%', top: false},
+        {v: r.target, c: 'var(--color-ok)', label: 'יעד', top: true}
+      ], r.last, [[r.stop, r.pivot, 'var(--color-bad)', 18], [r.pivot, r.zone_top, 'var(--color-ok)', 40], [r.zone_top, r.target, 'var(--color-ok)', 12]]);
+      mark(bar, 'swing_setups', null, null);
+      const lv = el('div', 'mc-levels');
+      [['pivot', 'נקודת קנייה', ''], ['zone_top', 'סוף אזור', ''], ['stop', 'סטופ', 'stop'], ['target', 'יעד', 'tp']].forEach(([f, l, k]) => {
+        const b = el('div', 'mc-lv ' + k); b.append(el('small', null, l), mark(el('span', 'mc-ltr', fmtP(r[f])), 'swing_setups', f, w)); lv.append(b);
+      });
+      const meta = el('dl', 'mc-meta');
+      [['מצב', 'status'], ['תבנית מגמה', 'trend'], ['דוח', 'earnings']].forEach(([l, f]) => { meta.append(el('dt', null, l), mark(el('dd', null, r[f]), 'swing_setups', f, w)); });
+      const rr = el('dd'); rr.append('סיכון ', mark(el('span', 'mc-ltr mc-bad', fmtPct(r.risk_pct, 1)), 'swing_setups', 'risk_pct', w), ' · יעד ', mark(el('span', 'mc-ltr mc-ok', fmtPct(r.target_pct, 1)), 'swing_setups', 'target_pct', w));
+      meta.append(el('dt', null, 'מנקודת הקנייה'), rr);
+      const plan = el('p', r.action === 'avoid' ? 'mc-avoid' : 'mc-plan'); plan.append(el('b', null, r.action === 'avoid' ? 'למה לא: ' : 'התוכנית: '), mark(el('span', null, r.reason), 'swing_setups', 'reason', w));
+      const foot = el('div', 'mc-tc-foot');
+      if (r.action !== 'avoid') { const bt = el('button', 'mc-btn-s', 'חשב פוזיציה'); bt.type = 'button'; bt.addEventListener('click', () => { show('day'); fillCalc(r.pivot, r.stop, r.target, r.symbol); }); foot.append(el('span'), bt); }
+      c.append(top, price, bar, lv, meta, plan, foot);
+      return c;
+    }));
+  }
+
+  /* ---------- sectors ---------- */
+  function drawSectors() {
+    const d = dash.data('sectors'), box = $('#sectors');
+    if (d.status === 'error') return fail(box);
+    if (d.status !== 'ok') { box.classList.add('dash-skeleton'); box.replaceChildren(); return; }
+    box.classList.remove('dash-skeleton');
+    const rows = [...d.data].sort((a, b) => (b.week_pct ?? -99) - (a.week_pct ?? -99));
+    const width = Math.max(280, box.clientWidth || 320), rowH = 32, h = rows.length * rowH + 6;
+    const svg = d3.create('svg').attr('width', '100%').attr('viewBox', `0 0 ${width} ${h}`).style('direction', 'ltr');
+    const labW = 120, numW = 64, mid = labW + (width - labW - numW) / 2;
+    const ext = d3.max(rows, (r) => Math.abs(r.week_pct ?? 0)) || 1;
+    const x = d3.scaleLinear([-ext, ext], [labW + 4, width - numW - 4]);
+    svg.append('line').attr('x1', x(0)).attr('x2', x(0)).attr('y1', 0).attr('y2', h).style('stroke', 'var(--cds-chart-axis)');
+    const g = svg.selectAll('g').data(rows).join('g').attr('transform', (r, i) => `translate(0,${i * rowH + 3})`);
+    g.append('text').attr('x', labW - 4).attr('y', 17).attr('text-anchor', 'end').style('font-size', '12px').style('fill', 'var(--color-fg)')
+      .text((r) => r.sector + ' · ' + r.etf).attr('data-source', 'sectors').attr('data-field', 'sector').attr('data-where', (r) => W('etf', r.etf));
+    g.filter((r) => r.week_pct != null).append('rect').attr('y', 6).attr('height', 16).attr('rx', 4)
+      .attr('x', (r) => Math.min(x(0), x(r.week_pct))).attr('width', (r) => Math.max(2, Math.abs(x(r.week_pct) - x(0))))
+      .style('fill', (r) => r.week_pct >= 0 ? 'var(--color-ok)' : 'var(--color-bad)').style('opacity', .8)
+      .attr('data-source', 'sectors').attr('data-field', 'week_pct').attr('data-where', (r) => W('etf', r.etf))
+      .append('title').text((r) => 'שבוע: ' + fmtPct(r.week_pct));
+    g.filter((r) => r.week_pct == null).append('text').attr('x', x(0) + 6).attr('y', 17).style('font-size', '11px').style('fill', 'var(--color-fg-muted)').text('אין נתון שבועי');
+    g.append('text').attr('x', width - 2).attr('y', 17).attr('text-anchor', 'end').style('font-size', '11px').style('fill', 'var(--color-fg-muted)')
+      .text((r) => r.ytd_pct == null ? '' : fmtPct(r.ytd_pct, 1)).attr('data-source', 'sectors').attr('data-field', 'ytd_pct').attr('data-where', (r) => W('etf', r.etf));
+    box.replaceChildren(svg.node());
+  }
+
+  /* ---------- market tab ---------- */
+  window.mcBriefKey = 'today';
+  document.querySelectorAll('#brief-tabs .mc-btab').forEach((b) => b.addEventListener('click', () => {
+    window.mcBriefKey = b.dataset.k;
+    document.querySelectorAll('#brief-tabs .mc-btab').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    drawBrief();
+  }));
+  function drawBrief() {
+    const d = dash.data('brief'), tx = $('#brieftext'), hl = $('#headline'), sb = $('#social-brief');
+    tx.setAttribute('data-where', 'key=' + window.mcBriefKey);
+    if (d.status !== 'ok') { [tx, hl, sb].forEach((e) => e.classList.toggle('dash-skeleton', d.status !== 'error')); return; }
+    const get = (k) => (d.data.find((r) => r.key === k) || {}).text;
+    [tx, hl, sb].forEach((e) => e.classList.remove('dash-skeleton'));
+    hl.textContent = get('headline') ?? '—';
+    tx.textContent = get(window.mcBriefKey) ?? '—';
+    sb.textContent = get('social') ?? '—';
+  }
+  function drawGauges() {
+    const d = dash.data('outlook'), box = $('#gauges');
+    if (d.status === 'error') return fail(box);
+    if (d.status !== 'ok') return skel(box, 3, '9rem');
+    const ns = 'http://www.w3.org/2000/svg';
+    box.replaceChildren(...d.data.map((r) => {
+      const g = el('div', 'mc-gauge'), R = 56, cx = 70, cy = 66, sw = 11;
+      const svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox', '0 0 140 84'); svg.setAttribute('width', '100%');
+      const arc = d3.arc().innerRadius(R - sw / 2).outerRadius(R + sw / 2).cornerRadius(sw / 2);
+      const bg = document.createElementNS(ns, 'path'); bg.setAttribute('d', arc({startAngle: -Math.PI / 2, endAngle: Math.PI / 2})); bg.setAttribute('transform', `translate(${cx},${cy})`); bg.style.fill = 'var(--cds-chart-grid)'; svg.appendChild(bg);
+      const fg = document.createElementNS(ns, 'path'); fg.setAttribute('d', arc({startAngle: -Math.PI / 2, endAngle: -Math.PI / 2 + Math.PI * r.p_up})); fg.setAttribute('transform', `translate(${cx},${cy})`);
+      fg.style.fill = r.p_up >= 0.55 ? 'var(--color-ok)' : r.p_up <= 0.45 ? 'var(--color-bad)' : 'var(--color-warn)'; svg.appendChild(fg);
+      const tx = document.createElementNS(ns, 'text'); tx.setAttribute('x', cx); tx.setAttribute('y', cy - 6); tx.setAttribute('text-anchor', 'middle');
+      tx.style.fontFamily = 'var(--font-anthropic-serif)'; tx.style.fontSize = '26px'; tx.style.fill = 'var(--color-fg)'; tx.textContent = d3.format('.0%')(r.p_up);
+      mark(tx, 'outlook', 'p_up', W('horizon', r.horizon)); svg.appendChild(tx);
+      const w = W('horizon', r.horizon);
+      g.append(svg, mark(el('div', 'mc-glabel', r.label), 'outlook', 'label', w),
+        mark(el('div', 'mc-gbias ' + (r.p_up >= 0.55 ? 'mc-ok' : r.p_up <= 0.45 ? 'mc-bad' : 'mc-warn'), r.bias), 'outlook', 'bias', w),
+        mark(el('div', 'mc-gdrv', r.drivers), 'outlook', 'drivers', w));
+      return g;
+    }));
+  }
   function drawIndices() {
     const d = dash.data('indices'), box = $('#indices');
     if (d.status === 'error') return fail(box);
     if (d.status !== 'ok') return skel(box, 3, '7.5rem');
     box.replaceChildren(...d.data.map((r) => {
-      const c = el('div', 'mc-card mc-ix');
-      const w = W('symbol', r.symbol);
-      const nm = el('div', 'mc-ixname');
-      nm.append(mark(el('span', null, r.name), 'indices', 'name', w), el('span', 'mc-ltr', 'סגירה אחרונה'));
-      const v = mark(el('div', 'mc-ixval mc-ltr', d3.format(',.2f')(r.last_close)), 'indices', 'last_close', w);
+      const c = el('div', 'mc-card'), w = W('symbol', r.symbol);
+      const nm = el('div', 'mc-ixname'); nm.append(mark(el('span', null, r.name), 'indices', 'name', w), el('span', null, 'סגירה אחרונה'));
       const chips = el('div', 'mc-chips');
-      [['pre_pct', 'חוזים עכשיו'], ['day_pct', 'אתמול'], ['wtd_pct', 'מתחילת שבוע'], ['mtd_pct', 'מתחילת חודש']].forEach(([f, l]) => {
-        const ch = el('div', 'mc-chip');
-        ch.append(el('small', null, l), mark(el('span', 'mc-ltr ' + cls(r[f]), fmtPct(r[f])), 'indices', f, w));
-        chips.append(ch);
+      [['pre_pct', 'חוזים בבוקר'], ['day_pct', 'אתמול'], ['wtd_pct', 'מתחילת שבוע'], ['mtd_pct', 'מתחילת חודש']].forEach(([f, l]) => {
+        const ch = el('div', 'mc-chip'); ch.append(el('small', null, l), mark(el('span', 'mc-ltr ' + cls(r[f]), fmtPct(r[f])), 'indices', f, w)); chips.append(ch);
       });
-      c.append(nm, v, chips);
+      c.append(nm, mark(el('div', 'mc-ixval mc-ltr', d3.format(',.2f')(r.last_close)), 'indices', 'last_close', w), chips);
       return c;
     }));
   }
-
-  /* ---------- progress calc ---------- */
-  dash.calc('progress', {
-    title: 'התקדמות ליעד',
-    description: 'איזה חלק מהמהלך הצפוי (מהסגירה הקודמת עד היעד) כבר בוצע, לפי המחיר העדכני ביותר: מסחר רגיל, אחרת פרה-מרקט, אחרת סגירה.',
-    inputs: ['picks', 'buzz'],
-    fn: (picks, buzz) => [...picks, ...buzz].map((r) => {
-      const current = r.reg_price ?? r.pre_price ?? r.prev_close;
-      return {symbol: r.symbol, current, progress_pct: Math.round(((current - r.prev_close) / (r.target - r.prev_close)) * 1000) / 10};
-    })
-  });
-
-  function priceBar(r, cur, opt) {
-    const lo = Math.min(r.stop, r.prev_close, cur), hi = Math.max(r.target, cur);
-    const pad = (hi - lo) * 0.04;
-    const x = d3.scaleLinear([lo - pad, hi + pad], [0, 100]).clamp(true);
-    const bar = el('div', 'mc-bar');
-    const track = el('div', 'mc-track');
-    const zone = (a, b, c, o) => { const z = el('div', 'mc-zone'); z.style.left = x(Math.min(a, b)) + '%'; z.style.width = Math.abs(x(b) - x(a)) + '%'; z.style.background = `color-mix(in srgb, ${c} ${o}%, transparent)`; return z; };
-    const entry = r.entry ?? r.prev_close;
-    track.append(zone(r.stop, entry, 'var(--color-bad)', 22));
-    if (r.take_profit != null) { track.append(zone(entry, r.take_profit, 'var(--color-ok)', 16), zone(r.take_profit, r.target, 'var(--color-ok)', 34)); }
-    else track.append(zone(entry, r.target, 'var(--color-ok)', 24));
-    bar.append(track);
-    // fill from prev close to current
-    const f = el('div', 'mc-fill');
-    const up = cur >= r.prev_close;
-    f.style.left = x(Math.min(cur, r.prev_close)) + '%'; f.style.width = Math.abs(x(cur) - x(r.prev_close)) + '%';
-    f.style.background = up ? 'var(--color-ok)' : 'var(--color-bad)';
-    bar.append(f);
-    const tickAt = (v, c, label, top) => {
-      const m = el('div', 'mc-mk'); m.style.left = x(v) + '%'; m.style.background = c; bar.append(m);
-      if (label) { const l = el('div', 'mc-mk-l', label); l.style.left = x(v) + '%'; l.style.top = top ? '0px' : '36px'; bar.append(l); }
-    };
-    tickAt(r.stop, 'var(--color-bad)', 'SL', false);
-    tickAt(r.prev_close, 'var(--color-fg-muted)', 'סגירה', true);
-    if (r.entry != null) tickAt(r.entry, 'var(--color-fg)', 'כניסה', false);
-    if (r.take_profit != null) tickAt(r.take_profit, 'var(--color-ok)', 'TP', false);
-    tickAt(r.target, 'var(--color-ok)', 'יעד', true);
-    const dot = el('div', 'mc-cur'); dot.style.left = x(cur) + '%';
-    dot.style.background = up ? 'var(--color-ok)' : 'var(--color-bad)'; dot.style.color = up ? 'var(--color-ok)' : 'var(--color-bad)';
-    dot.title = 'עכשיו ' + fmtP(cur);
-    bar.append(dot);
-    return bar;
-  }
-
-  function sessRows(r, src) {
-    const box = el('div', 'mc-sess');
-    const w = W('symbol', r.symbol);
-    const live = window.mcPhase().cur;
-    const liveKey = live && live.k === 'regular' ? 'reg' : 'pre';
-    const row = (key, label, pf, cf) => {
-      const lab = el('span', null, label); lab.dataset.sessRow = key;
-      if (key === liveKey) { lab.classList.add('mc-live'); }
-      const p = mark(el('span', 'mc-ltr', fmtP(r[pf])), src, pf, w);
-      const c = cf ? mark(el('span', 'mc-ltr ' + cls(r[cf]), r[cf] == null ? '—' : fmtPct(r[cf])), src, cf, w) : el('span');
-      if (r[pf] == null) p.textContent = key === 'reg' ? 'יעודכן בריענון' : 'אין נתון';
-      p.classList.toggle('mc-muted', r[pf] == null);
-      box.append(lab, p, c);
-    };
-    row('prev', 'סגירה קודמת', 'prev_close', null);
-    row('pre', 'פרה-מרקט', 'pre_price', 'pre_pct');
-    row('reg', 'מסחר רגיל', 'reg_price', src === 'picks' ? 'reg_pct' : null);
-    return box;
-  }
-
-  /* ---------- picks ---------- */
-  function drawPicks() {
-    const d = dash.data('picks'), pr = dash.data('progress'), box = $('#picks');
-    if (d.status === 'error') return fail(box);
-    if (d.status !== 'ok') return skel(box, 5, '24rem');
-    const prog = pr.status === 'ok' ? new Map(pr.data.map((r) => [r.symbol, r])) : new Map();
-    const first = !box.dataset.drawn; box.dataset.drawn = '1'; box.classList.toggle('mc-anim', first);
-    box.replaceChildren(...d.data.map((r) => {
-      const w = W('symbol', r.symbol);
-      const cur = r.reg_price ?? r.pre_price ?? r.prev_close;
-      const c = el('article', 'mc-card mc-pk'); c.id = 'pick-' + r.symbol;
-      const top = el('div', 'mc-pk-top');
-      const idb = el('div');
-      const symrow = el('div'); symrow.style.display = 'flex'; symrow.style.alignItems = 'baseline'; symrow.style.gap = '8px';
-      symrow.append(mark(el('span', 'mc-rank', '#' + r.rank), 'picks', 'rank', w), mark(el('span', 'mc-sym', r.symbol), 'picks', 'symbol', w));
-      idb.append(symrow, mark(el('div', 'mc-name', r.name), 'picks', 'name', w));
-      const conf = el('div', 'mc-conf');
-      const cb = el('div', 'mc-confbar'); const ci = el('i'); ci.style.width = r.confidence + '%'; cb.append(ci);
-      const cl = el('b'); cl.append('ביטחון ', mark(el('span', null, r.confidence + '%'), 'picks', 'confidence', w));
-      conf.append(cl, cb);
-      top.append(idb, conf);
-
-      const price = el('div', 'mc-price');
-      const nowb = el('div');
-      nowb.append(el('div', 'mc-note', 'מחיר עכשיו'), el('div', 'mc-now mc-ltr', fmtP(cur)));
-      const tg = el('div', 'mc-tgt');
-      const ts = el('strong'); ts.append(mark(el('span', 'mc-ltr', fmtP(r.target)), 'picks', 'target', w));
-      tg.append(el('span', 'mc-muted', 'מחיר יעד'), ts, mark(el('span', 'mc-ltr mc-ok', fmtPct(r.target_pct)), 'picks', 'target_pct', w));
-      price.append(nowb, tg);
-
-      const pg = prog.get(r.symbol);
-      const progRow = el('div', 'mc-prog');
-      progRow.append(el('span', 'mc-muted', 'מימוש המהלך עד היעד'), pg ? mark(el('span', 'mc-ltr ' + cls(pg.progress_pct), d3.format('.1f')(pg.progress_pct) + '%'), 'progress', 'progress_pct', w) : el('span', 'mc-muted', '—'));
-
-      const lv = el('div', 'mc-levels');
-      [['entry', 'כניסה', ''], ['stop', 'סטופ לוס', 'stop'], ['take_profit', 'טייק פרופיט', 'tp'], ['target', 'יעד', 'tg']].forEach(([f, l, k]) => {
-        const b = el('div', 'mc-lv ' + k); b.append(el('small', null, l), mark(el('span', 'mc-ltr', fmtP(r[f])), 'picks', f, w)); lv.append(b);
-      });
-      const rr = (r.target - r.entry) / (r.entry - r.stop);
-      const tags = el('div', 'mc-tags');
-      tags.append(mark(el('span', 'mc-tag', r.catalyst), 'picks', 'catalyst', w), mark(el('span', 'mc-tag', r.setup), 'picks', 'setup', w), el('span', 'mc-tag mc-ltr', 'R:R 1:' + d3.format('.1f')(rr)));
-      c.append(top, price, priceBar(r, cur), progRow, lv, sessRows(r, 'picks'), mark(el('p', 'mc-thesis', r.thesis), 'picks', 'thesis', w), tags);
-      return c;
-    }));
-  }
-
-  /* ---------- buzz ---------- */
-  function drawBuzz() {
-    const d = dash.data('buzz'), pr = dash.data('progress'), box = $('#buzz');
-    if (d.status === 'error') return fail(box);
-    if (d.status !== 'ok') return skel(box, 3, '20rem');
-    const prog = pr.status === 'ok' ? new Map(pr.data.map((r) => [r.symbol, r])) : new Map();
-    box.replaceChildren(...d.data.map((r) => {
-      const w = W('symbol', r.symbol);
-      const cur = r.reg_price ?? r.pre_price ?? r.prev_close;
-      const c = el('article', 'mc-bz'); c.id = 'buzz-' + r.symbol;
-      const top = el('div', 'mc-pk-top');
-      const idb = el('div');
-      idb.append(mark(el('div', 'mc-sym', r.symbol), 'buzz', 'symbol', w), mark(el('div', 'mc-name', r.name), 'buzz', 'name', w));
-      const jb = el('div'); jb.style.textAlign = 'left';
-      jb.append(mark(el('div', 'mc-jump mc-ltr mc-ok', fmtPct(r.pre_pct, 1)), 'buzz', 'pre_pct', w), el('div', 'mc-note', 'בפרה-מרקט'));
-      top.append(idb, jb);
-      const heat = el('div', 'mc-heat');
-      for (let i = 0; i < 10; i++) { const s = el('i'); if (i < Math.round(r.buzz_score / 10)) s.classList.add('on'); heat.append(s); }
-      const hrow = el('div', 'mc-prog');
-      hrow.append(el('span', 'mc-muted', 'עוצמת באזז'), mark(el('span', null, String(r.buzz_score)), 'buzz', 'buzz_score', w));
-      const price = el('div', 'mc-price');
-      const nb = el('div'); nb.append(el('div', 'mc-note', 'עכשיו'), el('div', 'mc-now mc-ltr', fmtP(cur)));
-      nb.querySelector('.mc-now').style.fontSize = '1.45rem';
-      const tg = el('div', 'mc-tgt');
-      const ts = el('strong'); ts.append(mark(el('span', 'mc-ltr', fmtP(r.target)), 'buzz', 'target', w));
-      tg.append(el('span', 'mc-muted', 'יעד'), ts, mark(el('span', 'mc-ltr mc-ok', fmtPct(r.target_pct, 1)), 'buzz', 'target_pct', w));
-      price.append(nb, tg);
-      const pg = prog.get(r.symbol);
-      const progRow = el('div', 'mc-prog');
-      progRow.append(el('span', 'mc-muted', 'מימוש המהלך'), pg ? mark(el('span', 'mc-ltr ' + cls(pg.progress_pct), d3.format('.1f')(pg.progress_pct) + '%'), 'progress', 'progress_pct', w) : el('span', 'mc-muted', '—'));
-      const lv = el('div', 'mc-levels'); lv.style.gridTemplateColumns = 'repeat(2,minmax(0,1fr))';
-      [['stop', 'סטופ לוס', 'stop'], ['target', 'טייק פרופיט', 'tg']].forEach(([f, l, k]) => { const b = el('div', 'mc-lv ' + k); b.append(el('small', null, l), mark(el('span', 'mc-ltr', fmtP(r[f])), 'buzz', f, w)); lv.append(b); });
-      c.append(top, mark(el('span', 'mc-risk', 'סיכון ' + r.risk), 'buzz', 'risk', w), price, priceBar(r, cur), progRow, lv, sessRows(r, 'buzz'), hrow, heat,
-        mark(el('p', 'mc-thesis', r.why), 'buzz', 'why', w), mark(el('p', 'mc-note', r.sources), 'buzz', 'sources', w));
-      return c;
-    }));
-  }
-
-  /* ---------- social ---------- */
   const SENT = {bullish: ['בולשי', 'var(--color-ok)'], neutral: ['ניטרלי', 'var(--cds-chart-muted)'], bearish: ['דובי', 'var(--color-bad)']};
   $('#social-legend').replaceChildren(...Object.values(SENT).map(([n, c]) => { const s = el('span'); const i = el('i'); i.style.background = c; s.append(i, n); return s; }));
   function drawSocial() {
@@ -552,29 +746,24 @@
     if (d.status !== 'ok') { box.classList.add('dash-skeleton'); box.replaceChildren(); return; }
     box.classList.remove('dash-skeleton');
     const rows = [...d.data].sort((a, b) => b.mentions - a.mentions);
-    const width = Math.max(260, box.clientWidth || 320), rowH = 30, h = rows.length * rowH + 8;
-    const svg = d3.create('svg').attr('width', '100%').attr('viewBox', `0 0 ${width} ${h}`).attr('direction', 'ltr').style('direction', 'ltr');
-    const labW = 52, valW = 40;
+    const width = Math.max(260, box.clientWidth || 320), rowH = 30, h = rows.length * rowH + 8, labW = 52, valW = 40;
+    const svg = d3.create('svg').attr('width', '100%').attr('viewBox', `0 0 ${width} ${h}`).style('direction', 'ltr');
     const x = d3.scaleLinear([0, d3.max(rows, (r) => r.mentions)], [0, width - labW - valW - 8]);
     const g = svg.selectAll('g').data(rows).join('g').attr('transform', (r, i) => `translate(0,${i * rowH + 4})`);
     g.append('text').attr('x', 0).attr('y', 15).style('font-size', '12px').style('font-weight', 600).style('fill', 'var(--color-fg)').text((r) => r.symbol)
       .attr('data-source', 'social').attr('data-field', 'symbol').attr('data-where', (r) => W('symbol', r.symbol));
     g.append('rect').attr('x', labW).attr('y', 4).attr('height', 14).attr('rx', 4).attr('width', (r) => Math.max(4, x(r.mentions)))
-      .style('fill', (r) => (SENT[r.sentiment] || SENT.neutral)[1])
-      .attr('data-source', 'social').attr('data-field', 'sentiment').attr('data-where', (r) => W('symbol', r.symbol));
+      .style('fill', (r) => (SENT[r.sentiment] || SENT.neutral)[1]).attr('data-source', 'social').attr('data-field', 'sentiment').attr('data-where', (r) => W('symbol', r.symbol));
     g.append('text').attr('x', (r) => labW + Math.max(4, x(r.mentions)) + 6).attr('y', 15).style('font-size', '11px').style('fill', 'var(--color-fg-muted)')
       .text((r) => d3.format(',')(r.mentions)).attr('data-source', 'social').attr('data-field', 'mentions').attr('data-where', (r) => W('symbol', r.symbol));
     box.replaceChildren(svg.node());
   }
-
-  /* ---------- macro ---------- */
   function drawMacro() {
     const d = dash.data('macro'), box = $('#macro');
     if (d.status === 'error') return fail(box);
     if (d.status !== 'ok') return skel(box, 12, '8.2rem');
     box.replaceChildren(...d.data.map((r) => {
-      const w = W('key', r.key);
-      const c = el('div', 'mc-card mc-mt'); c.id = 'macro-' + r.key;
+      const w = W('key', r.key), c = el('div', 'mc-card mc-mt'); c.id = 'macro-' + r.key;
       const lab = el('div', 'mc-ml'); const t = el('span', 'mc-tone'); t.dataset.tone = r.tone;
       lab.append(t, mark(el('span', null, r.label), 'macro', 'label', w));
       c.append(lab, mark(el('div', 'mc-mv', r.value), 'macro', 'value', w), mark(el('div', 'mc-mn', r.note), 'macro', 'note', w));
@@ -582,8 +771,6 @@
       return c;
     }));
   }
-
-  /* ---------- tables ---------- */
   function fillTable(id, cols, render) {
     const d = dash.data(id), tb = $('#' + id + ' tbody');
     if (d.status === 'error') { const tr = el('tr'); const td = el('td'); td.colSpan = cols; td.append(el('div', 'mc-fail', 'Failed to load')); tr.append(td); tb.replaceChildren(tr); return; }
@@ -592,34 +779,38 @@
   }
   const td = (t, c) => el('td', c, t);
   function drawTables() {
+    fillTable('chatter', 3, (r) => {
+      const tr = el('tr'); tr.dataset.key = r.symbol;
+      const a = td(null); a.style.whiteSpace = 'nowrap'; a.style.fontWeight = '600';
+      const dot = el('span', 'mc-imp'); dot.style.background = (SENT[r.sentiment] || SENT.neutral)[1]; dot.title = (SENT[r.sentiment] || SENT.neutral)[0];
+      a.append(dot, r.symbol); tr.append(a, td(r.theme), td(r.platforms, 'mc-muted')); return tr;
+    });
     fillTable('methods', 3, (r) => {
       const tr = el('tr'); tr.dataset.key = r.school;
       const a = td(r.school); a.style.fontWeight = '600'; a.title = r.method;
       const w = td(null); w.style.whiteSpace = 'nowrap'; w.append(d3.format('.0%')(r.weight)); const b = el('span', 'mc-wbar'); b.style.width = (r.weight * 160) + 'px'; w.append(b);
       tr.append(a, td(r.read), w); return tr;
     });
-    const fd = (s) => { const dt = new Date(s + 'T12:00:00Z'); return new Intl.DateTimeFormat('he-IL', {day: 'numeric', month: 'numeric', timeZone: 'UTC'}).format(dt); };
-    const todayNY = new Intl.DateTimeFormat('en-CA', {timeZone: 'America/New_York'}).format(new Date());
+    const fd = (s) => new Intl.DateTimeFormat('he-IL', {day: 'numeric', month: 'numeric', timeZone: 'UTC'}).format(new Date(s + 'T12:00:00Z'));
     fillTable('calendar', 3, (r) => {
-      const tr = el('tr'); tr.dataset.key = r.event; if (r.date === todayNY) tr.className = 'mc-cal-today';
+      const tr = el('tr'); tr.dataset.key = r.event;
       const a = td(null); const i = el('span', 'mc-imp'); i.dataset.i = r.impact; a.append(i, fd(r.date)); a.style.whiteSpace = 'nowrap';
       tr.append(a, td(r.event), td(r.time || '—', 'mc-ltr')); return tr;
-    });
-    fillTable('chatter', 3, (r) => {
-      const tr = el('tr'); tr.dataset.key = r.symbol;
-      const a = td(null); a.style.whiteSpace = 'nowrap'; a.style.fontWeight = '600';
-      const dot = el('span', 'mc-imp'); dot.style.background = (SENT[r.sentiment] || SENT.neutral)[1]; dot.title = (SENT[r.sentiment] || SENT.neutral)[0];
-      a.append(dot, r.symbol);
-      tr.append(a, td(r.theme), td(r.platforms, 'mc-muted')); return tr;
     });
     fillTable('sources', 3, (r) => { const tr = el('tr'); tr.dataset.key = r.name; tr.append(td(r.group, 'mc-muted'), td(r.name), td(r.signal)); return tr; });
   }
 
-  dash.onData(() => {
-    drawBrief(); drawGauges(); drawIndices(); drawPicks(); drawBuzz(); drawSocial(); drawMacro(); drawTables();
-  });
+  function drawAll() {
+    drawAsOf();
+    const p = window.mcPage || 'decide';
+    if (p === 'decide') { drawRegime(); drawNow(); drawDecisions(); }
+    if (p === 'day') drawDay();
+    if (p === 'swing') { drawSectors(); drawSwing(); }
+    if (p === 'market') { drawBrief(); drawGauges(); drawIndices(); drawSocial(); drawMacro(); drawTables(); }
+  }
 
-  const named = location.hash && document.getElementById(location.hash.slice(1));
-  if (named) setTimeout(() => named.scrollIntoView(), 300);
+  dash.onData(drawAll);
+  tick(); setInterval(tick, 1000);
+  show(location.hash.slice(1) || 'decide', false);
 })();
 </script>
