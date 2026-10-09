@@ -1,5 +1,21 @@
 <style>
 #dash-root{--dash-gutter:clamp(12px,2.2vw,28px)}
+.mc[data-theme=dark]{--color-bg:#0e1116;--color-panel:#161b22;--color-fg:#e6edf3;--color-fg-muted:#8b949e;--color-border-line:#2a313c;
+  --color-ok:#3fb950;--color-warn:#d29922;--color-bad:#f85149;--cds-chart-grid:#262c36;--cds-chart-axis:#3b4350;--cds-chart-muted:#56606e;
+  --cds-chart-reference:#6e7681;--cds-surface-popover:#1c2129;--cds-border:#30363d;color-scheme:dark}
+.mc[data-theme=light]{--color-bg:#f6f7f9;--color-panel:#ffffff;--color-fg:#1f2328;--color-fg-muted:#636c76;--color-border-line:#d8dee4;
+  --color-ok:#1a7f37;--color-warn:#9a6700;--color-bad:#cf222e;--cds-chart-grid:#eaeef2;--cds-chart-axis:#c6ccd3;--cds-chart-muted:#afb8c1;
+  --cds-chart-reference:#8c959f;--cds-surface-popover:#ffffff;--cds-border:#d0d7de;color-scheme:light}
+.mc[data-theme]{background:var(--color-bg);margin:0 calc(-1 * var(--dash-gutter)) calc(-1 * var(--dash-gutter));padding:var(--cds-pad-md) var(--dash-gutter) var(--dash-gutter);min-height:100vh;border-radius:var(--cds-radius) var(--cds-radius) 0 0}
+.mc-money{display:block;font-size:11px;color:var(--color-fg-muted);font-weight:400;margin-top:2px;direction:rtl}
+.mc-money b{font-weight:600;font-family:inherit;font-size:inherit;direction:ltr;display:inline-block}
+.mc-acct{display:flex;align-items:center;gap:6px;font-size:var(--cds-font-size-caption);padding:var(--cds-pad-xs) var(--cds-pad-md);border:1px solid var(--color-border-line);border-radius:999px;background:var(--color-panel);cursor:pointer;color:var(--color-fg);font:inherit;font-size:var(--cds-font-size-caption)}
+.mc-iconbtn{width:36px;height:36px;border-radius:50%;border:1px solid var(--color-border-line);background:var(--color-panel);color:var(--color-fg);cursor:pointer;display:grid;place-items:center;padding:0}
+.mc-iconbtn svg{width:18px;height:18px}
+.mc-size{font-size:var(--cds-font-size-caption);padding:8px 10px;border-radius:calc(var(--cds-radius) * .7);border:1px solid var(--color-border-line);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;text-align:center}
+.mc-size small{display:block;font-size:10.5px;color:var(--color-fg-muted)}
+.mc-size b{font-weight:700;direction:ltr;display:inline-block}
+.mc-size .mc-size-note{grid-column:1/-1;font-size:10.5px;color:var(--color-fg-muted);text-align:right}
 .mc{direction:rtl;font-family:var(--font-anthropic-sans);color:var(--color-fg);display:grid;gap:var(--cds-gap-md);font-variant-numeric:tabular-nums}
 .mc *{box-sizing:border-box}
 .mc-card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);min-width:0}
@@ -183,7 +199,7 @@
 }
 </style>
 
-<div class="mc" id="cockpit">
+<div class="mc" id="cockpit" data-theme="dark">
   <header class="mc-top" id="top">
     <div class="mc-title">
       <h1>תא הטייס של השוק</h1>
@@ -191,6 +207,8 @@
     </div>
     <div class="mc-ctrl">
       <div class="mc-session" id="session" data-phase="closed"><span class="mc-dot"></span><b id="sess-name">—</b><span id="sess-clock" class="mc-ltr mc-muted"></span></div>
+      <button class="mc-acct" id="acct-chip" type="button" title="לחץ לשינוי בגודל התיק ובסיכון"><span>תיק</span><b class="mc-ltr" id="acct-val">$100,000</b><span class="mc-muted" id="acct-risk">· סיכון 0.5%</span></button>
+      <button class="mc-iconbtn" id="theme-btn" type="button" aria-label="החלפת תצוגה כהה/בהירה" title="תצוגה כהה/בהירה"></button>
       <button class="mc-btn" id="analyze" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>תן ניתוח</button>
     </div>
   </header>
@@ -213,8 +231,8 @@
           <h3 class="dash-skeleton" id="regime-title">—</h3>
           <p class="dash-skeleton" id="regime-text">—</p>
           <div class="mc-expo">
-            <div><div class="mc-expo-l"><span>חשיפה למסחר יומי</span><b class="mc-ltr" id="expo-day">—</b></div><div class="mc-meter"><i id="expo-day-bar" style="width:0"></i></div></div>
-            <div><div class="mc-expo-l"><span>חשיפה לסווינג</span><b class="mc-ltr" id="expo-swing">—</b></div><div class="mc-meter"><i id="expo-swing-bar" style="width:0"></i></div></div>
+            <div><div class="mc-expo-l"><span>חשיפה למסחר יומי</span><b class="mc-ltr" id="expo-day">—</b></div><div class="mc-meter"><i id="expo-day-bar" style="width:0"></i></div><span class="mc-money" id="expo-day-usd"></span></div>
+            <div><div class="mc-expo-l"><span>חשיפה לסווינג</span><b class="mc-ltr" id="expo-swing">—</b></div><div class="mc-meter"><i id="expo-swing-bar" style="width:0"></i></div><span class="mc-money" id="expo-swing-usd"></span></div>
           </div>
         </div>
       </div>
@@ -243,7 +261,7 @@
     <div class="mc-card" id="calc-card">
       <div class="mc-h"><h2>מחשבון פוזיציה</h2><p class="mc-note">לחיצה על "חשב פוזיציה" בכרטיס ממלאת את הנתונים</p></div>
       <div class="mc-calc">
-        <label>גודל חשבון ($)<input id="c-acct" type="number" min="0" step="1000" value="100000"></label>
+        <label>גודל תיק ($)<input id="c-acct" type="number" min="0" step="1000" value="100000"></label>
         <label>סיכון לעסקה (%)<input id="c-risk" type="number" min="0" step="0.1" value="0.5"></label>
         <label>מחיר כניסה<input id="c-entry" type="number" min="0" step="0.01"></label>
         <label>סטופ לוס<input id="c-stop" type="number" min="0" step="0.01"></label>
@@ -363,6 +381,46 @@
   const skel = (box, n, h) => box.replaceChildren(...Array.from({length: n}, () => { const d = el('div', 'mc-card dash-skeleton'); d.style.minHeight = h; return d; }));
   const ST = {go: 'go', caution: 'caution', stop: 'stop'};
 
+  /* ---------- account, sizing, theme ---------- */
+  const acct = () => { const v = +(dash.params().account ?? 100000); return v > 0 ? v : 100000; };
+  const riskPct = () => { const v = +(dash.params().risk_pct ?? 0.5); return v > 0 ? v : 0.5; };
+  const usd = (v) => '$' + d3.format(',.0f')(v);
+  const usdK = (v) => v >= 10000 ? '$' + d3.format(',.1f')(v / 1000) + 'K' : usd(v);
+  const GRADE_MULT = {A: 1, B: 0.75, C: 0.25};
+  const size = (entry, stop, mult = 1) => {
+    const per = Math.abs(entry - stop);
+    if (!(per > 0 && entry > 0)) return null;
+    const riskCash = acct() * riskPct() / 100 * mult;
+    let sh = Math.floor(riskCash / per);
+    const capped = sh * entry > acct() * 0.25;
+    if (capped) sh = Math.floor(acct() * 0.25 / entry);
+    return {shares: sh, pos: sh * entry, risk: sh * per, capped, riskCash};
+  };
+  const sizeBox = (z, note) => {
+    const b = el('div', 'mc-size');
+    if (!z || z.shares < 1) { b.append(el('span', 'mc-size-note', 'הסטופ רחוק מדי ביחס לסיכון שהוגדר: לא נכנסים.')); return b; }
+    [['כמות מניות', d3.format(',')(z.shares)], ['סכום להכניס', usd(z.pos)], ['בסיכון עד הסטופ', usd(z.risk)]].forEach(([l, v]) => {
+      const c = el('div'); c.append(el('small', null, l), el('b', null, v)); b.append(c);
+    });
+    b.append(el('span', 'mc-size-note', note + (z.capped ? ' · הוגבל ל-25% מהתיק' : '')));
+    return b;
+  };
+  const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+  function applyPrefs() {
+    const th = dash.params().theme === 'light' ? 'light' : 'dark';
+    $('#cockpit').dataset.theme = th;
+    const tb = $('#theme-btn');
+    tb.innerHTML = th === 'dark' ? SUN : MOON;
+    tb.title = th === 'dark' ? 'מעבר לתצוגה בהירה' : 'מעבר לתצוגה כהה';
+    $('#acct-val').textContent = usd(acct());
+    $('#acct-risk').textContent = '· סיכון ' + riskPct() + '% לעסקה (' + usd(acct() * riskPct() / 100) + ')';
+    if (document.activeElement !== $('#c-acct')) $('#c-acct').value = acct();
+    if (document.activeElement !== $('#c-risk')) $('#c-risk').value = riskPct();
+  }
+  $('#theme-btn').addEventListener('click', () => dash.setParams({theme: dash.params().theme === 'light' ? 'dark' : 'light'}));
+  $('#acct-chip').addEventListener('click', () => { goTo('day', 'calc-card'); setTimeout(() => $('#c-acct').focus(), 400); });
+
   /* ---------- clocks ---------- */
   const fmtNY = new Intl.DateTimeFormat('en-US', {timeZone: 'America/New_York', weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'});
   const fmtIL = new Intl.DateTimeFormat('en-US', {timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'});
@@ -444,6 +502,8 @@
     mark($('#expo-day'), 'regime', 'day_exposure', w).textContent = d3.format('.0%')(o.day_exposure);
     mark($('#expo-swing'), 'regime', 'swing_exposure', w).textContent = d3.format('.0%')(o.swing_exposure);
     $('#expo-day-bar').style.width = (o.day_exposure * 100) + '%';
+    $('#expo-day-usd').replaceChildren('≈ ', el('b', null, usd(acct() * o.day_exposure)), ' מתוך תיק של ' + usd(acct()) + ' · עד 3 עסקאות במקביל');
+    $('#expo-swing-usd').replaceChildren('≈ ', el('b', null, usd(acct() * o.swing_exposure)), ' בפוזיציות סווינג פתוחות · השאר במזומן');
     $('#expo-swing-bar').style.width = (o.swing_exposure * 100) + '%';
     f.replaceChildren(...d.data.filter((r) => r.key !== 'overall').map((r) => {
       const ww = W('key', r.key);
@@ -514,13 +574,15 @@
     if (dd.status === 'ok') {
       buy.replaceChildren(...dd.data.filter((r) => r.grade !== 'C').map((r) => {
         const w = W('symbol', r.symbol);
-        return row(r.symbol, r.catalyst, 'ציון ' + r.grade + ' · טריגר ' + fmtP(r.trigger) + ' · סטופ ' + fmtP(r.stop) + ' · יעד ' + fmtP(r.t2), () => goTo('day', 'day-' + r.symbol), 'daytrade', 'catalyst', w);
+        const z = size(r.trigger, r.stop, GRADE_MULT[r.grade] ?? 1);
+        return row(r.symbol, r.catalyst, 'ציון ' + r.grade + ' · טריגר ' + fmtP(r.trigger) + ' · סטופ ' + fmtP(r.stop) + ' · יעד ' + fmtP(r.t2) + (z && z.shares ? ' · ' + z.shares + ' מניות ≈ ' + usdK(z.pos) : ''), () => goTo('day', 'day-' + r.symbol), 'daytrade', 'catalyst', w);
       }));
     } else if (dd.status === 'error') fail(buy); else skel(buy, 3, '2.5rem');
     if (sw.status === 'ok') {
       wait.replaceChildren(...sw.data.filter((r) => r.action !== 'avoid').map((r) => {
         const w = W('symbol', r.symbol);
-        const l2 = r.action === 'buy_close' ? 'קנייה מותנית בסגירה חזקה · סטופ ' + fmtP(r.stop) : 'נקודת קנייה ' + fmtP(r.pivot) + ' (‎' + fmtPct(r.dist_pivot_pct, 1) + ' ממנה) · סטופ ' + fmtP(r.stop);
+        const z = size(r.pivot, r.stop);
+        const l2 = (r.action === 'buy_close' ? 'קנייה מותנית בסגירה חזקה · סטופ ' + fmtP(r.stop) : 'נקודת קנייה ' + fmtP(r.pivot) + ' (‎' + fmtPct(r.dist_pivot_pct, 1) + ' ממנה) · סטופ ' + fmtP(r.stop)) + (z && z.shares ? ' · ' + z.shares + ' מניות ≈ ' + usdK(z.pos) : '');
         return row(r.symbol, r.status, l2, () => goTo('swing', 'swing-' + r.symbol), 'swing_setups', 'status', w);
       }));
     } else if (sw.status === 'error') fail(wait); else skel(wait, 3, '2.5rem');
@@ -584,7 +646,9 @@
       const bt = el('button', 'mc-btn-s', 'חשב פוזיציה'); bt.type = 'button';
       bt.addEventListener('click', () => fillCalc(r.trigger, r.stop, r.t2, r.symbol));
       foot.append(rr, bt);
-      c.append(top, mark(el('p', 'mc-cat', r.catalyst), 'daytrade', 'catalyst', w), checks, bar, lv, plan, av, foot);
+      const mult = GRADE_MULT[r.grade] ?? 1;
+      const sz = sizeBox(size(r.trigger, r.stop, mult), 'ציון ' + r.grade + ': ' + (mult === 1 ? 'סיכון מלא' : mult === 0.75 ? '75% מהסיכון' : 'רבע סיכון') + ' (' + usd(acct() * riskPct() / 100 * mult) + ') · כניסה בטריגר');
+      c.append(top, mark(el('p', 'mc-cat', r.catalyst), 'daytrade', 'catalyst', w), checks, bar, lv, sz, plan, av, foot);
       return c;
     }));
   }
@@ -611,7 +675,13 @@
     calc();
     $('#calc-card').scrollIntoView({behavior: 'smooth', block: 'center'});
   }
-  ['#c-acct', '#c-risk', '#c-entry', '#c-stop', '#c-target'].forEach((i) => $(i).addEventListener('input', () => { window.mcCalcSym = null; calc(); }));
+  ['#c-entry', '#c-stop', '#c-target'].forEach((i) => $(i).addEventListener('input', () => { window.mcCalcSym = null; calc(); }));
+  ['#c-acct', '#c-risk'].forEach((i) => $(i).addEventListener('change', () => {
+    const a = +$('#c-acct').value, r = +$('#c-risk').value;
+    if (a > 0 && r > 0 && r <= 5) dash.setParams({account: a, risk_pct: r}); else applyPrefs();
+    calc();
+  }));
+  ['#c-acct', '#c-risk'].forEach((i) => $(i).addEventListener('input', calc));
   calc();
 
   /* ---------- swing ---------- */
@@ -652,7 +722,8 @@
       const plan = el('p', r.action === 'avoid' ? 'mc-avoid' : 'mc-plan'); plan.append(el('b', null, r.action === 'avoid' ? 'למה לא: ' : 'התוכנית: '), mark(el('span', null, r.reason), 'swing_setups', 'reason', w));
       const foot = el('div', 'mc-tc-foot');
       if (r.action !== 'avoid') { const bt = el('button', 'mc-btn-s', 'חשב פוזיציה'); bt.type = 'button'; bt.addEventListener('click', () => { show('day'); fillCalc(r.pivot, r.stop, r.target, r.symbol); }); foot.append(el('span'), bt); }
-      c.append(top, price, bar, lv, meta, plan, foot);
+      const sz = r.action === 'avoid' ? null : sizeBox(size(r.pivot, r.stop), 'כניסה בנקודת הקנייה · סיכון ' + usd(acct() * riskPct() / 100) + ' · מסגרת סווינג כוללת לפי מצב השוק');
+      c.append(top, price, bar, lv, ...(sz ? [sz] : []), meta, plan, foot);
       return c;
     }));
   }
@@ -801,10 +872,11 @@
   }
 
   function drawAll() {
+    applyPrefs();
     drawAsOf();
     const p = window.mcPage || 'decide';
     if (p === 'decide') { drawRegime(); drawNow(); drawDecisions(); }
-    if (p === 'day') drawDay();
+    if (p === 'day') { drawDay(); calc(); }
     if (p === 'swing') { drawSectors(); drawSwing(); }
     if (p === 'market') { drawBrief(); drawGauges(); drawIndices(); drawSocial(); drawMacro(); drawTables(); }
   }
