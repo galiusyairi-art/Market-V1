@@ -1,0 +1,37 @@
+[
+ {
+  "symbol": "GOOG",
+  "mentions": 219,
+  "sentiment": "neutral"
+ },
+ {
+  "symbol": "MU",
+  "mentions": 217,
+  "sentiment": "bullish"
+ },
+ {
+  "symbol": "ADBE",
+  "mentions": 199,
+  "sentiment": "bullish"
+ },
+ {
+  "symbol": "NVDA",
+  "mentions": 152,
+  "sentiment": "bullish"
+ },
+ {
+  "symbol": "APLD",
+  "mentions": 143,
+  "sentiment": "bullish"
+ },
+ {
+  "symbol": "SPCX",
+  "mentions": 125,
+  "sentiment": "neutral"
+ },
+ {
+  "symbol": "PLTR",
+  "mentions": 67,
+  "sentiment": "bearish"
+ }
+]

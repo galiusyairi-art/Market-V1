@@ -1,0 +1,47 @@
+[
+ {
+  "symbol": "VEEA",
+  "name": "Veea",
+  "prev_close": 3.87,
+  "pre_price": 5.91,
+  "pre_pct": 52.7,
+  "reg_price": null,
+  "target": 7.1,
+  "target_pct": 20.1,
+  "stop": 4.9,
+  "buzz_score": 88,
+  "why": "חזרה לעמידה בדרישות הנאסד״ק, ונסחרו 20 מיליון מניות כבר בפרה-מרקט",
+  "sources": "Benzinga · StockAnalysis · סורקי פרה-מרקט",
+  "risk": "קיצוני · שווי כ-12M$"
+ },
+ {
+  "symbol": "FRGT",
+  "name": "Freight Technologies",
+  "prev_close": 0.2564,
+  "pre_price": 0.33,
+  "pre_pct": 28.7,
+  "reg_price": null,
+  "target": 0.4,
+  "target_pct": 21.2,
+  "stop": 0.28,
+  "buzz_score": 74,
+  "why": "מובילת העליות בפרה-מרקט (‎+28%–68% לאורך הבוקר)",
+  "sources": "Benzinga · סורקי Small-cap",
+  "risk": "קיצוני · מניית פני"
+ },
+ {
+  "symbol": "OFAL",
+  "name": "OFA Group",
+  "prev_close": 0.41,
+  "pre_price": 0.53,
+  "pre_pct": 29.3,
+  "reg_price": null,
+  "target": 0.62,
+  "target_pct": 17.0,
+  "stop": 0.45,
+  "buzz_score": 69,
+  "why": "‎+29% בפרה-מרקט בסקטור התעשייה",
+  "sources": "Benzinga · סורקי פרה-מרקט",
+  "risk": "קיצוני · מניית פני"
+ }
+]

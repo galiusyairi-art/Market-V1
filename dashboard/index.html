@@ -1,0 +1,608 @@
+<style>
+#dash-root{--dash-gutter:clamp(12px,2.2vw,28px)}
+.mc{direction:rtl;font-family:var(--font-anthropic-sans);color:var(--color-fg);display:grid;gap:var(--cds-gap-md);font-variant-numeric:tabular-nums}
+.mc *{box-sizing:border-box}
+.mc-card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);min-width:0}
+.mc-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--cds-gap-sm);margin:0 0 var(--cds-gap-sm)}
+.mc-h h2{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0}
+.mc-note{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin:0}
+.mc-muted{color:var(--color-fg-muted)}
+.mc-ok{color:var(--color-ok)}.mc-bad{color:var(--color-bad)}.mc-warn{color:var(--color-warn)}
+.mc-ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+.mc-serif{font-family:var(--font-anthropic-serif);font-weight:400}
+
+/* top bar */
+.mc-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--cds-gap-md)}
+.mc-title{display:flex;flex-direction:column;gap:2px}
+.mc-title h1{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-title);margin:0;line-height:1.15}
+.mc-asof{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.mc-ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:var(--cds-gap-sm)}
+.mc-session{display:flex;align-items:center;gap:var(--cds-gap-sm);padding:var(--cds-pad-xs) var(--cds-pad-md);border:1px solid var(--color-border-line);border-radius:999px;background:var(--color-panel);font-size:var(--cds-font-size-caption)}
+.mc-dot{width:.55rem;height:.55rem;border-radius:50%;background:var(--color-fg-muted);flex:none}
+.mc-session[data-phase=regular] .mc-dot{background:var(--color-ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-ok) 25%,transparent)}
+.mc-session[data-phase=pre] .mc-dot,.mc-session[data-phase=after] .mc-dot{background:var(--color-warn)}
+.mc-session b{font-weight:600}
+.mc-btn{font:inherit;font-size:var(--cds-font-size-body);font-weight:600;padding:var(--cds-pad-sm) var(--cds-pad-lg);border-radius:999px;border:0;cursor:pointer;background:var(--color-fg);color:var(--color-bg);display:inline-flex;align-items:center;gap:8px}
+.mc-btn:hover{opacity:.88}
+.mc-btn svg{width:16px;height:16px}
+.mc-tip{font-size:var(--cds-font-size-caption);background:var(--cds-surface-popover);border:1px solid var(--cds-border);border-radius:var(--cds-radius);box-shadow:var(--cds-shadow-popover);padding:var(--cds-pad-sm) var(--cds-pad-md);max-width:30rem}
+.mc-tip[hidden]{display:none}
+
+/* row: brief + gauges */
+.mc-row1{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr))}
+.mc-headline{font-family:var(--font-anthropic-serif);font-size:calc(var(--cds-font-size-heading) * 1.15);line-height:1.45;margin:0 0 var(--cds-gap-md)}
+.mc-tabs{display:flex;gap:4px;border-bottom:1px solid var(--color-border-line);margin-bottom:var(--cds-gap-sm)}
+.mc-tab{font:inherit;font-size:var(--cds-font-size-caption);background:none;border:0;border-bottom:2px solid transparent;padding:6px 10px;color:var(--color-fg-muted);cursor:pointer;margin-bottom:-1px}
+.mc-tab[aria-selected=true]{color:var(--color-fg);border-bottom-color:var(--color-fg);font-weight:600}
+.mc-brieftext{line-height:1.7;margin:0;min-height:6.5em}
+.mc-gauges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--cds-gap-sm)}
+.mc-gauge{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;min-width:0}
+.mc-gauge svg{width:100%;max-width:150px;height:auto;overflow:visible}
+.mc-gauge .mc-glabel{font-weight:600}
+.mc-gauge .mc-gbias{font-size:var(--cds-font-size-caption)}
+.mc-gauge .mc-gdrv{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.4}
+
+/* indices */
+.mc-idx{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr))}
+.mc-ix .mc-ixname{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);display:flex;justify-content:space-between}
+.mc-ix .mc-ixval{font-family:var(--font-anthropic-serif);font-size:var(--cds-font-size-title);line-height:1.2;margin:2px 0 6px}
+.mc-chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.mc-chip{border-radius:calc(var(--cds-radius) * .7);padding:4px 6px;background:color-mix(in srgb,var(--color-fg) 5%,transparent);display:flex;flex-direction:column;gap:1px;min-width:0}
+.mc-chip small{font-size:10.5px;color:var(--color-fg-muted);white-space:nowrap}
+.mc-chip span{font-size:var(--cds-font-size-caption);font-weight:600}
+
+/* section header */
+.mc-sec{display:flex;align-items:baseline;gap:var(--cds-gap-sm);margin:var(--cds-gap-sm) 0 0}
+.mc-sec h2{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0}
+
+/* pick cards */
+.mc-picks{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fill,minmax(min(100%,17.5rem),1fr))}
+.mc-pk{display:flex;flex-direction:column;gap:10px;position:relative}
+.mc-pk-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.mc-sym{font-size:1.35rem;font-weight:700;letter-spacing:.02em;direction:ltr}
+.mc-rank{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.mc-name{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.mc-conf{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.mc-conf b{font-size:var(--cds-font-size-caption)}
+.mc-confbar{width:64px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--color-fg) 10%,transparent);overflow:hidden;direction:ltr}
+.mc-confbar i{display:block;height:100%;background:var(--color-ok);border-radius:3px}
+.mc-price{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.mc-price .mc-now{font-family:var(--font-anthropic-serif);font-size:1.9rem;line-height:1}
+.mc-tgt{text-align:left;font-size:var(--cds-font-size-caption)}
+.mc-tgt strong{font-size:var(--cds-font-size-body);display:block}
+.mc-sess{display:grid;grid-template-columns:auto 1fr auto;gap:2px 8px;font-size:var(--cds-font-size-caption);align-items:center;padding:6px 8px;border-radius:calc(var(--cds-radius) * .7);background:color-mix(in srgb,var(--color-fg) 4%,transparent)}
+.mc-sess .mc-live{font-weight:700}
+.mc-sess .mc-livebadge{font-size:10px;padding:0 5px;border-radius:999px;background:var(--color-ok);color:var(--color-bg);margin-inline-start:4px}
+.mc-bar{direction:ltr;position:relative;height:46px;margin-top:4px}
+.mc-track{position:absolute;left:0;right:0;top:20px;height:8px;border-radius:4px;background:color-mix(in srgb,var(--color-fg) 9%,transparent);overflow:hidden}
+.mc-zone{position:absolute;top:0;bottom:0}
+.mc-fill{position:absolute;top:20px;height:8px;border-radius:4px}
+.mc-mk{position:absolute;top:14px;width:2px;height:20px;transform:translateX(-1px);border-radius:1px}
+.mc-mk-l{position:absolute;font-size:10px;line-height:1;white-space:nowrap;transform:translateX(-50%);color:var(--color-fg-muted)}
+.mc-cur{position:absolute;top:16px;width:16px;height:16px;border-radius:50%;transform:translateX(-8px);border:3px solid var(--color-panel);box-shadow:0 0 0 1.5px currentColor}
+.mc-levels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;text-align:center}
+.mc-lv{padding:5px 2px;border-radius:calc(var(--cds-radius) * .7);background:color-mix(in srgb,var(--color-fg) 4%,transparent);min-width:0}
+.mc-lv small{display:block;font-size:10.5px;color:var(--color-fg-muted)}
+.mc-lv span{font-size:var(--cds-font-size-caption);font-weight:600}
+.mc-lv.stop span{color:var(--color-bad)}.mc-lv.tp span,.mc-lv.tg span{color:var(--color-ok)}
+.mc-thesis{font-size:var(--cds-font-size-caption);line-height:1.55;margin:0}
+.mc-tags{display:flex;flex-wrap:wrap;gap:4px}
+.mc-tag{font-size:10.5px;padding:2px 7px;border-radius:999px;border:1px solid var(--color-border-line);color:var(--color-fg-muted)}
+.mc-prog{font-size:var(--cds-font-size-caption);display:flex;justify-content:space-between}
+
+/* buzz */
+.mc-row-buzz{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr))}
+.mc-buzzgrid{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fill,minmax(min(100%,15rem),1fr))}
+.mc-bz{display:flex;flex-direction:column;gap:8px;border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-md);background:var(--color-bg)}
+.mc-risk{font-size:10.5px;font-weight:600;color:var(--color-bad);border:1px solid color-mix(in srgb,var(--color-bad) 45%,transparent);border-radius:999px;padding:1px 7px;align-self:flex-start}
+.mc-heat{display:flex;gap:2px;direction:ltr}
+.mc-heat i{flex:1;height:6px;border-radius:2px;background:color-mix(in srgb,var(--color-fg) 10%,transparent)}
+.mc-heat i.on{background:var(--color-warn)}
+.mc-jump{font-family:var(--font-anthropic-serif);font-size:1.6rem;line-height:1}
+
+/* social */
+.mc-social svg{display:block}
+.mc-legend{display:flex;gap:12px;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);flex-wrap:wrap}
+.mc-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-inline-end:4px;vertical-align:middle}
+
+/* macro */
+.mc-macro{display:grid;gap:var(--cds-gap-sm);grid-template-columns:repeat(auto-fill,minmax(min(100%,11.5rem),1fr))}
+.mc-mt{padding:var(--cds-pad-md);display:flex;flex-direction:column;gap:3px;min-height:8.2rem}
+.mc-mt .mc-ml{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);display:flex;align-items:center;gap:6px}
+.mc-mt .mc-mv{font-family:var(--font-anthropic-serif);font-size:1.65rem;line-height:1.15;direction:ltr;text-align:right}
+.mc-mt .mc-mn{font-size:11.5px;line-height:1.4}
+.mc-mt .mc-mx{font-size:11px;color:var(--color-fg-muted);line-height:1.35;margin-top:auto}
+.mc-tone{width:.5rem;height:.5rem;border-radius:50%;flex:none;background:var(--color-fg-muted)}
+.mc-tone[data-tone=ok]{background:var(--color-ok)}.mc-tone[data-tone=bad]{background:var(--color-bad)}.mc-tone[data-tone=warn]{background:var(--color-warn)}
+
+/* bottom */
+.mc-bottom{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr))}
+.mc-tbl{width:100%;border-collapse:collapse;font-size:var(--cds-font-size-caption)}
+.mc-tbl th{text-align:right;font-weight:600;color:var(--color-fg-muted);padding:6px 4px;border-bottom:1px solid var(--color-border-line);position:sticky;top:0;background:var(--color-panel)}
+.mc-tbl td{padding:7px 4px;border-bottom:1px solid var(--color-border-line);vertical-align:top;line-height:1.45}
+.mc-tbl tr:last-child td{border-bottom:0}
+.mc-wbar{display:inline-block;height:6px;border-radius:3px;background:var(--color-fg);opacity:.75;vertical-align:middle;margin-inline-start:6px}
+.mc-imp{display:inline-block;width:7px;height:7px;border-radius:50%;margin-inline-end:6px;vertical-align:middle}
+.mc-imp[data-i=high]{background:var(--color-bad)}.mc-imp[data-i=med]{background:var(--color-warn)}
+.mc-cal-today td{font-weight:600}
+.mc-disc{font-size:11px;color:var(--color-fg-muted);text-align:center;line-height:1.5;margin:var(--cds-gap-sm) 0 0}
+
+.mc-fail{display:flex;align-items:center;justify-content:center;gap:8px;min-height:5rem;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.mc-fail::before{content:"";width:.375rem;height:.375rem;border-radius:50%;background:var(--color-bad)}
+[data-dash-source-state=empty]{color:transparent}
+[data-dash-source-state=refreshing]{opacity:.5;transition:opacity var(--cds-dur-slow)}
+@media (prefers-reduced-motion:no-preference){
+  .mc-anim .mc-fill,.mc-anim .mc-cur{animation:mc-in var(--cds-dur-slow) var(--cds-ease-out) both}
+  .mc-anim .mc-garc{animation:mc-arc 1.1s var(--cds-ease-out) both}
+  @keyframes mc-in{from{opacity:0}to{opacity:1}}
+  @keyframes mc-arc{from{stroke-dashoffset:var(--len)}}
+  .mc-session[data-phase=regular] .mc-dot{animation:mc-pulse 2s infinite}
+  @keyframes mc-pulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--color-ok) 0%,transparent)}}
+}
+</style>
+
+<div class="mc" id="cockpit">
+  <!-- top bar -->
+  <header class="mc-top" id="top">
+    <div class="mc-title">
+      <h1>תא הטייס של השוק</h1>
+      <span class="mc-asof">ניתוח אחרון: <span id="asof" class="dash-skeleton" data-source="brief" data-field="text" data-where="key=as_of">—</span> <span id="asof-age" class="mc-muted"></span></span>
+    </div>
+    <div class="mc-ctrl">
+      <div class="mc-session" id="session" data-phase="closed"><span class="mc-dot"></span><b id="sess-name">—</b><span id="sess-clock" class="mc-ltr mc-muted"></span><span id="sess-next" class="mc-muted"></span></div>
+      <button class="mc-btn" id="analyze" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>תן ניתוח</button>
+    </div>
+  </header>
+  <div class="mc-tip" id="analyze-tip" hidden>הנתונים נטענו מחדש. כדי להריץ סריקה ומחקר חדשים (חדשות, מאקרו, פורומים ורשתות), כתוב <b>„תן ניתוח”</b> בצ׳אט. המוח יסרוק את כל המקורות, יעדכן את התחזיות ואת המניות, והדף יתעדכן כאן.</div>
+
+  <!-- brief + probability -->
+  <section class="mc-row1" id="overview">
+    <div class="mc-card" id="brief-card">
+      <div class="mc-h"><h2>מה קורה בשוק</h2><p class="mc-note">סינתזה של חדשות, מאקרו ורשתות</p></div>
+      <p class="mc-headline dash-skeleton" id="headline" data-source="brief" data-field="text" data-where="key=headline">—</p>
+      <div class="mc-tabs" role="tablist" id="brief-tabs">
+        <button class="mc-tab" role="tab" data-k="today" aria-selected="true">היום</button>
+        <button class="mc-tab" role="tab" data-k="week" aria-selected="false">מתחילת השבוע</button>
+        <button class="mc-tab" role="tab" data-k="month" aria-selected="false">מתחילת החודש</button>
+      </div>
+      <p class="mc-brieftext dash-skeleton" id="brieftext" data-source="brief" data-field="text" data-where="key=today">—</p>
+    </div>
+    <div class="mc-card" id="odds-card">
+      <div class="mc-h"><h2>סבירות לעלייה (S&amp;P 500)</h2><p class="mc-note">מודל משוקלל · מעל 50% = הטיה לעלייה</p></div>
+      <div class="mc-gauges" id="gauges" data-source="outlook"></div>
+    </div>
+  </section>
+
+  <!-- indices -->
+  <section class="mc-idx" id="indices" data-source="indices"></section>
+
+  <!-- picks -->
+  <div class="mc-sec" id="picks-head"><h2>5 המניות להיום</h2><p class="mc-note">הכי סבירות לסגור בירוק · הבר: סטופ ← כניסה ← טייק פרופיט ← יעד</p></div>
+  <section class="mc-picks" id="picks" data-source="picks"></section>
+
+  <!-- buzz + social -->
+  <section class="mc-row-buzz" id="buzz-row">
+    <div class="mc-card" id="buzz-card">
+      <div class="mc-h"><h2>3 מניות הבאזז: פוטנציאל לעשרות אחוזים</h2></div>
+      <p class="mc-note" style="margin-bottom:var(--cds-gap-sm)">מניות קטנות עם גאפ חד ונפח חריג. ספקולציה טהורה: פוזיציה קטנה וסטופ קשיח.</p>
+      <div class="mc-buzzgrid" id="buzz" data-source="buzz"></div>
+    </div>
+    <div class="mc-card mc-social" id="social-card">
+      <div class="mc-h"><h2>הדופק ברשתות</h2><p class="mc-note">אזכורים ב-r/wallstreetbets ב-24 השעות האחרונות</p></div>
+      <div class="mc-legend" id="social-legend"></div>
+      <div id="social" data-source="social" style="min-height:230px"></div>
+    </div>
+  </section>
+
+  <!-- macro -->
+  <div class="mc-sec" id="macro-head"><h2>מאקרו: הנתונים שמזיזים את השוק</h2><p class="mc-note">ריבית, אינפלציה, תעסוקה, מסים וסחורות</p></div>
+  <section class="mc-macro" id="macro" data-source="macro"></section>
+
+  <!-- brain / calendar / sources -->
+  <section class="mc-bottom" id="brain-row">
+    <div class="mc-card" id="brain-card">
+      <div class="mc-h"><h2>המוח: איך הוחלט</h2><p class="mc-note">שיטות מסחר ומשקלן בציון</p></div>
+      <div style="max-height:22rem;overflow:auto">
+        <table class="mc-tbl" id="methods" data-source="methods" data-row-key="school">
+          <thead><tr><th data-field="school">אסכולה</th><th data-field="read">הקריאה היום</th><th data-field="weight">משקל</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="mc-card" id="calendar-card">
+      <div class="mc-h"><h2>אירועים קרובים</h2><p class="mc-note">שעון ניו יורק</p></div>
+      <table class="mc-tbl" id="calendar" data-source="calendar" data-row-key="event">
+        <thead><tr><th data-field="date">תאריך</th><th data-field="event">אירוע</th><th data-field="time">שעה</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="mc-card" id="sources-card">
+      <div class="mc-h"><h2>מקורות שנסרקו</h2><p class="mc-note">מה כל מקור תרם לניתוח</p></div>
+      <div style="max-height:22rem;overflow:auto">
+        <table class="mc-tbl" id="sources" data-source="sources" data-row-key="name">
+          <thead><tr><th data-field="group">סוג</th><th data-field="name">מקור</th><th data-field="signal">אות</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <p class="mc-disc">התחזיות הן הערכה סטטיסטית מבוססת מקורות פתוחים ואינן ייעוץ השקעות. מחירי הפרה-מרקט הם תמונת מצב מרגע הניתוח.</p>
+</div>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  const mark = (e, src, field, where) => { e.setAttribute('data-source', src); if (field) e.setAttribute('data-field', field); if (where) e.setAttribute('data-where', where); return e; };
+  const W = (k, v) => k + '=' + encodeURIComponent(v);
+  const fmtP = (v) => v == null ? '—' : (Math.abs(v) < 1 ? '$' + d3.format('.4~f')(v) : '$' + d3.format(',.2f')(v));
+  const fmtPct = (v, dp = 2) => v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + d3.format('.' + dp + 'f')(Math.abs(v)) + '%';
+  const cls = (v) => v == null ? 'mc-muted' : v > 0 ? 'mc-ok' : v < 0 ? 'mc-bad' : 'mc-muted';
+  const fail = (box) => { box.replaceChildren(el('div', 'mc-fail', 'Failed to load')); };
+  const skel = (box, n, h) => { box.replaceChildren(...Array.from({length: n}, () => { const d = el('div', 'mc-card dash-skeleton'); d.style.minHeight = h; return d; })); };
+
+  /* ---------- session clock (New York) ---------- */
+  const fmtET = new Intl.DateTimeFormat('en-US', {timeZone: 'America/New_York', weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'});
+  const PH = [
+    {k: 'pre', s: 240, e: 570, n: 'פרה-מרקט'},
+    {k: 'regular', s: 570, e: 960, n: 'מסחר פעיל'},
+    {k: 'after', s: 960, e: 1200, n: 'אפטר-מרקט'}
+  ];
+  window.mcPhase = () => {
+    const p = Object.fromEntries(fmtET.formatToParts(new Date()).map((x) => [x.type, x.value]));
+    const mins = (+p.hour) * 60 + (+p.minute) + (+p.second) / 60;
+    const wk = p.weekday === 'Sat' || p.weekday === 'Sun';
+    const cur = wk ? null : PH.find((x) => mins >= x.s && mins < x.e);
+    return {cur, mins, wk, clock: p.hour + ':' + p.minute + ':' + p.second};
+  };
+  const tick = () => {
+    const {cur, mins, wk, clock} = window.mcPhase();
+    const box = $('#session');
+    box.dataset.phase = cur ? cur.k : 'closed';
+    $('#sess-name').textContent = cur ? cur.n : 'השוק סגור';
+    $('#sess-clock').textContent = clock + ' NY';
+    let next = '';
+    if (cur) { const left = Math.max(0, Math.round(cur.e - mins)); next = '· נסגר בעוד ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0'); }
+    else if (!wk && mins < 240) { const left = Math.round(240 - mins); next = '· פרה-מרקט בעוד ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0'); }
+    $('#sess-next').textContent = next;
+    if (window.mcLastPhase !== box.dataset.phase) { window.mcLastPhase = box.dataset.phase; document.querySelectorAll('[data-sess-row]').forEach((r) => r.classList.toggle('mc-live', r.dataset.sessRow === (box.dataset.phase === 'regular' ? 'reg' : 'pre'))); }
+  };
+  tick(); setInterval(tick, 1000);
+
+  /* ---------- analyze button ---------- */
+  const ALL = ['brief', 'outlook', 'indices', 'picks', 'buzz', 'macro', 'social', 'methods', 'sources', 'calendar'];
+  $('#analyze').addEventListener('click', () => {
+    ALL.forEach((id) => dash.refresh(id));
+    const t = $('#analyze-tip'); t.hidden = false;
+    clearTimeout(window.mcTipT); window.mcTipT = setTimeout(() => { t.hidden = true; }, 9000);
+  });
+
+  /* ---------- brief tabs ---------- */
+  window.mcBriefKey = 'today';
+  document.querySelectorAll('#brief-tabs .mc-tab').forEach((b) => b.addEventListener('click', () => {
+    window.mcBriefKey = b.dataset.k;
+    document.querySelectorAll('#brief-tabs .mc-tab').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    drawBrief();
+  }));
+  function drawBrief() {
+    const d = dash.data('brief');
+    const tx = $('#brieftext'), hl = $('#headline'), asof = $('#asof');
+    tx.setAttribute('data-where', 'key=' + window.mcBriefKey);
+    if (d.status !== 'ok') {
+      [tx, hl, asof].forEach((e) => { if (d.status === 'error') { e.classList.remove('dash-skeleton'); e.textContent = '—'; } else e.classList.add('dash-skeleton'); });
+      if (d.status === 'error') fail(tx);
+      return;
+    }
+    const get = (k) => (d.data.find((r) => r.key === k) || {}).text;
+    [tx, hl, asof].forEach((e) => e.classList.remove('dash-skeleton'));
+    hl.textContent = get('headline') ?? '—';
+    tx.textContent = get(window.mcBriefKey) ?? '—';
+    const a = get('as_of');
+    asof.textContent = '—';
+    if (a) {
+      const dt = new Date(a);
+      const parts = new Intl.DateTimeFormat('he-IL', {timeZone: 'America/New_York', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit'}).format(dt);
+      asof.title = a;
+      asof.textContent = parts + ' NY';
+      const mins = Math.round((Date.now() - dt) / 60000);
+      $('#asof-age').textContent = '(' + (mins < 60 ? 'לפני ' + Math.max(mins, 0) + ' דק׳' : mins < 1440 ? 'לפני ' + Math.round(mins / 60) + ' שע׳' : 'לפני ' + Math.round(mins / 1440) + ' ימים') + ')';
+    }
+  }
+
+  /* ---------- gauges ---------- */
+  function drawGauges() {
+    const d = dash.data('outlook'), box = $('#gauges');
+    if (d.status === 'error') return fail(box);
+    if (d.status !== 'ok') { box.replaceChildren(...[0, 1, 2].map(() => { const g = el('div', 'mc-gauge dash-skeleton'); g.style.minHeight = '9rem'; return g; })); return; }
+    const first = !box.dataset.drawn; box.dataset.drawn = '1';
+    box.classList.toggle('mc-anim', first);
+    box.replaceChildren(...d.data.map((r) => {
+      const g = el('div', 'mc-gauge');
+      const W2 = 140, R = 56, cx = 70, cy = 66, sw = 11;
+      const ns = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('viewBox', '0 0 ' + W2 + ' 84'); svg.setAttribute('width', '100%');
+      const arc = d3.arc().innerRadius(R - sw / 2).outerRadius(R + sw / 2).cornerRadius(sw / 2);
+      const bg = document.createElementNS(ns, 'path');
+      bg.setAttribute('d', arc({startAngle: -Math.PI / 2, endAngle: Math.PI / 2}));
+      bg.setAttribute('transform', `translate(${cx},${cy})`);
+      bg.style.fill = 'var(--cds-chart-grid)';
+      svg.appendChild(bg);
+      const col = r.p_up >= 0.55 ? 'var(--color-ok)' : r.p_up <= 0.45 ? 'var(--color-bad)' : 'var(--color-warn)';
+      // value arc as a stroked path so it can animate
+      const a1 = -Math.PI / 2, a2 = -Math.PI / 2 + Math.PI * r.p_up;
+      const p = document.createElementNS(ns, 'path');
+      const x1 = cx + R * Math.sin(a1), y1 = cy - R * Math.cos(a1), x2 = cx + R * Math.sin(a2), y2 = cy - R * Math.cos(a2);
+      p.setAttribute('d', `M${x1},${y1} A${R},${R} 0 0 1 ${x2},${y2}`);
+      p.setAttribute('fill', 'none'); p.setAttribute('stroke-width', sw); p.setAttribute('stroke-linecap', 'round');
+      p.style.stroke = col; p.setAttribute('class', 'mc-garc');
+      const len = Math.PI * R * r.p_up; p.style.strokeDasharray = len; p.style.setProperty('--len', len); p.style.strokeDashoffset = 0;
+      svg.appendChild(p);
+      // 50% tick
+      const t = document.createElementNS(ns, 'line');
+      t.setAttribute('x1', cx); t.setAttribute('x2', cx); t.setAttribute('y1', cy - R - sw / 2 - 3); t.setAttribute('y2', cy - R + sw / 2 + 3);
+      t.style.stroke = 'var(--cds-chart-reference)'; t.setAttribute('stroke-width', 1.5);
+      svg.appendChild(t);
+      const tx = document.createElementNS(ns, 'text');
+      tx.setAttribute('x', cx); tx.setAttribute('y', cy - 6); tx.setAttribute('text-anchor', 'middle');
+      tx.style.fontFamily = 'var(--font-anthropic-serif)'; tx.style.fontSize = '26px'; tx.style.fill = 'var(--color-fg)';
+      tx.textContent = d3.format('.0%')(r.p_up);
+      mark(tx, 'outlook', 'p_up', W('horizon', r.horizon));
+      svg.appendChild(tx);
+      const dn = document.createElementNS(ns, 'text');
+      dn.setAttribute('x', cx); dn.setAttribute('y', cy + 14); dn.setAttribute('text-anchor', 'middle');
+      dn.style.fontSize = '10px'; dn.style.fill = 'var(--color-fg-muted)';
+      dn.textContent = 'ירידה ' + d3.format('.0%')(1 - r.p_up);
+      svg.appendChild(dn);
+      g.append(svg,
+        mark(el('div', 'mc-glabel', r.label), 'outlook', 'label', W('horizon', r.horizon)),
+        mark(el('div', 'mc-gbias ' + (r.p_up >= 0.55 ? 'mc-ok' : r.p_up <= 0.45 ? 'mc-bad' : 'mc-warn'), r.bias), 'outlook', 'bias', W('horizon', r.horizon)),
+        mark(el('div', 'mc-gdrv', r.drivers), 'outlook', 'drivers', W('horizon', r.horizon)));
+      return g;
+    }));
+  }
+
+  /* ---------- indices ---------- */
+  function drawIndices() {
+    const d = dash.data('indices'), box = $('#indices');
+    if (d.status === 'error') return fail(box);
+    if (d.status !== 'ok') return skel(box, 3, '7.5rem');
+    box.replaceChildren(...d.data.map((r) => {
+      const c = el('div', 'mc-card mc-ix');
+      const w = W('symbol', r.symbol);
+      const nm = el('div', 'mc-ixname');
+      nm.append(mark(el('span', null, r.name), 'indices', 'name', w), el('span', 'mc-ltr', 'סגירה אחרונה'));
+      const v = mark(el('div', 'mc-ixval mc-ltr', d3.format(',.2f')(r.last_close)), 'indices', 'last_close', w);
+      const chips = el('div', 'mc-chips');
+      [['pre_pct', 'חוזים עכשיו'], ['day_pct', 'אתמול'], ['wtd_pct', 'מתחילת שבוע'], ['mtd_pct', 'מתחילת חודש']].forEach(([f, l]) => {
+        const ch = el('div', 'mc-chip');
+        ch.append(el('small', null, l), mark(el('span', 'mc-ltr ' + cls(r[f]), fmtPct(r[f])), 'indices', f, w));
+        chips.append(ch);
+      });
+      c.append(nm, v, chips);
+      return c;
+    }));
+  }
+
+  /* ---------- progress calc ---------- */
+  dash.calc('progress', {
+    title: 'התקדמות ליעד',
+    description: 'איזה חלק מהמהלך הצפוי (מהסגירה הקודמת עד היעד) כבר בוצע, לפי המחיר העדכני ביותר: מסחר רגיל, אחרת פרה-מרקט, אחרת סגירה.',
+    inputs: ['picks', 'buzz'],
+    fn: (picks, buzz) => [...picks, ...buzz].map((r) => {
+      const current = r.reg_price ?? r.pre_price ?? r.prev_close;
+      return {symbol: r.symbol, current, progress_pct: Math.round(((current - r.prev_close) / (r.target - r.prev_close)) * 1000) / 10};
+    })
+  });
+
+  function priceBar(r, cur, opt) {
+    const lo = Math.min(r.stop, r.prev_close, cur), hi = Math.max(r.target, cur);
+    const pad = (hi - lo) * 0.04;
+    const x = d3.scaleLinear([lo - pad, hi + pad], [0, 100]).clamp(true);
+    const bar = el('div', 'mc-bar');
+    const track = el('div', 'mc-track');
+    const zone = (a, b, c, o) => { const z = el('div', 'mc-zone'); z.style.left = x(Math.min(a, b)) + '%'; z.style.width = Math.abs(x(b) - x(a)) + '%'; z.style.background = `color-mix(in srgb, ${c} ${o}%, transparent)`; return z; };
+    const entry = r.entry ?? r.prev_close;
+    track.append(zone(r.stop, entry, 'var(--color-bad)', 22));
+    if (r.take_profit != null) { track.append(zone(entry, r.take_profit, 'var(--color-ok)', 16), zone(r.take_profit, r.target, 'var(--color-ok)', 34)); }
+    else track.append(zone(entry, r.target, 'var(--color-ok)', 24));
+    bar.append(track);
+    // fill from prev close to current
+    const f = el('div', 'mc-fill');
+    const up = cur >= r.prev_close;
+    f.style.left = x(Math.min(cur, r.prev_close)) + '%'; f.style.width = Math.abs(x(cur) - x(r.prev_close)) + '%';
+    f.style.background = up ? 'var(--color-ok)' : 'var(--color-bad)';
+    bar.append(f);
+    const tickAt = (v, c, label, top) => {
+      const m = el('div', 'mc-mk'); m.style.left = x(v) + '%'; m.style.background = c; bar.append(m);
+      if (label) { const l = el('div', 'mc-mk-l', label); l.style.left = x(v) + '%'; l.style.top = top ? '0px' : '36px'; bar.append(l); }
+    };
+    tickAt(r.stop, 'var(--color-bad)', 'SL', false);
+    tickAt(r.prev_close, 'var(--color-fg-muted)', 'סגירה', true);
+    if (r.entry != null) tickAt(r.entry, 'var(--color-fg)', 'כניסה', false);
+    if (r.take_profit != null) tickAt(r.take_profit, 'var(--color-ok)', 'TP', false);
+    tickAt(r.target, 'var(--color-ok)', 'יעד', true);
+    const dot = el('div', 'mc-cur'); dot.style.left = x(cur) + '%';
+    dot.style.background = up ? 'var(--color-ok)' : 'var(--color-bad)'; dot.style.color = up ? 'var(--color-ok)' : 'var(--color-bad)';
+    dot.title = 'עכשיו ' + fmtP(cur);
+    bar.append(dot);
+    return bar;
+  }
+
+  function sessRows(r, src) {
+    const box = el('div', 'mc-sess');
+    const w = W('symbol', r.symbol);
+    const live = window.mcPhase().cur;
+    const liveKey = live && live.k === 'regular' ? 'reg' : 'pre';
+    const row = (key, label, pf, cf) => {
+      const lab = el('span', null, label); lab.dataset.sessRow = key;
+      if (key === liveKey) { lab.classList.add('mc-live'); }
+      const p = mark(el('span', 'mc-ltr', fmtP(r[pf])), src, pf, w);
+      const c = cf ? mark(el('span', 'mc-ltr ' + cls(r[cf]), r[cf] == null ? '—' : fmtPct(r[cf])), src, cf, w) : el('span');
+      if (r[pf] == null) p.textContent = key === 'reg' ? 'יעודכן בריענון' : 'אין נתון';
+      p.classList.toggle('mc-muted', r[pf] == null);
+      box.append(lab, p, c);
+    };
+    row('prev', 'סגירה קודמת', 'prev_close', null);
+    row('pre', 'פרה-מרקט', 'pre_price', 'pre_pct');
+    row('reg', 'מסחר רגיל', 'reg_price', src === 'picks' ? 'reg_pct' : null);
+    return box;
+  }
+
+  /* ---------- picks ---------- */
+  function drawPicks() {
+    const d = dash.data('picks'), pr = dash.data('progress'), box = $('#picks');
+    if (d.status === 'error') return fail(box);
+    if (d.status !== 'ok') return skel(box, 5, '24rem');
+    const prog = pr.status === 'ok' ? new Map(pr.data.map((r) => [r.symbol, r])) : new Map();
+    const first = !box.dataset.drawn; box.dataset.drawn = '1'; box.classList.toggle('mc-anim', first);
+    box.replaceChildren(...d.data.map((r) => {
+      const w = W('symbol', r.symbol);
+      const cur = r.reg_price ?? r.pre_price ?? r.prev_close;
+      const c = el('article', 'mc-card mc-pk'); c.id = 'pick-' + r.symbol;
+      const top = el('div', 'mc-pk-top');
+      const idb = el('div');
+      const symrow = el('div'); symrow.style.display = 'flex'; symrow.style.alignItems = 'baseline'; symrow.style.gap = '8px';
+      symrow.append(mark(el('span', 'mc-rank', '#' + r.rank), 'picks', 'rank', w), mark(el('span', 'mc-sym', r.symbol), 'picks', 'symbol', w));
+      idb.append(symrow, mark(el('div', 'mc-name', r.name), 'picks', 'name', w));
+      const conf = el('div', 'mc-conf');
+      const cb = el('div', 'mc-confbar'); const ci = el('i'); ci.style.width = r.confidence + '%'; cb.append(ci);
+      const cl = el('b'); cl.append('ביטחון ', mark(el('span', null, r.confidence + '%'), 'picks', 'confidence', w));
+      conf.append(cl, cb);
+      top.append(idb, conf);
+
+      const price = el('div', 'mc-price');
+      const nowb = el('div');
+      nowb.append(el('div', 'mc-note', 'מחיר עכשיו'), el('div', 'mc-now mc-ltr', fmtP(cur)));
+      const tg = el('div', 'mc-tgt');
+      const ts = el('strong'); ts.append(mark(el('span', 'mc-ltr', fmtP(r.target)), 'picks', 'target', w));
+      tg.append(el('span', 'mc-muted', 'מחיר יעד'), ts, mark(el('span', 'mc-ltr mc-ok', fmtPct(r.target_pct)), 'picks', 'target_pct', w));
+      price.append(nowb, tg);
+
+      const pg = prog.get(r.symbol);
+      const progRow = el('div', 'mc-prog');
+      progRow.append(el('span', 'mc-muted', 'מימוש המהלך עד היעד'), pg ? mark(el('span', 'mc-ltr ' + cls(pg.progress_pct), d3.format('.1f')(pg.progress_pct) + '%'), 'progress', 'progress_pct', w) : el('span', 'mc-muted', '—'));
+
+      const lv = el('div', 'mc-levels');
+      [['entry', 'כניסה', ''], ['stop', 'סטופ לוס', 'stop'], ['take_profit', 'טייק פרופיט', 'tp'], ['target', 'יעד', 'tg']].forEach(([f, l, k]) => {
+        const b = el('div', 'mc-lv ' + k); b.append(el('small', null, l), mark(el('span', 'mc-ltr', fmtP(r[f])), 'picks', f, w)); lv.append(b);
+      });
+      const rr = (r.target - r.entry) / (r.entry - r.stop);
+      const tags = el('div', 'mc-tags');
+      tags.append(mark(el('span', 'mc-tag', r.catalyst), 'picks', 'catalyst', w), mark(el('span', 'mc-tag', r.setup), 'picks', 'setup', w), el('span', 'mc-tag mc-ltr', 'R:R 1:' + d3.format('.1f')(rr)));
+      c.append(top, price, priceBar(r, cur), progRow, lv, sessRows(r, 'picks'), mark(el('p', 'mc-thesis', r.thesis), 'picks', 'thesis', w), tags);
+      return c;
+    }));
+  }
+
+  /* ---------- buzz ---------- */
+  function drawBuzz() {
+    const d = dash.data('buzz'), pr = dash.data('progress'), box = $('#buzz');
+    if (d.status === 'error') return fail(box);
+    if (d.status !== 'ok') return skel(box, 3, '20rem');
+    const prog = pr.status === 'ok' ? new Map(pr.data.map((r) => [r.symbol, r])) : new Map();
+    box.replaceChildren(...d.data.map((r) => {
+      const w = W('symbol', r.symbol);
+      const cur = r.reg_price ?? r.pre_price ?? r.prev_close;
+      const c = el('article', 'mc-bz'); c.id = 'buzz-' + r.symbol;
+      const top = el('div', 'mc-pk-top');
+      const idb = el('div');
+      idb.append(mark(el('div', 'mc-sym', r.symbol), 'buzz', 'symbol', w), mark(el('div', 'mc-name', r.name), 'buzz', 'name', w));
+      const jb = el('div'); jb.style.textAlign = 'left';
+      jb.append(mark(el('div', 'mc-jump mc-ltr mc-ok', fmtPct(r.pre_pct, 1)), 'buzz', 'pre_pct', w), el('div', 'mc-note', 'בפרה-מרקט'));
+      top.append(idb, jb);
+      const heat = el('div', 'mc-heat');
+      for (let i = 0; i < 10; i++) { const s = el('i'); if (i < Math.round(r.buzz_score / 10)) s.classList.add('on'); heat.append(s); }
+      const hrow = el('div', 'mc-prog');
+      hrow.append(el('span', 'mc-muted', 'עוצמת באזז'), mark(el('span', null, String(r.buzz_score)), 'buzz', 'buzz_score', w));
+      const price = el('div', 'mc-price');
+      const nb = el('div'); nb.append(el('div', 'mc-note', 'עכשיו'), el('div', 'mc-now mc-ltr', fmtP(cur)));
+      nb.querySelector('.mc-now').style.fontSize = '1.45rem';
+      const tg = el('div', 'mc-tgt');
+      const ts = el('strong'); ts.append(mark(el('span', 'mc-ltr', fmtP(r.target)), 'buzz', 'target', w));
+      tg.append(el('span', 'mc-muted', 'יעד'), ts, mark(el('span', 'mc-ltr mc-ok', fmtPct(r.target_pct, 1)), 'buzz', 'target_pct', w));
+      price.append(nb, tg);
+      const pg = prog.get(r.symbol);
+      const progRow = el('div', 'mc-prog');
+      progRow.append(el('span', 'mc-muted', 'מימוש המהלך'), pg ? mark(el('span', 'mc-ltr ' + cls(pg.progress_pct), d3.format('.1f')(pg.progress_pct) + '%'), 'progress', 'progress_pct', w) : el('span', 'mc-muted', '—'));
+      const lv = el('div', 'mc-levels'); lv.style.gridTemplateColumns = 'repeat(2,minmax(0,1fr))';
+      [['stop', 'סטופ לוס', 'stop'], ['target', 'טייק פרופיט', 'tg']].forEach(([f, l, k]) => { const b = el('div', 'mc-lv ' + k); b.append(el('small', null, l), mark(el('span', 'mc-ltr', fmtP(r[f])), 'buzz', f, w)); lv.append(b); });
+      c.append(top, mark(el('span', 'mc-risk', 'סיכון ' + r.risk), 'buzz', 'risk', w), price, priceBar(r, cur), progRow, lv, sessRows(r, 'buzz'), hrow, heat,
+        mark(el('p', 'mc-thesis', r.why), 'buzz', 'why', w), mark(el('p', 'mc-note', r.sources), 'buzz', 'sources', w));
+      return c;
+    }));
+  }
+
+  /* ---------- social ---------- */
+  const SENT = {bullish: ['בולשי', 'var(--color-ok)'], neutral: ['ניטרלי', 'var(--cds-chart-muted)'], bearish: ['דובי', 'var(--color-bad)']};
+  $('#social-legend').replaceChildren(...Object.values(SENT).map(([n, c]) => { const s = el('span'); const i = el('i'); i.style.background = c; s.append(i, n); return s; }));
+  function drawSocial() {
+    const d = dash.data('social'), box = $('#social');
+    if (d.status === 'error') return fail(box);
+    if (d.status !== 'ok') { box.classList.add('dash-skeleton'); box.replaceChildren(); return; }
+    box.classList.remove('dash-skeleton');
+    const rows = [...d.data].sort((a, b) => b.mentions - a.mentions);
+    const width = Math.max(260, box.clientWidth || 320), rowH = 30, h = rows.length * rowH + 8;
+    const svg = d3.create('svg').attr('width', '100%').attr('viewBox', `0 0 ${width} ${h}`).attr('direction', 'ltr').style('direction', 'ltr');
+    const labW = 52, valW = 40;
+    const x = d3.scaleLinear([0, d3.max(rows, (r) => r.mentions)], [0, width - labW - valW - 8]);
+    const g = svg.selectAll('g').data(rows).join('g').attr('transform', (r, i) => `translate(0,${i * rowH + 4})`);
+    g.append('text').attr('x', 0).attr('y', 15).style('font-size', '12px').style('font-weight', 600).style('fill', 'var(--color-fg)').text((r) => r.symbol)
+      .attr('data-source', 'social').attr('data-field', 'symbol').attr('data-where', (r) => W('symbol', r.symbol));
+    g.append('rect').attr('x', labW).attr('y', 4).attr('height', 14).attr('rx', 4).attr('width', (r) => Math.max(4, x(r.mentions)))
+      .style('fill', (r) => (SENT[r.sentiment] || SENT.neutral)[1])
+      .attr('data-source', 'social').attr('data-field', 'sentiment').attr('data-where', (r) => W('symbol', r.symbol));
+    g.append('text').attr('x', (r) => labW + Math.max(4, x(r.mentions)) + 6).attr('y', 15).style('font-size', '11px').style('fill', 'var(--color-fg-muted)')
+      .text((r) => d3.format(',')(r.mentions)).attr('data-source', 'social').attr('data-field', 'mentions').attr('data-where', (r) => W('symbol', r.symbol));
+    box.replaceChildren(svg.node());
+  }
+
+  /* ---------- macro ---------- */
+  function drawMacro() {
+    const d = dash.data('macro'), box = $('#macro');
+    if (d.status === 'error') return fail(box);
+    if (d.status !== 'ok') return skel(box, 12, '8.2rem');
+    box.replaceChildren(...d.data.map((r) => {
+      const w = W('key', r.key);
+      const c = el('div', 'mc-card mc-mt'); c.id = 'macro-' + r.key;
+      const lab = el('div', 'mc-ml'); const t = el('span', 'mc-tone'); t.dataset.tone = r.tone;
+      lab.append(t, mark(el('span', null, r.label), 'macro', 'label', w));
+      c.append(lab, mark(el('div', 'mc-mv', r.value), 'macro', 'value', w), mark(el('div', 'mc-mn', r.note), 'macro', 'note', w));
+      if (r.next) c.append(mark(el('div', 'mc-mx', r.next), 'macro', 'next', w));
+      return c;
+    }));
+  }
+
+  /* ---------- tables ---------- */
+  function fillTable(id, cols, render) {
+    const d = dash.data(id), tb = $('#' + id + ' tbody');
+    if (d.status === 'error') { const tr = el('tr'); const td = el('td'); td.colSpan = cols; td.append(el('div', 'mc-fail', 'Failed to load')); tr.append(td); tb.replaceChildren(tr); return; }
+    if (d.status !== 'ok') { tb.replaceChildren(...[0, 1, 2].map(() => { const tr = el('tr'); const td = el('td', 'dash-skeleton', '—'); td.colSpan = cols; tr.append(td); return tr; })); return; }
+    tb.replaceChildren(...d.data.map(render));
+  }
+  const td = (t, c) => el('td', c, t);
+  function drawTables() {
+    fillTable('methods', 3, (r) => {
+      const tr = el('tr'); tr.dataset.key = r.school;
+      const a = td(r.school); a.style.fontWeight = '600'; a.title = r.method;
+      const w = td(null); w.style.whiteSpace = 'nowrap'; w.append(d3.format('.0%')(r.weight)); const b = el('span', 'mc-wbar'); b.style.width = (r.weight * 160) + 'px'; w.append(b);
+      tr.append(a, td(r.read), w); return tr;
+    });
+    const fd = (s) => { const dt = new Date(s + 'T12:00:00Z'); return new Intl.DateTimeFormat('he-IL', {day: 'numeric', month: 'numeric', timeZone: 'UTC'}).format(dt); };
+    const todayNY = new Intl.DateTimeFormat('en-CA', {timeZone: 'America/New_York'}).format(new Date());
+    fillTable('calendar', 3, (r) => {
+      const tr = el('tr'); tr.dataset.key = r.event; if (r.date === todayNY) tr.className = 'mc-cal-today';
+      const a = td(null); const i = el('span', 'mc-imp'); i.dataset.i = r.impact; a.append(i, fd(r.date)); a.style.whiteSpace = 'nowrap';
+      tr.append(a, td(r.event), td(r.time || '—', 'mc-ltr')); return tr;
+    });
+    fillTable('sources', 3, (r) => { const tr = el('tr'); tr.dataset.key = r.name; tr.append(td(r.group, 'mc-muted'), td(r.name), td(r.signal)); return tr; });
+  }
+
+  dash.onData(() => {
+    drawBrief(); drawGauges(); drawIndices(); drawPicks(); drawBuzz(); drawSocial(); drawMacro(); drawTables();
+  });
+
+  const named = location.hash && document.getElementById(location.hash.slice(1));
+  if (named) setTimeout(() => named.scrollIntoView(), 300);
+})();
+</script>

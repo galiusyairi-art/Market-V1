@@ -1,0 +1,35 @@
+[
+ {
+  "symbol": "SPX",
+  "name": "S&P 500",
+  "last_close": 7765.36,
+  "pre_pct": 0.4,
+  "day_pct": -0.47,
+  "wtd_pct": 0.55,
+  "mtd_pct": 1.49,
+  "week_ref": 7722.72,
+  "month_ref": 7651.54
+ },
+ {
+  "symbol": "IXIC",
+  "name": "נאסד״ק",
+  "last_close": 27193.34,
+  "pre_pct": 0.8,
+  "day_pct": -1.25,
+  "wtd_pct": 0.01,
+  "mtd_pct": 1.24,
+  "week_ref": 27190.86,
+  "month_ref": 26861.06
+ },
+ {
+  "symbol": "DJI",
+  "name": "דאו ג׳ונס",
+  "last_close": 51231.64,
+  "pre_pct": 0.2,
+  "day_pct": 0.1,
+  "wtd_pct": 0.11,
+  "mtd_pct": 0.64,
+  "week_ref": 51176.96,
+  "month_ref": 50906.05
+ }
+]
