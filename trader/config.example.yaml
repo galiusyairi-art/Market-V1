@@ -1,0 +1,67 @@
+# העתק ל-config.yaml ושנה לפי הצורך. סודות (טלגרם) עדיף להעביר במשתני סביבה:
+#   TRADEKIT_TELEGRAM_TOKEN, TRADEKIT_TELEGRAM_CHAT
+
+var_dir: var                      # נתונים, מודלים, יומן
+
+ibkr:
+  host: 127.0.0.1
+  port: 7497                      # TWS paper=7497, TWS live=7496, Gateway paper=4002, Gateway live=4001
+  client_id: 17
+  market_data_type: 1             # 1=זמן אמת (דורש מנוי), 3=מושהה (לבדיקות בלי מנוי)
+
+universe:
+  file: universe.txt              # מניות לסריקת הסווינג ולבקטסט
+  index: SPY                      # מדד למשטר השוק (פיצ'רים למודל)
+  watchlist: []                   # מניות שתמיד נכנסות לסריקה התוך-יומית
+
+premarket_scan:                   # סורקי IBKR שבונים את "המניות במשחק" לפני הפתיחה
+  enabled: true
+  scan_codes: [TOP_PERC_GAIN, HOT_BY_VOLUME]
+  above_price: 3.0
+  above_volume: 100000
+  rows: 25
+  refresh_min: 5
+
+intraday:
+  enabled: true
+  setups: [orb, vwap_pullback, gap_and_go]
+  max_watch: 40                   # כמה מניות עוקבים במקביל (מגבלת קווי דאטה ב-IBKR)
+  top_k: 20                       # בבקטסט: רק 20 המניות עם ה-RVOL הגבוה ביותר בכל יום
+  history_days: 15                # היסטוריית דקות לחישוב RVOL
+
+swing:
+  enabled: true
+  setups: [earnings_gap, trend_pullback, base_breakout, rsi2_reversion]
+  run_at: "16:10"                 # שעון ניו יורק
+
+strategies:                       # דריסת פרמטרים לכל אסטרטגיה (ברירות המחדל בקוד)
+  orb: {min_rvol: 1.0, stop_atr: 0.10, target_r: 5.0}
+  # vwap_pullback: {min_rvol: 1.5, target_r: 2.0}
+  # earnings_gap: {min_gap: 0.05, target_r: 2.5}
+
+meta:
+  enabled: true
+  min_prob: null                  # null = הסף שהמודל בחר בבקטסט; או מספר קבוע, למשל 0.55
+  folds: 5
+  live_weight: 3.0                # משקל של תוצאות התראות אמיתיות לעומת בקטסט
+  min_trades: 300                 # מתחת לזה לא מאמנים מודל
+
+health:                           # השתקה אוטומטית של אסטרטגיה שהאדג' שלה נשחק
+  window: 30
+  min_trades: 20
+  mute_below_r: -0.05
+
+risk:
+  account: 100000
+  risk_pct: 0.5                   # % מהחשבון בסיכון לעסקה (כניסה→סטופ)
+  max_position_pct: 25
+  max_open_intraday: 3
+  max_open_swing: 8
+  daily_loss_r: 3.0               # אחרי הפסד של 3R ביום, ההתראות התוך-יומיות נעצרות
+
+costs:
+  slippage_bps: 5.0               # החלקה לכל צד בבקטסט
+
+telegram:
+  token: null
+  chat_id: null
