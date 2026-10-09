@@ -21,8 +21,23 @@
  },
  {
   "group": "רשתות ופורומים",
-  "name": "r/wallstreetbets · Reddit (AltIndex) · Stocktwits",
-  "signal": "MU ו-ADBE בולשיות, PLTR דובית"
+  "name": "r/wallstreetbets (AltIndex, Tradestie)",
+  "signal": "MU, ADBE, NVDA בולשיות · PLTR דובית · SBUX קפצה באזכורים"
+ },
+ {
+  "group": "רשתות ופורומים",
+  "name": "Reddit-wide (AltIndex)",
+  "signal": "GME ‏679, META ‏210 אזכורים"
+ },
+ {
+  "group": "רשתות ופורומים",
+  "name": "Stocktwits (טרנד + חדשות)",
+  "signal": "ASTS, HUM, LITE, DAL בטרנד · SPY/QQQ בולשי מאוד"
+ },
+ {
+  "group": "רשתות ופורומים",
+  "name": "X / FinTwit (AltIndex, Substack)",
+  "signal": "ASTS, ‏CMG, ‏GME ו-NVDA בדיון"
  },
  {
   "group": "שווקי תחזית",

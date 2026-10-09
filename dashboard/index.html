@@ -183,14 +183,23 @@
   <!-- buzz + social -->
   <section class="mc-row-buzz" id="buzz-row">
     <div class="mc-card" id="buzz-card">
-      <div class="mc-h"><h2>3 מניות הבאזז: פוטנציאל לעשרות אחוזים</h2></div>
-      <p class="mc-note" style="margin-bottom:var(--cds-gap-sm)">מניות קטנות עם גאפ חד ונפח חריג. ספקולציה טהורה: פוזיציה קטנה וסטופ קשיח.</p>
+      <div class="mc-h"><h2>3 מניות הבאזז</h2><p class="mc-note">הכי מדוברות + תנועה חדה</p></div>
+      <p class="mc-note" style="margin-bottom:var(--cds-gap-sm)">מדורגות לפי עוצמת הדיון ברשתות. מניות קטנות הן ספקולציה טהורה: פוזיציה קטנה וסטופ קשיח.</p>
       <div class="mc-buzzgrid" id="buzz" data-source="buzz"></div>
     </div>
     <div class="mc-card mc-social" id="social-card">
-      <div class="mc-h"><h2>הדופק ברשתות</h2><p class="mc-note">אזכורים ב-r/wallstreetbets ב-24 השעות האחרונות</p></div>
+      <div class="mc-h"><h2>הדופק ברשתות</h2><p class="mc-note">WallStreetBets · Reddit · Stocktwits · X</p></div>
+      <p class="mc-thesis dash-skeleton" id="social-brief" data-source="brief" data-field="text" data-where="key=social" style="margin-bottom:var(--cds-gap-sm)">—</p>
       <div class="mc-legend" id="social-legend"></div>
+      <p class="mc-note" style="margin:6px 0 2px">אזכורים ב-r/wallstreetbets, 24 שעות</p>
       <div id="social" data-source="social" style="min-height:230px"></div>
+      <p class="mc-note" style="margin:var(--cds-gap-sm) 0 4px">על מה מדברים עכשיו, בכל הפלטפורמות</p>
+      <div style="max-height:19rem;overflow:auto">
+        <table class="mc-tbl" id="chatter" data-source="chatter" data-row-key="symbol">
+          <thead><tr><th data-field="symbol">מניה</th><th data-field="theme">על מה מדברים</th><th data-field="platforms">איפה</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </section>
 
@@ -270,7 +279,7 @@
   tick(); setInterval(tick, 1000);
 
   /* ---------- analyze button ---------- */
-  const ALL = ['brief', 'outlook', 'indices', 'picks', 'buzz', 'macro', 'social', 'methods', 'sources', 'calendar'];
+  const ALL = ['brief', 'outlook', 'indices', 'picks', 'buzz', 'macro', 'social', 'chatter', 'methods', 'sources', 'calendar'];
   $('#analyze').addEventListener('click', () => {
     ALL.forEach((id) => dash.refresh(id));
     const t = $('#analyze-tip'); t.hidden = false;
@@ -296,6 +305,7 @@
     const get = (k) => (d.data.find((r) => r.key === k) || {}).text;
     [tx, hl, asof].forEach((e) => e.classList.remove('dash-skeleton'));
     hl.textContent = get('headline') ?? '—';
+    const sb = $('#social-brief'); sb.classList.remove('dash-skeleton'); sb.textContent = get('social') ?? '—';
     tx.textContent = get(window.mcBriefKey) ?? '—';
     const a = get('as_of');
     asof.textContent = '—';
@@ -594,6 +604,13 @@
       const tr = el('tr'); tr.dataset.key = r.event; if (r.date === todayNY) tr.className = 'mc-cal-today';
       const a = td(null); const i = el('span', 'mc-imp'); i.dataset.i = r.impact; a.append(i, fd(r.date)); a.style.whiteSpace = 'nowrap';
       tr.append(a, td(r.event), td(r.time || '—', 'mc-ltr')); return tr;
+    });
+    fillTable('chatter', 3, (r) => {
+      const tr = el('tr'); tr.dataset.key = r.symbol;
+      const a = td(null); a.style.whiteSpace = 'nowrap'; a.style.fontWeight = '600';
+      const dot = el('span', 'mc-imp'); dot.style.background = (SENT[r.sentiment] || SENT.neutral)[1]; dot.title = (SENT[r.sentiment] || SENT.neutral)[0];
+      a.append(dot, r.symbol);
+      tr.append(a, td(r.theme), td(r.platforms, 'mc-muted')); return tr;
     });
     fillTable('sources', 3, (r) => { const tr = el('tr'); tr.dataset.key = r.name; tr.append(td(r.group, 'mc-muted'), td(r.name), td(r.signal)); return tr; });
   }

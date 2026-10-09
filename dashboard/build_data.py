@@ -1,5 +1,5 @@
 import json
-AS_OF="2026-10-09T09:15:00-04:00"
+AS_OF="2026-10-09T09:55:00-04:00"
 def w(name, rows):
     json.dump(rows, open(name,"w",encoding="utf-8"), ensure_ascii=False, indent=1)
 
@@ -8,6 +8,7 @@ w("brief.json",[
  {"key":"headline","text":"החוזים מצביעים על פתיחה ירוקה אחרי יום אדום בטכנולוגיה: ריבאונד ב-AI ונפט שנרגע, אבל תשואות מעל 5% וברנט מעל 100$ עדיין מגבילים את העלייה."},
  {"key":"today","text":"אתמול הנאסד״ק ירד 1.25% וה-S&P ירד 0.5%, אחרי דיווח ב-FT שההכנסות השנתיות של OpenAI עומדות על כ-50 מיליארד$ ולא 68. זו הייתה מכה למניות תשתית ה-AI (אורקל ‎-5.5%, CoreWeave ‎-7.8%). הבוקר החוזים בירוק (נאסד״ק 100 ‎+0.8%, S&P ‏‎+0.4%) והנפט יורד אחרי שטראמפ איתת שלא יפעל מול איראן לפני הבחירות. בפרה-מרקט חמים במיוחד ביטוח הבריאות (Humana ‏‎+15% בזכות דירוגי הכוכבים), מגדלי הסלולר (SpaceX קנתה ספקטרום ב-8 מיליארד$) והאופטיקה (Lumentum מכורה עד 2029). כדאי להיזהר מתעופה (Delta ‏‎-4%) ומחברות התקשורת (T-Mobile ‏‎-7%), וב-10:00 מתפרסם מדד הסנטימנט של מישיגן."},
  {"key":"week","text":"השבוע נפתח בשיאים: ה-S&P והנאסד״ק ננעלו בשיא ביום שלישי, ואחריהם הגיעו שני ימי ירידה. ה-S&P עדיין ב-‎+0.55% מתחילת השבוע, ופתיחה ירוקה היום תסגור שבוע חיובי. מה שמניע את השבוע: נפט והורמוז, תשואות האג״ח והספקות לגבי החזר ההשקעה ב-AI."},
+ {"key":"social","text":"ברשתות: ב-Stocktwits הסנטימנט של הקמעונאים על SPY ו-QQQ 'בולשי מאוד', ובראש הטרנד עומדות ASTS (נפגעה מעסקת SpaceX), HUM, LITE ו-DAL. ב-WallStreetBets הבולשיות מרוכזת בשבבים ובזיכרון (MU, NVDA, ADBE), PLTR היא המניה הדובית ביותר, ו-SBUX קפצה ב-1,920% באזכורים בגלל השמועה שתציע לרכוש את Chipotle."},
  {"key":"month","text":"אוקטובר נפתח חיובי: ה-S&P עלה ב-1.5% מתחילת החודש, למרות תשואת 10 שנים שנגעה ב-5.35% (שיא מאז 2002) וברנט מעל 100$. בספטמבר הפד העלה את הריבית ל-3.75%–4%. נקודות ההכרעה של החודש הן ה-CPI ב-14.10 (הצפי 3.6%–3.7%) וה-FOMC ב-28.10. רוחב השוק חלש, והעליות מרוכזות במניות ה-AI הגדולות."}
 ])
 
@@ -30,11 +31,11 @@ def pick(rank,sym,name,prev,pre,entry,stop,tp,target,conf,thesis,cat,setup):
       "entry":entry,"stop":stop,"take_profit":tp,"target":target,
       "target_pct":round((target/cur-1)*100,2),"confidence":conf,"thesis":thesis,"catalyst":cat,"setup":setup}
 w("picks.json",[
- pick(1,"HUM","Humana",387.12,447.00,440,424,462,472,72,"95% מחברי ה-MA בתוכניות של 4+ כוכבים ב-2027 (לעומת 20%). מדובר בבונוסים של מיליארדים, ו-Baird העלתה המלצה ליעד 596$.","דירוגי כוכבים CMS 2027","גאפ על קטליזטור עם נפח גבוה · כניסה בפולבק ל-VWAP"),
- pick(2,"LITE","Lumentum",1048.60,1111.50,1100,1068,1130,1145,66,"המנכ״ל: הביקוש לרכיבים האופטיים עולה על ההיצע, וההזמנות מלאות עד 2029. המניה תיקנה 5.6% אתמול ומנסה לחזור לשיא ה-52 שבועות (1,137.20$).","הזמנות מלאות עד 2029","ריבאונד אחרי יום תיקון · פריצת שיא"),
- pick(3,"AMT","American Tower",166.73,178.65,177,172,183,186,64,"עסקת הספקטרום של SpaceX (800MHz) מחייבת תשתית קרקעית. מורגן סטנלי ו-JPMorgan רואים בה חיובית למגדלים.","SpaceX קנתה ספקטרום של Grain","רוטציה סקטוריאלית · REIT בתנופה"),
- pick(4,"CRWV","CoreWeave",81.58,83.62,83,79.9,87,89,61,"ירידה של 7.8% אתמול בגלל OpenAI. הבוקר מניות ה-AI מתאוששות בפרה-מרקט, והמניה עדיין ‎+14% מתחילת השנה.","ריבאונד AI אחרי מכירת יתר","מכירת יתר ליום אחד · בטא גבוהה"),
- pick(5,"MU","Micron",1035.84,None,1040,1005,1075,1090,58,"המניה הבולשית ביותר ב-WallStreetBets (217 אזכורים). ירדה 4.8% אתמול עם השבבים, והמחזור של זיכרון ה-HBM עדיין חזק.","סנטימנט קמעונאי + ריבאונד שבבים","חזרה לממוצע · אישור מעל 1,040")
+ pick(1,"LITE","Lumentum",1048.60,1111.50,1100,1068,1130,1145,66,"המנכ״ל: הביקוש לרכיבים האופטיים עולה על ההיצע, וההזמנות מלאות עד 2029. המניה תיקנה 5.6% אתמול ומנסה לחזור לשיא ה-52 שבועות (1,137.20$).","הזמנות מלאות עד 2029","ריבאונד אחרי יום תיקון · פריצת שיא"),
+ pick(2,"AMT","American Tower",166.73,178.65,177,172,183,186,64,"עסקת הספקטרום של SpaceX (800MHz) מחייבת תשתית קרקעית. מורגן סטנלי ו-JPMorgan רואים בה חיובית למגדלים.","SpaceX קנתה ספקטרום של Grain","רוטציה סקטוריאלית · REIT בתנופה"),
+ pick(3,"CRWV","CoreWeave",81.58,83.62,83,79.9,87,89,61,"ירידה של 7.8% אתמול בגלל OpenAI. הבוקר מניות ה-AI מתאוששות בפרה-מרקט, והמניה עדיין ‎+14% מתחילת השנה.","ריבאונד AI אחרי מכירת יתר","מכירת יתר ליום אחד · בטא גבוהה"),
+ pick(4,"MU","Micron",1035.84,None,1040,1005,1075,1090,58,"המניה הבולשית ביותר ב-WallStreetBets (217 אזכורים). ירדה 4.8% אתמול עם השבבים, והמחזור של זיכרון ה-HBM עדיין חזק.","סנטימנט קמעונאי + ריבאונד שבבים","חזרה לממוצע · אישור מעל 1,040"),
+ pick(5,"CMG","Chipotle",32.65,None,32.5,31.4,33.8,34.5,55,"לפי ה-FT, סטארבקס בחנה הצעת רכש ל-Chipotle (שווי כ-39 מיליארד$). המניה עלתה 6.1% אתמול במחזור של 63.7 מיליון מניות, ו-SBUX קפצה ב-1,920% באזכורים ב-WSB.","שמועת רכישה (FT)","פרמיית מיזוג · המשך מומנטום")
 ])
 
 def buzz(sym,name,prev,pre,target,stop,score,why,src,risk):
@@ -42,9 +43,9 @@ def buzz(sym,name,prev,pre,target,stop,score,why,src,risk):
       "reg_price":None,"target":target,"target_pct":round((target/pre-1)*100,1),"stop":stop,
       "buzz_score":score,"why":why,"sources":src,"risk":risk}
 w("buzz.json",[
- buzz("VEEA","Veea",3.87,5.91,7.10,4.90,88,"חזרה לעמידה בדרישות הנאסד״ק, ונסחרו 20 מיליון מניות כבר בפרה-מרקט","Benzinga · StockAnalysis · סורקי פרה-מרקט","קיצוני · שווי כ-12M$"),
- buzz("FRGT","Freight Technologies",0.2564,0.33,0.40,0.28,74,"מובילת העליות בפרה-מרקט (‎+28%–68% לאורך הבוקר)","Benzinga · סורקי Small-cap","קיצוני · מניית פני"),
- buzz("OFAL","OFA Group",0.41,0.53,0.62,0.45,69,"‎+29% בפרה-מרקט בסקטור התעשייה","Benzinga · סורקי פרה-מרקט","קיצוני · מניית פני")
+ buzz("HUM","Humana",387.12,447.00,465.00,432.00,92,"המניה שכולם מדברים עליה היום: בראש הטרנד ב-Stocktwits, בכל אתרי החדשות ובשרשורי Reddit. 95% מחברי ה-MA שלה בתוכניות של 4+ כוכבים, ו-Baird מסמנת יעד של 596$.","Stocktwits (טרנד) · Reddit · Reuters · Bloomberg · CNBC","בינוני · גאפ גדול עלול להיסגר"),
+ buzz("VEEA","Veea",3.87,5.91,7.10,4.90,70,"‎+34%–53% בפרה-מרקט אחרי חזרה לעמידה בדרישות הנאסד״ק, עם 20 מיליון מניות בנפח. מדברים עליה בסורקים וב-Benzinga, אבל לא מצאתי אישור לבאזז ב-Reddit.","Benzinga · StockAnalysis · סורקי פרה-מרקט","קיצוני · שווי כ-12M$"),
+ buzz("FRGT","Freight Technologies",0.2564,0.33,0.40,0.28,45,"מובילת העליות בפרה-מרקט (‎+28%–68%). רק בסורקים, בלי אישור ברשתות החברתיות.","Benzinga · סורקי Small-cap","קיצוני · מניית פני")
 ])
 
 w("macro.json",[
@@ -72,12 +73,26 @@ w("social.json",[
  {"symbol":"PLTR","mentions":67,"sentiment":"bearish"}
 ])
 
+w("chatter.json",[
+ {"symbol":"HUM","platforms":"Stocktwits · Reddit · X","sentiment":"bullish","theme":"דירוגי כוכבים 2027, ‎+15% בפרה-מרקט"},
+ {"symbol":"ASTS","platforms":"Stocktwits #1 · X · Reddit","sentiment":"bearish","theme":"SpaceX חטפה את ספקטרום Grain; B. Riley הורידה ל-Neutral"},
+ {"symbol":"MU","platforms":"WSB · Reddit · Stocktwits","sentiment":"bullish","theme":"המניה הבולשית ביותר ב-WSB, ריבאונד בשבבים"},
+ {"symbol":"SBUX / CMG","platforms":"WSB · X","sentiment":"neutral","theme":"שמועת רכישה של Chipotle ‏(FT), קפיצה של 1,920% באזכורים"},
+ {"symbol":"SPCX","platforms":"Stocktwits · WSB · X","sentiment":"neutral","theme":"עסקת ספקטרום 8B$, נכנסת לסלולר"},
+ {"symbol":"LITE","platforms":"Stocktwits · X","sentiment":"bullish","theme":"מכורה עד 2029, קרובה לשיא"},
+ {"symbol":"DAL","platforms":"Stocktwits","sentiment":"bearish","theme":"פספוס בדוח, קיצוץ תחזית בגלל הדלק"},
+ {"symbol":"GME","platforms":"Reddit","sentiment":"neutral","theme":"עדיין הכי מוזכרת ב-Reddit ‏(679 אזכורים)"},
+ {"symbol":"PLTR","platforms":"WSB","sentiment":"bearish","theme":"המניה הדובית ביותר ב-WSB"},
+ {"symbol":"RVMD · VSTM · NOK","platforms":"Stocktwits","sentiment":"neutral","theme":"בטרנד הבוקר; ל-RVMD יש ספקות של ה-FDA"},
+ {"symbol":"SPY / QQQ","platforms":"Stocktwits","sentiment":"bullish","theme":"סנטימנט קמעונאי 'בולשי מאוד'"}
+])
+
 w("methods.json",[
  {"school":"ערך · באפט","method":"מרווח ביטחון, חפיר תחרותי, תמחור מול רווחים","read":"HUM נסחרת בכ-6.7× על רווחי 2028 · זול יחסית לאיכות","weight":0.15},
  {"school":"מומנטום · אוניל CAN SLIM","method":"קטליזטור חדש, מוביל סקטור, נפח מוסדי","read":"LITE ו-HUM: קטליזטור + נפח, קרובות לשיא","weight":0.20},
  {"school":"ניתוח טכני","method":"גאפים, VWAP, תמיכה/התנגדות, ממוצעים","read":"S&P מעל ממוצע 50 · שני ימי ירידה אחרי שיא = פולבק בריא","weight":0.20},
  {"school":"מאקרו · דליו","method":"ריבית, אינפלציה, נפט, דולר, מחזור","read":"פד מעלה, תשואות 5%+ ⇒ לחץ על מכפילים ועל Small-cap","weight":0.20},
- {"school":"סנטימנט וזרימות","method":"פורומים, אופציות, שווקי תחזית","read":"Polymarket: ‏94% לפתיחה גבוהה · WSB בולשי על שבבים","weight":0.15},
+ {"school":"סנטימנט וזרימות","method":"פורומים, אופציות, שווקי תחזית","read":"Polymarket: ‏94% לפתיחה גבוהה · Stocktwits: SPY/QQQ בולשי מאוד · WSB בולשי על שבבים, דובי על PLTR","weight":0.15},
  {"school":"מסחר יומי","method":"גאפ-אנד-גו, ORB, יחס סיכוי/סיכון ≥ 1:2","read":"כניסה רק אחרי 15 הדקות הראשונות · סטופ מתחת לנמוך הפתיחה","weight":0.10}
 ])
 
@@ -86,7 +101,10 @@ w("sources.json",[
  {"group":"חדשות ונתונים","name":"Benzinga · Investing.com · TheStreet · 24/7 Wall St","signal":"מניות שזזות בפרה-מרקט, חוזים"},
  {"group":"מאקרו רשמי","name":"Federal Reserve · BLS · BEA · EIA · מישיגן","signal":"ריבית, CPI, תעסוקה, תוצר, נפט"},
  {"group":"שוק אג״ח וסחורות","name":"Schwab · BabyPips · Trading Economics","signal":"10Y ‏5.23%, ברנט 104$, זהב"},
- {"group":"רשתות ופורומים","name":"r/wallstreetbets · Reddit (AltIndex) · Stocktwits","signal":"MU ו-ADBE בולשיות, PLTR דובית"},
+ {"group":"רשתות ופורומים","name":"r/wallstreetbets (AltIndex, Tradestie)","signal":"MU, ADBE, NVDA בולשיות · PLTR דובית · SBUX קפצה באזכורים"},
+ {"group":"רשתות ופורומים","name":"Reddit-wide (AltIndex)","signal":"GME ‏679, META ‏210 אזכורים"},
+ {"group":"רשתות ופורומים","name":"Stocktwits (טרנד + חדשות)","signal":"ASTS, HUM, LITE, DAL בטרנד · SPY/QQQ בולשי מאוד"},
+ {"group":"רשתות ופורומים","name":"X / FinTwit (AltIndex, Substack)","signal":"ASTS, ‏CMG, ‏GME ו-NVDA בדיון"},
  {"group":"שווקי תחזית","name":"Polymarket","signal":"94% לפתיחה גבוהה יותר"},
  {"group":"אנליסטים","name":"Baird · Evercore · Morgan Stanley · JPMorgan · Bernstein","signal":"HUM יעד 596$, מגדלים חיובי"}
 ])
