@@ -2,11 +2,13 @@
 
 Dashboard artifact: https://claude.ai/artifact/AMqT7GGi3A6ZtCNFoxrHRs (Dashboard type, Hebrew RTL).
 The page (`files/index.html`) is final: **never edit or republish it**. A refresh only replaces the data files.
+Never touch `datasets/quotes` (the live Finnhub query) or `dash/params`. The page keeps the quote symbol list in sync with `daytrade` and `swing_setups` by itself.
 
 ## 0. Should this run do anything?
 Check the New York date and time. If it is a weekend or a NYSE holiday, stop and reply in one line that there was no trading today.
 
-## 1. Research (WebSearch; WebFetch usually can't reach finance sites from this environment)
+## 1. Research
+**Prices come from the Finnhub connector** (tools `mcp__Finhub__get_quotes`, `get_company_news`, `get_earnings_calendar`, `get_market_status`; load them with ToolSearch "finnhub"). It gives real-time quotes: use it for every price, prev close, day high/low and earnings date. Use WebSearch for news, catalysts, macro and social (WebFetch usually can't reach finance sites from this environment). If Finnhub is unavailable, fall back to dated web sources.
 Gather only numbers you can confirm from a dated source. If you can't confirm a number, leave it out or keep the previous value and say how old it is. Never invent prices.
 - Index futures or levels (S&P 500, Nasdaq, Dow), the previous close, and closes for the start of the week and the start of the month.
 - Premarket / intraday movers with catalysts (CNBC "stocks making the biggest moves", Benzinga movers, Reuters, Yahoo).
