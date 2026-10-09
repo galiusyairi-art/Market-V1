@@ -57,6 +57,42 @@
 .mc-sec{display:flex;align-items:baseline;gap:var(--cds-gap-sm);flex-wrap:wrap;margin-top:var(--cds-gap-sm)}
 .mc-sec h2{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0}
 
+
+/* header strip + next update */
+.mc-strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.mc-strip::-webkit-scrollbar{display:none}
+.mc-tick{flex:none;display:flex;align-items:baseline;gap:6px;padding:6px 10px;border-radius:10px;background:var(--color-panel);border:1px solid var(--color-border-line);font-size:var(--cds-font-size-caption);white-space:nowrap}
+.mc-tick span{color:var(--color-fg-muted)}
+.mc-tick b{font-weight:600;direction:ltr}
+.mc-tick i{font-style:normal;font-weight:600;direction:ltr}
+.mc-next{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);white-space:nowrap}
+.mc-next b{color:var(--color-fg);font-weight:600;direction:ltr;display:inline-block}
+/* simple trade card */
+.mc-sc{display:flex;flex-direction:column;gap:12px}
+.mc-sc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.mc-sc-px{text-align:left}
+.mc-sc-px b{font-family:var(--font-anthropic-serif);font-weight:400;font-size:1.6rem;line-height:1;direction:ltr;display:block}
+.mc-sc-px span{font-size:var(--cds-font-size-caption);font-weight:600;direction:ltr;display:inline-block}
+.mc-do{border-radius:12px;padding:12px 14px;background:color-mix(in srgb,var(--st) 13%,transparent);border:1px solid color-mix(in srgb,var(--st) 40%,transparent)}
+.mc-do-t{display:flex;align-items:center;gap:8px;font-size:1.15rem;font-weight:800;color:var(--st);margin:0 0 4px}
+.mc-do-t::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--st);flex:none}
+.mc-do p{margin:0;font-size:var(--cds-font-size-body);line-height:1.55}
+.mc-do p b{direction:ltr;display:inline-block;font-weight:800}
+.mc-nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;text-align:center}
+.mc-num{padding:8px 4px;border-radius:10px;background:color-mix(in srgb,var(--color-fg) 5%,transparent);min-width:0}
+.mc-num small{display:block;font-size:11px;color:var(--color-fg-muted);margin-bottom:2px}
+.mc-num b{display:block;font-weight:700;font-size:var(--cds-font-size-body);direction:ltr}
+.mc-num i{display:block;font-style:normal;font-size:11px;font-weight:600;direction:ltr}
+.mc-num.sl b,.mc-num.sl i{color:var(--color-bad)}.mc-num.tp b,.mc-num.tp i{color:var(--color-ok)}
+.mc-pos{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:var(--cds-font-size-caption);padding:8px 10px;border-radius:10px;border:1px dashed var(--color-border-line)}
+.mc-pos b{font-weight:700;direction:ltr;display:inline-block}
+.mc-more{border-top:1px solid var(--color-border-line);padding-top:8px}
+.mc-more>summary{cursor:pointer;list-style:none;font-size:var(--cds-font-size-caption);font-weight:600;color:var(--color-fg-muted);display:flex;align-items:center;gap:6px;user-select:none}
+.mc-more>summary::-webkit-details-marker{display:none}
+.mc-more>summary::after{content:"▾";transition:transform .15s}
+.mc-more[open]>summary::after{transform:rotate(180deg)}
+.mc-more-body{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+
 /* status colors */
 [data-st=go]{--st:var(--color-ok)}[data-st=caution]{--st:var(--color-warn)}[data-st=stop]{--st:var(--color-bad)}
 .mc-pill{display:inline-flex;align-items:center;gap:6px;font-size:var(--cds-font-size-caption);font-weight:600;padding:2px 10px;border-radius:999px;color:var(--st,var(--color-fg-muted));border:1px solid color-mix(in srgb,var(--st,var(--color-fg-muted)) 45%,transparent);background:color-mix(in srgb,var(--st,var(--color-fg-muted)) 10%,transparent);white-space:nowrap}
@@ -212,12 +248,14 @@
     </div>
     <div class="mc-ctrl">
       <div class="mc-session" id="session" data-phase="closed"><span class="mc-dot"></span><b id="sess-name">—</b><span id="sess-clock" class="mc-ltr mc-muted"></span></div>
+      <span class="mc-next" id="next-upd" title="ריצה אוטומטית של הניתוח: 08:45 ו-11:57 בניו יורק, בימי מסחר"></span>
       <button class="mc-acct" id="acct-chip" type="button" title="לחץ לשינוי בגודל התיק ובסיכון"><span>תיק</span><b class="mc-ltr" id="acct-val">$100,000</b><span class="mc-muted" id="acct-risk">· סיכון 0.5%</span></button>
       <button class="mc-iconbtn" id="theme-btn" type="button" aria-label="החלפת תצוגה כהה/בהירה" title="תצוגה כהה/בהירה"></button>
       <span class="mc-qtime" id="quotes-time" data-source="quotes"></span>
       <button class="mc-btn" id="analyze" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>רענן מחירים</button>
     </div>
   </header>
+  <div class="mc-strip" id="strip" data-source="quotes" aria-label="מחירים חיים"></div>
   <div class="mc-tip" id="analyze-tip" hidden>המחירים מתעדכנים עכשיו מ-Finnhub. הניתוח (רמות, ציונים, רמזור) מתעדכן אוטומטית ב-08:45 וב-11:57 בניו יורק, או כשכותבים <b>„תן ניתוח”</b> בצ׳אט.</div>
 
   <nav class="mc-tabs" role="tablist" id="tabs">
@@ -470,7 +508,7 @@
   function syncSymbols() {
     const dd = dash.data('daytrade'), sw = dash.data('swing_setups');
     if (dd.status !== 'ok' || sw.status !== 'ok') return;
-    const want = [...new Set(['SPY', 'QQQ', 'DIA', ...dd.data.map((r) => r.symbol), ...sw.data.map((r) => r.symbol)])].slice(0, 30).join(',');
+    const want = [...new Set([...STRIP.map((x) => x[0]), ...dd.data.map((r) => r.symbol), ...sw.data.map((r) => r.symbol)])].slice(0, 30).join(',');
     if (dash.params().symbols !== want) dash.setParams({symbols: want});
   }
   function drawQuotesTime() {
@@ -479,6 +517,39 @@
       const ts = (d.data || []).map((r) => r.time_ny).filter(Boolean).sort().pop();
       e.textContent = ts ? 'מחירים חיים · ' + ts.slice(11, 19) + ' NY' + (d.refreshing ? ' · מתעדכן…' : '') : '';
     } else e.textContent = d.status === 'loading' ? 'טוען מחירים…' : d.status === 'connect' || d.status === 'error' ? 'מחירים חיים: לא מחובר' : '';
+  }
+  const STRIP = [['SPY', 'S&P 500'], ['QQQ', 'נאסד״ק'], ['DIA', 'דאו'], ['IWM', 'ראסל 2000'], ['IBIT', 'ביטקוין'], ['GLD', 'זהב'], ['USO', 'נפט'], ['TLT', 'אג״ח 20ש׳']];
+  function drawStrip() {
+    const box = $('#strip'), d = dash.data('quotes');
+    box.replaceChildren(...STRIP.map(([sym, name]) => {
+      const t = el('div', 'mc-tick'); t.title = sym;
+      const q = d.status === 'ok' ? (d.data || []).find((r) => r.symbol === sym && r.price != null) : null;
+      t.append(el('span', null, name));
+      if (q) {
+        t.append(mark(el('b', null, fmtP(q.price)), 'quotes', 'price', 'symbol=' + sym), mark(el('i', cls(q.change_pct), fmtPct(q.change_pct)), 'quotes', 'change_pct', 'symbol=' + sym));
+      } else t.append(el('b', 'mc-muted', '—'));
+      return t;
+    }));
+  }
+  const RUNS = [525, 717]; // 08:45 and 11:57 New York, weekdays
+  const DOW = {Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6};
+  function nextRun() {
+    const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', {timeZone: 'America/New_York', weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'}).formatToParts(new Date()).map((x) => [x.type, x.value]));
+    const nowS = (+p.hour) * 3600 + (+p.minute) * 60 + (+p.second);
+    let dow = DOW[p.weekday];
+    for (let add = 0; add < 8; add++) {
+      const day = (dow + add) % 7;
+      if (day === 0 || day === 6) continue;
+      for (const m of RUNS) { const secs = add * 86400 + m * 60 - nowS; if (secs > 0) return {secs, at: m}; }
+    }
+    return null;
+  }
+  function drawNext() {
+    const n = nextRun(), e = $('#next-upd');
+    if (!n) { e.textContent = ''; return; }
+    const h = Math.floor(n.secs / 3600), m = Math.floor((n.secs % 3600) / 60), sc = n.secs % 60;
+    const txt = (h >= 24 ? Math.floor(h / 24) + ' ימים ' + (h % 24) + ':' : h + ':') + String(m).padStart(2, '0') + ':' + String(sc).padStart(2, '0');
+    e.replaceChildren('ניתוח הבא בעוד ', el('b', null, txt), ' (' + hm(n.at + window.mcNow().offset) + ' ישראל)');
   }
   $('#acct-chip').addEventListener('click', () => { goTo('day', 'calc-card'); setTimeout(() => $('#c-acct').focus(), 400); });
 
@@ -501,8 +572,9 @@
     $('#session').dataset.phase = ph;
     $('#sess-name').textContent = {pre: 'פרה-מרקט', regular: 'מסחר פעיל', after: 'אפטר-מרקט', closed: 'השוק סגור'}[ph];
     $('#sess-clock').textContent = 'NY ' + n.clock + ' · ישראל ' + n.ilClock;
+    drawNext();
     const mins = Math.floor(n.ny);
-    if (window.mcLastMin !== mins) { window.mcLastMin = mins; drawNow(); }
+    if (window.mcLastMin !== mins) { window.mcLastMin = mins; drawNow(); if (window.mcPage === 'day' || window.mcPage === 'swing' || window.mcPage === 'decide') drawAll(); }
   };
 
   /* ---------- tabs ---------- */
@@ -621,37 +693,108 @@
     tl.replaceChildren(...parts);
   }
 
+  /* ---------- plain-language instructions ---------- */
+  const pctFrom = (v, base) => (v / base - 1) * 100;
+  const nyMin = () => window.mcNow().ny;
+  function dayInstruction(r) {
+    const lr = liveRow('day', r.symbol), m = nyMin(), wk = window.mcNow().wk;
+    const maxEntry = +(r.trigger + (r.t1 - r.trigger) * 0.5).toFixed(2);
+    const P = fmtP;
+    if (wk || m >= 960 || m < 240) return {st: 'caution', title: 'השוק סגור', text: ['תוכנית לפתיחה הבאה: קנה רק מעל ', P(r.trigger), '. סטופ ', P(r.stop), '.'], maxEntry};
+    if (lr && lr.status === 'stop') return {st: 'stop', title: 'בוטל: לא נכנסים', text: ['המחיר ירד מתחת לסטופ (', P(r.stop), '). העסקה לא רלוונטית היום.'], maxEntry};
+    if (lr && (lr.status === 't1' || lr.status === 't2')) return {st: 'stop', title: 'פספסנו: לא נכנסים', text: ['המחיר כבר ליד היעד. מי שבפנים: מוכרים חצי ב-', P(r.t1), ' ואת השאר ב-', P(r.t2), '.'], maxEntry};
+    if (m < 575) return {st: 'caution', title: 'חכה לפתיחה', text: ['אחרי 09:35 (' + hm(575 + window.mcNow().offset) + ' ישראל), קנה רק אם המחיר עולה מעל ', P(r.trigger), '.'], maxEntry};
+    if (m >= 930) return {st: 'stop', title: 'מאוחר מדי היום', text: ['לא פותחים עסקה יומית חדשה אחרי 15:30. מי שבפנים: סוגרים עד 15:55.'], maxEntry};
+    if (lr && lr.status === 'in') {
+      if (lr.price <= maxEntry) return {st: 'go', title: 'אפשר לקנות עכשיו', text: ['המחיר מעל הטריגר. קנה עד ', P(maxEntry), ' ולא מעל. סטופ מיד ב-', P(r.stop), '.'], maxEntry};
+      return {st: 'caution', title: 'אל תרדוף', text: ['המחיר ברח מעל ', P(maxEntry), '. קונים רק אם הוא חוזר לטווח ', P(r.trigger), '–', P(maxEntry), '.'], maxEntry};
+    }
+    return {st: 'caution', title: 'חכה לטריגר', text: ['קנה רק כשהמחיר עולה מעל ', P(r.trigger), '. עד אז לא עושים כלום.'], maxEntry};
+  }
+  function swingInstruction(r) {
+    const lr = liveRow('swing', r.symbol), P = fmtP;
+    if (r.action === 'avoid') return {st: 'stop', title: 'לא לקנות', text: [String(r.reason).split('.')[0] + '.']};
+    if (lr && lr.status === 'below_stop') return {st: 'stop', title: 'בוטל', text: ['המחיר מתחת לסטופ (', P(r.stop), '). לא נכנסים.']};
+    if (r.action === 'buy_close') {
+      if (lr && lr.price >= r.pivot) return {st: 'go', title: 'קנה לקראת הסגירה', text: ['ב-15:50–16:00 (' + hm(950 + window.mcNow().offset) + ' ישראל), קנה רק אם המחיר עדיין מעל ', P(r.pivot), '.']};
+      return {st: 'caution', title: 'חכה לסגירה', text: ['קונים רק אם המניה נסגרת מעל ', P(r.pivot), '. כרגע היא מתחת.']};
+    }
+    if (lr && lr.status === 'zone') return {st: 'go', title: 'אפשר לקנות', text: ['המחיר באזור הקנייה. קנה עד ', P(r.zone_top), ' ולא מעל.']};
+    if (lr && lr.status === 'extended') return {st: 'stop', title: 'אל תרדוף', text: ['המחיר מעל אזור הקנייה (', P(r.pivot), '–', P(r.zone_top), '). מחכים לחזרה.']};
+    return {st: 'caution', title: 'חכה לפריצה', text: ['קנה רק כשהמחיר עולה מעל ', P(r.pivot), ', ולא מעל ', P(r.zone_top), '.']};
+  }
+  function doBox(ins) {
+    const b = el('div', 'mc-do'); b.dataset.st = ins.st;
+    const p = el('p');
+    ins.text.forEach((t, i) => p.append(i % 2 ? el('b', null, t) : t));
+    b.append(el('div', 'mc-do-t', ins.title), p);
+    return b;
+  }
+  function nums(entryLabel, entry, cells) {
+    const g = el('div', 'mc-nums');
+    [[entryLabel, entry, null, '']].concat(cells).forEach(([l, v, base, k, src]) => {
+      const c = el('div', 'mc-num ' + k);
+      c.append(el('small', null, l));
+      const b = el('b', null, fmtP(v)); if (src) mark(b, src[0], src[1], src[2]);
+      c.append(b);
+      if (base) c.append(el('i', null, fmtPct(pctFrom(v, base), 1))); else c.append(el('i', 'mc-muted', 'כניסה'));
+      g.append(c);
+    });
+    return g;
+  }
+  function posLine(z, extra) {
+    const b = el('div', 'mc-pos');
+    if (!z || z.shares < 1) { b.append(el('span', 'mc-muted', 'הסטופ רחוק מדי לגודל התיק: לא נכנסים')); return b; }
+    const a = el('span'); a.append('קנה ', el('b', null, d3.format(',')(z.shares)), ' מניות ≈ ', el('b', null, usd(z.pos)));
+    const r = el('span', 'mc-muted'); r.append('הפסד מקסימלי ', el('b', null, usd(z.risk)), extra ? ' · ' + extra : '');
+    b.append(a, r);
+    return b;
+  }
+  window.mcOpen = window.mcOpen || new Set();
+  function moreBox(id, children) {
+    const d = el('details', 'mc-more'); d.open = window.mcOpen.has(id);
+    d.addEventListener('toggle', () => { if (d.open) window.mcOpen.add(id); else window.mcOpen.delete(id); });
+    const sm = el('summary', null, 'ראה עוד'); d.append(sm);
+    const body = el('div', 'mc-more-body'); body.append(...children); d.append(body);
+    return d;
+  }
+  function headPrice(sym) {
+    const q = quote(sym), box = el('div', 'mc-sc-px');
+    if (!q) { box.append(el('span', 'mc-muted', 'מחיר חי —')); return box; }
+    box.append(mark(el('b', null, fmtP(q.price)), 'quotes', 'price', 'symbol=' + sym), mark(el('span', cls(q.change_pct), fmtPct(q.change_pct) + ' היום'), 'quotes', 'change_pct', 'symbol=' + sym));
+    return box;
+  }
+
   /* ---------- decisions ---------- */
   function drawDecisions() {
     const dd = dash.data('daytrade'), sw = dash.data('swing_setups');
     const buy = $('#dec-buy-list'), wait = $('#dec-wait-list'), avoid = $('#dec-avoid-list');
-    const row = (sym, line1, line2, onClick, src, field, w) => {
+    const row = (sym, ins, line2, onClick, src) => {
       const r = el('div', 'mc-drow'); r.tabIndex = 0;
-      r.append(mark(el('span', 'mc-dsym', sym), src, 'symbol', w), mark(el('span', 'mc-dline', line1), src, field, w));
+      const t = el('span', 'mc-dline'); t.dataset.st = ins.st;
+      const tt = el('b', null, ins.title + ': '); tt.style.color = 'var(--st)';
+      t.append(tt); ins.text.forEach((x, i) => t.append(i % 2 ? el('b', null, x) : x));
+      t.style.color = 'var(--color-fg)';
+      r.append(mark(el('span', 'mc-dsym', sym), src, 'symbol', W('symbol', sym)), t);
       if (line2) { r.append(el('span'), el('span', 'mc-dline', line2)); }
       r.addEventListener('click', onClick); r.addEventListener('keydown', (e) => { if (e.key === 'Enter') onClick(); });
       return r;
     };
     if (dd.status === 'ok') {
       buy.replaceChildren(...dd.data.filter((r) => r.grade !== 'C').map((r) => {
-        const w = W('symbol', r.symbol);
         const z = size(r.trigger, r.stop, GRADE_MULT[r.grade] ?? 1);
-        const lr = liveRow('day', r.symbol);
-        return row(r.symbol, r.catalyst, (lr ? 'עכשיו ' + fmtP(lr.price) + ' · ' + LIVE_TXT[lr.status][0] + ' · ' : '') + 'ציון ' + r.grade + ' · טריגר ' + fmtP(r.trigger) + ' · סטופ ' + fmtP(r.stop) + ' · יעד ' + fmtP(r.t2) + (z && z.shares ? ' · ' + z.shares + ' מניות ≈ ' + usdK(z.pos) : ''), () => goTo('day', 'day-' + r.symbol), 'daytrade', 'catalyst', w);
+        return row(r.symbol, dayInstruction(r), 'SL ' + fmtP(r.stop) + ' · TP ' + fmtP(r.t1) + ' / ' + fmtP(r.t2) + (z && z.shares ? ' · ' + z.shares + ' מניות ≈ ' + usdK(z.pos) : ''), () => goTo('day', 'day-' + r.symbol), 'daytrade');
       }));
     } else if (dd.status === 'error') fail(buy); else skel(buy, 3, '2.5rem');
     if (sw.status === 'ok') {
       wait.replaceChildren(...sw.data.filter((r) => r.action !== 'avoid').map((r) => {
-        const w = W('symbol', r.symbol);
         const z = size(r.pivot, r.stop);
-        const lr = liveRow('swing', r.symbol);
-        const l2 = (lr ? 'עכשיו ' + fmtP(lr.price) + ' · ' + (lr.status === 'wait' ? SWING_WAIT[0] : LIVE_TXT[lr.status][0]) + ' · ' : '') + (r.action === 'buy_close' ? 'קנייה מותנית בסגירה חזקה · סטופ ' + fmtP(r.stop) : 'נקודת קנייה ' + fmtP(r.pivot) + ' (‎' + fmtPct(r.dist_pivot_pct, 1) + ' ממנה) · סטופ ' + fmtP(r.stop)) + (z && z.shares ? ' · ' + z.shares + ' מניות ≈ ' + usdK(z.pos) : '');
-        return row(r.symbol, r.status, l2, () => goTo('swing', 'swing-' + r.symbol), 'swing_setups', 'status', w);
+        return row(r.symbol, swingInstruction(r), 'SL ' + fmtP(r.stop) + ' · TP ' + fmtP(r.target) + (z && z.shares ? ' · ' + z.shares + ' מניות ≈ ' + usdK(z.pos) : ''), () => goTo('swing', 'swing-' + r.symbol), 'swing_setups');
       }));
     } else if (sw.status === 'error') fail(wait); else skel(wait, 3, '2.5rem');
     const av = [];
-    if (sw.status === 'ok') sw.data.filter((r) => r.action === 'avoid').forEach((r) => av.push(row(r.symbol, r.reason, 'סווינג · ' + r.status, () => goTo('swing', 'swing-' + r.symbol), 'swing_setups', 'reason', W('symbol', r.symbol))));
-    if (dd.status === 'ok') dd.data.filter((r) => r.grade === 'C').forEach((r) => av.push(row(r.symbol, r.avoid, 'יומי · ספקולציה, ציון C', () => goTo('day', 'day-' + r.symbol), 'daytrade', 'avoid', W('symbol', r.symbol))));
+    if (sw.status === 'ok') sw.data.filter((r) => r.action === 'avoid').forEach((r) => av.push(row(r.symbol, swingInstruction(r), 'סווינג', () => goTo('swing', 'swing-' + r.symbol), 'swing_setups')));
+    if (dd.status === 'ok') dd.data.filter((r) => r.grade === 'C').forEach((r) => av.push(row(r.symbol, {st: 'stop', title: 'ספקולציה', text: ['רק רבע פוזיציה, ורק מעל ', fmtP(r.trigger), '.']}, 'יומי · ציון C', () => goTo('day', 'day-' + r.symbol), 'daytrade')));
     if (sw.status === 'ok' || dd.status === 'ok') avoid.replaceChildren(...av); else skel(avoid, 2, '2.5rem');
   }
 
@@ -677,41 +820,42 @@
   function drawDay() {
     const d = dash.data('daytrade'), box = $('#daycards');
     if (d.status === 'error') return fail(box);
-    if (d.status !== 'ok') return skel(box, 3, '26rem');
+    if (d.status !== 'ok') return skel(box, 3, '20rem');
     box.replaceChildren(...d.data.map((r) => {
       const w = W('symbol', r.symbol);
-      const c = el('article', 'mc-card mc-tc'); c.id = 'day-' + r.symbol;
-      const top = el('div', 'mc-tc-top');
+      const c = el('article', 'mc-card mc-sc'); c.id = 'day-' + r.symbol;
+      const head = el('div', 'mc-sc-head');
       const idb = el('div');
-      idb.append(mark(el('div', 'mc-sym', r.symbol), 'daytrade', 'symbol', w), mark(el('div', 'mc-name', r.name), 'daytrade', 'name', w));
-      const mid = el('div'); mid.style.textAlign = 'center';
-      mid.append(mark(el('div', 'mc-gap mc-ltr ' + cls(r.gap_pct), fmtPct(r.gap_pct, 1)), 'daytrade', 'gap_pct', w), el('div', 'mc-note', 'גאפ בפרה-מרקט'));
-      const g = mark(el('div', 'mc-grade', r.grade), 'daytrade', 'grade', w); g.dataset.st = GRADE_ST[r.grade] || 'caution'; g.title = 'ציון הסטאפ';
-      top.append(idb, mid, g);
+      const sy = el('div'); sy.style.display = 'flex'; sy.style.alignItems = 'center'; sy.style.gap = '8px';
+      const g = mark(el('div', 'mc-grade', r.grade), 'daytrade', 'grade', w); g.dataset.st = GRADE_ST[r.grade] || 'caution'; g.title = 'ציון הסטאפ'; g.style.width = '30px'; g.style.height = '30px'; g.style.fontSize = '1.05rem'; g.style.borderRadius = '8px';
+      sy.append(mark(el('div', 'mc-sym', r.symbol), 'daytrade', 'symbol', w), g);
+      idb.append(sy, mark(el('div', 'mc-name', r.name), 'daytrade', 'name', w));
+      head.append(idb, headPrice(r.symbol));
+      const ins = dayInstruction(r);
+      const n = nums('כניסה', r.trigger, [['סטופ (SL)', r.stop, r.trigger, 'sl', ['daytrade', 'stop', w]], ['יעד 1 (TP1)', r.t1, r.trigger, 'tp', ['daytrade', 't1', w]], ['יעד 2 (TP2)', r.t2, r.trigger, 'tp', ['daytrade', 't2', w]]]);
+      mark(n.firstChild.querySelector('b'), 'daytrade', 'trigger', w);
+      const mult = GRADE_MULT[r.grade] ?? 1;
+      const pos = posLine(size(r.trigger, r.stop, mult), mult === 1 ? null : mult === 0.75 ? 'גודל 75% (ציון B)' : 'רבע גודל (ציון C)');
+      // details
       const checks = el('div', 'mc-checks'); mark(checks, 'daytrade', null, null);
       r.checks.split('|').forEach((p) => { const [k, v] = p.split(':'); const ch = el('span', 'mc-chk', (v === '1' ? '✓ ' : '✗ ') + k); ch.dataset.v = v; checks.append(ch); });
-      const lv = el('div', 'mc-levels');
-      [['trigger', 'טריגר כניסה', ''], ['stop', 'סטופ', 'stop'], ['t1', 'יעד 1', 'tp'], ['t2', 'יעד 2', 'tp']].forEach(([f, l, k]) => {
-        const b = el('div', 'mc-lv ' + k); b.append(el('small', null, l), mark(el('span', 'mc-ltr', fmtP(r[f])), 'daytrade', f, w)); lv.append(b);
-      });
       const bar = ladder([
-        {v: r.stop, c: 'var(--color-bad)', label: 'סטופ', top: false},
+        {v: r.stop, c: 'var(--color-bad)', label: 'SL', top: false},
         {v: r.prev_close, c: 'var(--color-fg-muted)', label: 'סגירה', top: true},
-        {v: r.trigger, c: 'var(--color-fg)', label: 'טריגר', top: false},
-        {v: r.t1, c: 'var(--color-ok)', label: 'T1', top: true},
-        {v: r.t2, c: 'var(--color-ok)', label: 'T2', top: false}
+        {v: r.trigger, c: 'var(--color-fg)', label: 'כניסה', top: false},
+        {v: r.t1, c: 'var(--color-ok)', label: 'TP1', top: true},
+        {v: r.t2, c: 'var(--color-ok)', label: 'TP2', top: false}
       ], (quote(r.symbol) || {}).price ?? r.pm_price, [[r.stop, r.trigger, 'var(--color-bad)', 20], [r.trigger, r.t1, 'var(--color-ok)', 18], [r.t1, r.t2, 'var(--color-ok)', 36]]);
       mark(bar, 'daytrade', null, null);
-      const plan = el('p', 'mc-plan'); plan.append(el('b', null, 'התוכנית: '), mark(el('span', null, r.plan), 'daytrade', 'plan', w));
-      const av = el('p', 'mc-avoid'); av.append(el('b', null, 'לא נכנסים אם: '), mark(el('span', null, r.avoid), 'daytrade', 'avoid', w));
-      const foot = el('div', 'mc-tc-foot');
-      const rr = el('span', 'mc-note'); rr.append('סיכוי/סיכון: T1 ', mark(el('span', 'mc-ltr', r.r_t1 + 'R'), 'daytrade', 'r_t1', w), ' · T2 ', mark(el('span', 'mc-ltr', r.r_t2 + 'R'), 'daytrade', 'r_t2', w));
-      const bt = el('button', 'mc-btn-s', 'חשב פוזיציה'); bt.type = 'button';
+      const rules = el('p', 'mc-thesis'); rules.append(el('b', null, 'איך מנהלים: '), 'ביעד 1 מוכרים חצי ומזיזים את הסטופ למחיר הכניסה. את השאר מוכרים ביעד 2, או עד 15:55 לכל המאוחר.');
+      const cat = el('p', 'mc-thesis'); cat.append(el('b', null, 'למה המניה: '), mark(el('span', null, r.catalyst), 'daytrade', 'catalyst', w));
+      const plan = el('p', 'mc-thesis'); plan.append(el('b', null, 'התוכנית המלאה: '), mark(el('span', null, r.plan), 'daytrade', 'plan', w));
+      const av = el('p', 'mc-thesis'); av.append(el('b', null, 'לא נכנסים אם: '), mark(el('span', null, r.avoid), 'daytrade', 'avoid', w));
+      const q = quote(r.symbol);
+      const meta = el('p', 'mc-note', (q ? 'מחיר מ-' + (q.time_ny || '').slice(11, 16) + ' NY · טווח היום ' + fmtP(q.low) + '–' + fmtP(q.high) + ' · ' : '') + 'גאפ בפרה-מרקט ' + fmtPct(r.gap_pct, 1) + ' · סיכוי/סיכון 1:' + r.r_t1 + ' / 1:' + r.r_t2);
+      const bt = el('button', 'mc-btn-s', 'פתח במחשבון'); bt.type = 'button'; bt.style.alignSelf = 'flex-start';
       bt.addEventListener('click', () => fillCalc(r.trigger, r.stop, r.t2, r.symbol));
-      foot.append(rr, bt);
-      const mult = GRADE_MULT[r.grade] ?? 1;
-      const sz = sizeBox(size(r.trigger, r.stop, mult), 'ציון ' + r.grade + ': ' + (mult === 1 ? 'סיכון מלא' : mult === 0.75 ? '75% מהסיכון' : 'רבע סיכון') + ' (' + usd(acct() * riskPct() / 100 * mult) + ') · כניסה בטריגר');
-      c.append(top, liveBox('day', r.symbol, 'מהטריגר'), mark(el('p', 'mc-cat', r.catalyst), 'daytrade', 'catalyst', w), checks, bar, lv, sz, plan, av, foot);
+      c.append(head, doBox(ins), n, pos, moreBox('day-' + r.symbol, [bar, cat, rules, plan, av, checks, meta, bt]));
       return c;
     }));
   }
@@ -752,41 +896,38 @@
   function drawSwing() {
     const d = dash.data('swing_setups'), box = $('#swingcards');
     if (d.status === 'error') return fail(box);
-    if (d.status !== 'ok') return skel(box, 3, '22rem');
+    if (d.status !== 'ok') return skel(box, 3, '18rem');
     box.replaceChildren(...d.data.map((r) => {
       const w = W('symbol', r.symbol);
-      const c = el('article', 'mc-card mc-tc'); c.id = 'swing-' + r.symbol;
-      const top = el('div', 'mc-tc-top');
+      const c = el('article', 'mc-card mc-sc'); c.id = 'swing-' + r.symbol;
+      const head = el('div', 'mc-sc-head');
       const idb = el('div');
       idb.append(mark(el('div', 'mc-sym', r.symbol), 'swing_setups', 'symbol', w), mark(el('div', 'mc-name', r.name), 'swing_setups', 'name', w));
-      const [vt, vs] = VERDICT[r.verdict] || [r.verdict, 'caution'];
-      const pill = el('span', 'mc-pill', vt); pill.dataset.st = vs;
-      top.append(idb, pill);
-      const price = el('div'); price.style.display = 'flex'; price.style.justifyContent = 'space-between'; price.style.alignItems = 'baseline'; price.style.gap = '8px';
-      const pl = el('div'); pl.append(el('div', 'mc-note', 'מחיר בזמן הניתוח'), mark(el('div', 'mc-gap mc-ltr', fmtP(r.last)), 'swing_setups', 'last', w));
-      const pr = el('div'); pr.style.textAlign = 'left';
-      pr.append(el('div', 'mc-note', 'מנקודת הקנייה (בניתוח)'), mark(el('div', 'mc-ltr ' + (r.dist_pivot_pct < 0 ? 'mc-warn' : r.dist_pivot_pct <= 5 ? 'mc-ok' : 'mc-bad'), fmtPct(r.dist_pivot_pct, 1)), 'swing_setups', 'dist_pivot_pct', w));
-      price.append(pl, pr);
+      head.append(idb, headPrice(r.symbol));
+      const ins = swingInstruction(r);
+      const kids = [head, doBox(ins)];
+      if (r.action !== 'avoid') {
+        const n = nums('כניסה', r.pivot, [['קנה עד', r.zone_top, r.pivot, '', ['swing_setups', 'zone_top', w]], ['סטופ (SL)', r.stop, r.pivot, 'sl', ['swing_setups', 'stop', w]], ['יעד (TP)', r.target, r.pivot, 'tp', ['swing_setups', 'target', w]]]);
+        mark(n.firstChild.querySelector('b'), 'swing_setups', 'pivot', w);
+        kids.push(n, posLine(size(r.pivot, r.stop), null));
+      }
       const bar = ladder([
-        {v: r.stop, c: 'var(--color-bad)', label: 'סטופ', top: false},
-        {v: r.pivot, c: 'var(--color-fg)', label: 'קנייה', top: true},
-        {v: r.zone_top, c: 'var(--color-ok)', label: '+5%', top: false},
-        {v: r.target, c: 'var(--color-ok)', label: 'יעד', top: true}
+        {v: r.stop, c: 'var(--color-bad)', label: 'SL', top: false},
+        {v: r.pivot, c: 'var(--color-fg)', label: 'כניסה', top: true},
+        {v: r.zone_top, c: 'var(--color-ok)', label: 'קנה עד', top: false},
+        {v: r.target, c: 'var(--color-ok)', label: 'TP', top: true}
       ], (quote(r.symbol) || {}).price ?? r.last, [[r.stop, r.pivot, 'var(--color-bad)', 18], [r.pivot, r.zone_top, 'var(--color-ok)', 40], [r.zone_top, r.target, 'var(--color-ok)', 12]]);
       mark(bar, 'swing_setups', null, null);
-      const lv = el('div', 'mc-levels');
-      [['pivot', 'נקודת קנייה', ''], ['zone_top', 'סוף אזור', ''], ['stop', 'סטופ', 'stop'], ['target', 'יעד', 'tp']].forEach(([f, l, k]) => {
-        const b = el('div', 'mc-lv ' + k); b.append(el('small', null, l), mark(el('span', 'mc-ltr', fmtP(r[f])), 'swing_setups', f, w)); lv.append(b);
-      });
+      const rules = el('p', 'mc-thesis'); rules.append(el('b', null, 'איך מנהלים: '), 'מוכרים הכול אם המחיר נסגר מתחת לסטופ. ביעד מוכרים חצי, ואת השאר מחזיקים כל עוד המניה מעל ממוצע 21 יום.');
+      const why = el('p', 'mc-thesis'); why.append(el('b', null, r.action === 'avoid' ? 'למה לא: ' : 'למה המניה: '), mark(el('span', null, r.reason), 'swing_setups', 'reason', w));
       const meta = el('dl', 'mc-meta');
       [['מצב', 'status'], ['תבנית מגמה', 'trend'], ['דוח', 'earnings']].forEach(([l, f]) => { meta.append(el('dt', null, l), mark(el('dd', null, r[f]), 'swing_setups', f, w)); });
-      const rr = el('dd'); rr.append('סיכון ', mark(el('span', 'mc-ltr mc-bad', fmtPct(r.risk_pct, 1)), 'swing_setups', 'risk_pct', w), ' · יעד ', mark(el('span', 'mc-ltr mc-ok', fmtPct(r.target_pct, 1)), 'swing_setups', 'target_pct', w));
-      meta.append(el('dt', null, 'מנקודת הקנייה'), rr);
-      const plan = el('p', r.action === 'avoid' ? 'mc-avoid' : 'mc-plan'); plan.append(el('b', null, r.action === 'avoid' ? 'למה לא: ' : 'התוכנית: '), mark(el('span', null, r.reason), 'swing_setups', 'reason', w));
-      const foot = el('div', 'mc-tc-foot');
-      if (r.action !== 'avoid') { const bt = el('button', 'mc-btn-s', 'חשב פוזיציה'); bt.type = 'button'; bt.addEventListener('click', () => { show('day'); fillCalc(r.pivot, r.stop, r.target, r.symbol); }); foot.append(el('span'), bt); }
-      const sz = r.action === 'avoid' ? null : sizeBox(size(r.pivot, r.stop), 'כניסה בנקודת הקנייה · סיכון ' + usd(acct() * riskPct() / 100) + ' · מסגרת סווינג כוללת לפי מצב השוק');
-      c.append(top, liveBox('swing', r.symbol, 'מנקודת הקנייה'), price, bar, lv, ...(sz ? [sz] : []), meta, plan, foot);
+      const more = [bar, why];
+      if (r.action !== 'avoid') more.push(rules);
+      more.push(meta);
+      if (r.action !== 'avoid') { const bt = el('button', 'mc-btn-s', 'פתח במחשבון'); bt.type = 'button'; bt.style.alignSelf = 'flex-start'; bt.addEventListener('click', () => { show('day'); fillCalc(r.pivot, r.stop, r.target, r.symbol); }); more.push(bt); }
+      kids.push(moreBox('swing-' + r.symbol, more));
+      c.append(...kids);
       return c;
     }));
   }
@@ -868,8 +1009,6 @@
       [['pre_pct', 'חוזים בבוקר'], ['day_pct', 'אתמול'], ['wtd_pct', 'מתחילת שבוע'], ['mtd_pct', 'מתחילת חודש']].forEach(([f, l]) => {
         const ch = el('div', 'mc-chip'); ch.append(el('small', null, l), mark(el('span', 'mc-ltr ' + cls(r[f]), fmtPct(r[f])), 'indices', f, w)); chips.append(ch);
       });
-      const etf = {SPX: 'SPY', IXIC: 'QQQ', DJI: 'DIA'}[r.symbol], q = etf && quote(etf);
-      if (q) { const lv = el('div', 'mc-live'); lv.style.marginTop = '6px'; lv.append(el('span', 'mc-muted', 'עכשיו (' + etf + ')'), mark(el('b', 'mc-ltr ' + cls(q.change_pct), fmtPct(q.change_pct)), 'quotes', 'change_pct', 'symbol=' + etf)); c.append(lv); }
       c.prepend(nm, mark(el('div', 'mc-ixval mc-ltr', d3.format(',.2f')(r.last_close)), 'indices', 'last_close', w), chips);
       return c;
     }));
@@ -940,6 +1079,7 @@
     applyPrefs();
     syncSymbols();
     drawQuotesTime();
+    drawStrip();
     drawAsOf();
     const p = window.mcPage || 'decide';
     if (p === 'decide') { drawRegime(); drawNow(); drawDecisions(); }
