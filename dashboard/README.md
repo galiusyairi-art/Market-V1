@@ -1,4 +1,4 @@
-# Market Cockpit
+# TradePilot (Market Cockpit)
 
 One-page market dashboard (Hebrew, RTL), published as a Claude Dashboard artifact:
 https://claude.ai/artifact/AMqT7GGi3A6ZtCNFoxrHRs
