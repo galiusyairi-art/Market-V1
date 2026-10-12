@@ -935,6 +935,14 @@
     return bar;
   }
 
+  function rangeNote(sym) {
+    const q = quote(sym);
+    const p = el('p', 'mc-note'); p.style.margin = '-2px 0 0'; p.style.textAlign = 'center';
+    if (!q) { p.textContent = 'טווח היום יופיע אחרי "רענן מחירים"'; return p; }
+    const pos = q.high > q.low ? Math.round(((q.price - q.low) / (q.high - q.low)) * 100) : null;
+    p.append('טווח היום (מסגרת מקווקוות): ', el('b', 'mc-ltr', fmtP(q.low) + ' – ' + fmtP(q.high)), pos != null ? ' · המחיר ב-' + pos + '% מהטווח' : '');
+    return p;
+  }
   /* ---------- day cards ---------- */
   const GRADE_ST = {A: 'go', B: 'caution', C: 'stop'};
   function drawDay() {
@@ -976,7 +984,7 @@
       const meta = el('p', 'mc-note', (q ? 'מחיר מ-' + qil(q.time_ny) + ' · טווח היום ' + fmtP(q.low) + '–' + fmtP(q.high) + ' · ' : '') + 'גאפ בפרה-מרקט ' + fmtPct(r.gap_pct, 1) + ' · סיכוי/סיכון 1:' + r.r_t1 + ' / 1:' + r.r_t2);
       const bt = el('button', 'mc-btn-s', 'פתח במחשבון'); bt.type = 'button'; bt.style.alignSelf = 'flex-start';
       bt.addEventListener('click', () => fillCalc(r.trigger, r.stop, r.t2, r.symbol));
-      c.append(head, doBox(ins), ...[pulse('day', r)].filter(Boolean), n, pos, moreBox('day-' + r.symbol, [bar, cat, rules, plan, av, checks, meta, bt]));
+      c.append(head, doBox(ins), ...[pulse('day', r)].filter(Boolean), n, bar, rangeNote(r.symbol), pos, moreBox('day-' + r.symbol, [cat, rules, plan, av, checks, meta, bt]));
       return c;
     }));
   }
@@ -1027,10 +1035,11 @@
       head.append(idb, headPrice(r.symbol));
       const ins = swingInstruction(r);
       const kids = [head, doBox(ins), ...[r.action === 'avoid' ? null : pulse('swing', r)].filter(Boolean)];
+      let swPos = null;
       if (r.action !== 'avoid') {
         const n = nums('כניסה', r.pivot, [['קנה עד', r.zone_top, r.pivot, '', ['swing_setups', 'zone_top', w]], ['סטופ (SL)', r.stop, r.pivot, 'sl', ['swing_setups', 'stop', w]], ['יעד (TP)', r.target, r.pivot, 'tp', ['swing_setups', 'target', w]]]);
         mark(n.firstChild.querySelector('b'), 'swing_setups', 'pivot', w);
-        kids.push(n, posLine(size(r.pivot, r.stop), null));
+        kids.push(n); swPos = posLine(size(r.pivot, r.stop), null);
       }
       const bar = ladder([
         {v: r.stop, c: 'var(--color-bad)', label: 'SL', top: false},
@@ -1043,7 +1052,8 @@
       const why = el('p', 'mc-thesis'); why.append(el('b', null, r.action === 'avoid' ? 'למה לא: ' : 'למה המניה: '), mark(el('span', null, r.reason), 'swing_setups', 'reason', w));
       const meta = el('dl', 'mc-meta');
       [['מצב', 'status'], ['תבנית מגמה', 'trend'], ['דוח', 'earnings']].forEach(([l, f]) => { meta.append(el('dt', null, l), mark(el('dd', null, r[f]), 'swing_setups', f, w)); });
-      const more = [bar, why];
+      kids.push(bar, rangeNote(r.symbol)); if (swPos) kids.push(swPos);
+      const more = [why];
       if (r.action !== 'avoid') more.push(rules);
       more.push(meta);
       if (r.action !== 'avoid') { const bt = el('button', 'mc-btn-s', 'פתח במחשבון'); bt.type = 'button'; bt.style.alignSelf = 'flex-start'; bt.addEventListener('click', () => { show('day'); fillCalc(r.pivot, r.stop, r.target, r.symbol); }); more.push(bt); }
