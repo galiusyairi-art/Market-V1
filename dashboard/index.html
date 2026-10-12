@@ -124,13 +124,17 @@
 .mc-now-badge{font-size:var(--cds-font-size-caption);font-weight:700;padding:4px 12px;border-radius:999px;color:var(--color-bg);background:var(--st,var(--color-fg-muted))}
 .mc-now h3{margin:0 0 4px;font-size:var(--cds-font-size-heading);font-weight:600}
 .mc-now p{margin:0;line-height:1.6}
-.mc-tl{position:relative;direction:ltr;margin-top:var(--cds-gap-md);height:58px}
-.mc-tl-seg{position:absolute;top:18px;height:14px;border-radius:3px;cursor:default}
+.mc-tl{position:relative;direction:ltr;margin-top:var(--cds-gap-md);height:74px}
+.mc-tl-seg{position:absolute;top:18px;height:22px;border-radius:6px;cursor:default;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:10.5px;font-weight:600;color:var(--color-fg);white-space:nowrap;direction:rtl}
 .mc-tl-seg[data-a=go]{background:color-mix(in srgb,var(--color-ok) 55%,transparent)}
 .mc-tl-seg[data-a=wait]{background:color-mix(in srgb,var(--color-bad) 35%,transparent)}
 .mc-tl-seg[data-a=plan]{background:color-mix(in srgb,var(--color-fg) 14%,transparent)}
-.mc-tl-t{position:absolute;top:38px;font-size:10px;color:var(--color-fg-muted);transform:translateX(-50%);white-space:nowrap;text-align:center;line-height:1.25}
-.mc-tl-now{position:absolute;top:8px;width:2px;height:34px;background:var(--color-fg);transform:translateX(-1px)}
+.mc-tl-t{position:absolute;top:46px;transform:translateX(-50%);white-space:nowrap;text-align:center;line-height:1.2}
+.mc-tl-t b{display:block;font-size:11.5px;font-weight:600;color:var(--color-fg)}
+.mc-tl-t small{display:block;font-size:9.5px;color:var(--color-fg-muted)}
+.mc-tl-t:first-of-type{transform:none}
+.mc-tl-now{position:absolute;top:10px;width:3px;height:38px;border-radius:2px;background:var(--color-fg);transform:translateX(-1.5px);box-shadow:0 0 0 2px var(--color-panel)}
+.mc-clk small{font-size:10.5px;color:var(--color-fg-muted)}
 .mc-tl-now::after{content:attr(data-l);position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;white-space:nowrap}
 .mc-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
 .mc-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-inline-end:5px;vertical-align:middle}
@@ -287,7 +291,7 @@
       <div class="mc-h"><h2>מה עושים עכשיו</h2><p class="mc-note" id="now-clock"></p></div>
       <div class="mc-now" id="now-box"></div>
       <div class="mc-tl" id="timeline"></div>
-      <div class="mc-legend"><span><i style="background:color-mix(in srgb,var(--color-ok) 55%,transparent)"></i>זמן מסחר</span><span><i style="background:color-mix(in srgb,var(--color-bad) 35%,transparent)"></i>להמתין</span><span><i style="background:color-mix(in srgb,var(--color-fg) 14%,transparent)"></i>תכנון</span><span>שעות ניו יורק, ובשורה השנייה שעון ישראל</span></div>
+      <div class="mc-legend"><span><i style="background:color-mix(in srgb,var(--color-ok) 55%,transparent)"></i>זמן מסחר</span><span><i style="background:color-mix(in srgb,var(--color-bad) 35%,transparent)"></i>להמתין</span><span><i style="background:color-mix(in srgb,var(--color-fg) 14%,transparent)"></i>תכנון</span><span>שעון ישראל, ומתחת בקטן ניו יורק</span></div>
     </div>
 
     <div class="mc-sec"><h2>ההחלטות להיום</h2><p class="mc-note">לחיצה על מניה פותחת את תוכנית המסחר המלאה</p></div>
@@ -490,6 +494,7 @@
   const LIVE_TXT = {stop: ['מתחת לסטופ', 'stop'], t2: ['הגיע ליעד 2', 'go'], t1: ['מעל יעד 1', 'go'], in: ['מעל הטריגר', 'go'], wait: ['מתחת לטריגר', 'caution'],
     below_stop: ['מתחת לסטופ', 'stop'], zone: ['באזור הקנייה', 'go'], extended: ['מתוח: לא לרדוף', 'stop'], failed: ['פרץ ונכשל', 'stop']};
   const SWING_WAIT = ['ממתין לפריצה', 'caution'];
+  const qil = (t, sec) => { if (!t) return ''; const m = (+t.slice(11, 13)) * 60 + (+t.slice(14, 16)); return hm(m + window.mcNow().offset) + (sec ? t.slice(16, 19) : '') + ' ישראל'; };
   const liveRow = (kind, sym) => { const l = dash.data('live'); return l.status === 'ok' ? (l.data || []).find((r) => r.key === kind + ':' + sym) : null; };
   const quote = (sym) => { const d = dash.data('quotes'); return d.status === 'ok' ? (d.data || []).find((r) => r.symbol === sym && r.price != null) : null; };
   const liveBox = (kind, sym, refLabel) => {
@@ -504,7 +509,7 @@
     const right = el('div'); right.style.display = 'flex'; right.style.alignItems = 'center'; right.style.gap = '8px';
     const pill = el('span', 'mc-pill', txt); pill.dataset.st = st;
     right.append(mark(el('span', 'mc-ltr mc-muted', fmtPct(lr.dist_pct, 1) + ' ' + refLabel), 'live', 'dist_pct', w), pill);
-    const t = el('span', 'mc-note', 'עכשיו · ' + (q.time_ny || '').slice(11, 16) + ' NY · טווח היום ' + fmtP(q.low) + '–' + fmtP(q.high));
+    const t = el('span', 'mc-note', 'עכשיו · ' + qil(q.time_ny) + ' · טווח היום ' + fmtP(q.low) + '–' + fmtP(q.high));
     t.style.flexBasis = '100%';
     box.append(left, right, t);
     return box;
@@ -519,7 +524,7 @@
     const d = dash.data('quotes'), e = $('#quotes-time');
     if (d.status === 'ok') {
       const ts = (d.data || []).map((r) => r.time_ny).filter(Boolean).sort().pop();
-      e.textContent = ts ? 'מחירים חיים · ' + ts.slice(11, 19) + ' NY' + (d.refreshing ? ' · מתעדכן…' : '') : '';
+      e.textContent = ts ? 'מחירים חיים · ' + qil(ts, true) + (d.refreshing ? ' · מתעדכן…' : '') : '';
     } else e.textContent = d.status === 'loading' ? 'טוען מחירים…' : d.status === 'connect' || d.status === 'error' ? 'מחירים חיים: לא מחובר' : '';
   }
   const STRIP = [['SPY', 'S&P 500'], ['QQQ', 'נאסד״ק'], ['DIA', 'דאו'], ['IWM', 'ראסל 2000'], ['IBIT', 'ביטקוין'], ['GLD', 'זהב'], ['USO', 'נפט'], ['TLT', 'אג״ח 20ש׳']];
@@ -570,12 +575,14 @@
   };
   const hm = (m) => { m = ((Math.round(m) % 1440) + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
   const toMin = (s) => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
+  const il = (nyMin) => hm(nyMin + window.mcNow().offset);
+  const dual = (nyMin) => { const sp = el('span', 'mc-clk'); sp.append(il(nyMin) + ' ', el('small', null, '(' + hm(nyMin) + ' NY)')); return sp; };
   const tick = () => {
     const n = window.mcNow();
     const ph = n.wk ? 'closed' : n.ny >= 240 && n.ny < 570 ? 'pre' : n.ny >= 570 && n.ny < 960 ? 'regular' : n.ny >= 960 && n.ny < 1200 ? 'after' : 'closed';
     $('#session').dataset.phase = ph;
     $('#sess-name').textContent = {pre: 'פרה-מרקט', regular: 'מסחר פעיל', after: 'אפטר-מרקט', closed: 'השוק סגור'}[ph];
-    $('#sess-clock').textContent = 'NY ' + n.clock + ' · ישראל ' + n.ilClock;
+    const sc = $('#sess-clock'); sc.classList.add('mc-clk'); sc.replaceChildren('ישראל ' + n.ilClock + ' ', el('small', null, '· NY ' + n.clock));
     drawNext();
     const mins = Math.floor(n.ny);
     if (window.mcLastMin !== mins) { window.mcLastMin = mins; drawNow(); if (window.mcPage === 'day' || window.mcPage === 'swing' || window.mcPage === 'decide') drawAll(); }
@@ -615,7 +622,7 @@
     if (!v) return;
     const dt = new Date(v);
     a.title = v;
-    a.textContent = new Intl.DateTimeFormat('he-IL', {timeZone: 'America/New_York', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit'}).format(dt) + ' NY';
+    a.textContent = new Intl.DateTimeFormat('he-IL', {timeZone: 'Asia/Jerusalem', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit'}).format(dt) + ' (שעון ישראל)';
     const mins = Math.round((Date.now() - dt) / 60000);
     $('#asof-age').textContent = '(' + (mins < 60 ? 'לפני ' + Math.max(mins, 0) + ' דק׳' : mins < 1440 ? 'לפני ' + Math.round(mins / 60) + ' שע׳' : 'לפני ' + Math.round(mins / 1440) + ' ימים') + ')';
   }
@@ -659,7 +666,7 @@
     if (!box) return;
     if (d.status !== 'ok') { if (d.status === 'error') fail(box); else { box.replaceChildren(el('div', 'dash-skeleton', '—')); } return; }
     const n = window.mcNow();
-    $('#now-clock').textContent = 'עכשיו: ' + n.clock + ' ניו יורק · ' + n.ilClock + ' ישראל';
+    const nc = $('#now-clock'); nc.classList.add('mc-clk'); nc.replaceChildren('עכשיו ' + n.ilClock + ' ', el('small', null, '· ' + n.clock + ' NY'));
     const rows = d.data.map((r) => ({...r, s: toMin(r.start), e: toMin(r.end)}));
     const cur = n.wk ? null : rows.find((r) => n.ny >= r.s && n.ny < r.e);
     const next = n.wk ? null : rows.find((r) => r.s > n.ny);
@@ -669,31 +676,44 @@
       const st = {go: 'go', wait: 'stop', plan: 'caution'}[cur.action];
       badge.dataset.st = st; badge.textContent = {go: 'זמן מסחר', wait: 'להמתין', plan: 'תכנון'}[cur.action];
       const w = W('start', cur.start);
-      const h = el('h3'); h.append(mark(el('span', null, cur.name), 'timing', 'name', w), ' ', el('span', 'mc-muted mc-ltr', cur.start + '–' + cur.end + ' NY'));
+      const h = el('h3'); const rg = el('span', 'mc-clk mc-ltr'); rg.style.fontWeight = '500'; rg.append(il(cur.s) + '–' + il(cur.e) + ' ', el('small', null, '(' + cur.start + '–' + cur.end + ' NY)'));
+      h.append(mark(el('span', null, cur.name), 'timing', 'name', w), ' ', rg);
       const left = Math.max(0, Math.round(cur.e - n.ny));
-      body.append(h, mark(el('p', null, cur.what), 'timing', 'what', w), el('p', 'mc-note', 'נותרו ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0') + ' לחלון הזה' + (next ? ' · הבא: ' + next.name + ' ב-' + next.start + ' NY (' + hm(next.s + n.offset) + ' ישראל)' : '')));
+      body.append(h, mark(el('p', null, cur.what), 'timing', 'what', w), el('p', 'mc-note', 'נותרו ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0') + ' לחלון הזה' + (next ? ' · הבא: ' + next.name + ' ב-' + il(next.s) + ' (' + next.start + ' NY)' : '')));
     } else {
       badge.dataset.st = 'caution'; badge.textContent = 'השוק סגור';
       const first = rows[0];
       body.append(el('h3', null, 'מחוץ לשעות המסחר'), el('p', null, 'זה הזמן לעבור על לשונית הסווינג, לסמן רמות ולהכין רשימה למחר.'),
-        el('p', 'mc-note', 'הפרה-מרקט נפתח ב-' + first.start + ' NY (' + hm(first.s + n.offset) + ' ישראל)'));
+        el('p', 'mc-note', 'הפרה-מרקט נפתח ב-' + il(first.s) + ' (' + first.start + ' NY), והמסחר ב-' + il(570) + ' (09:30 NY)'));
     }
     box.replaceChildren(badge, body);
-    // timeline 04:00–16:00
-    const x0 = 240, x1 = 960, X = (m) => ((m - x0) / (x1 - x0)) * 100;
+    // timeline: every window gets the same width, so short windows stay readable
+    const N = rows.length, W1 = 100 / N;
+    const X = (m) => {
+      if (m <= rows[0].s) return 0;
+      for (let k = 0; k < N; k++) { const r = rows[k]; if (m < r.e) return (k + Math.max(0, m - r.s) / (r.e - r.s)) * W1; }
+      return 100;
+    };
     const parts = [];
-    rows.forEach((r) => {
+    const narrow = (tl.clientWidth || 600) < 560;
+    rows.forEach((r, k) => {
       const seg = el('div', 'mc-tl-seg'); seg.dataset.a = r.action;
-      seg.style.left = X(r.s) + '%'; seg.style.width = `calc(${X(r.e) - X(r.s)}% - 2px)`;
-      seg.title = r.name + ' · ' + r.start + '–' + r.end + ' NY';
+      seg.style.left = `calc(${k * W1}% + 1px)`; seg.style.width = `calc(${W1}% - 2px)`;
+      seg.title = r.name + ' · ' + il(r.s) + '–' + il(r.e) + ' ישראל (' + r.start + '–' + r.end + ' NY)';
+      if (!narrow) seg.textContent = r.name;
       parts.push(seg);
     });
-    ((tl.clientWidth || 600) < 560 ? [240, 570, 690, 840, 960] : [240, 570, 600, 690, 840, 900, 960]).forEach((m) => {
-      const t = el('div', 'mc-tl-t'); t.style.left = X(m) + '%';
-      t.append(el('div', null, hm(m)), el('div', null, hm(m + n.offset)));
+    const marks = rows.map((r) => r.s).concat([rows[N - 1].e]);
+    marks.forEach((m, k) => {
+      if (narrow && k % 2 === 1 && k !== marks.length - 1) return;
+      const t = el('div', 'mc-tl-t'); t.style.left = (k * W1) + '%';
+      if (k === marks.length - 1) { t.style.transform = 'translateX(-100%)'; t.style.textAlign = 'right'; }
+      else if (k === 0) { t.style.transform = 'none'; t.style.textAlign = 'left'; }
+      t.append(el('b', null, il(m)), el('small', null, hm(m) + ' NY'));
       parts.push(t);
     });
-    if (!n.wk && n.ny >= x0 && n.ny <= x1) { const nw = el('div', 'mc-tl-now'); nw.style.left = X(n.ny) + '%'; nw.dataset.l = 'עכשיו'; parts.push(nw); }
+    const x0 = rows[0].s, x1 = rows[N - 1].e;
+    if (!n.wk && n.ny >= x0 && n.ny <= x1) { const nw = el('div', 'mc-tl-now'); nw.style.left = X(n.ny) + '%'; nw.title = 'עכשיו ' + n.ilClock; parts.push(nw); }
     tl.replaceChildren(...parts);
   }
 
@@ -745,8 +765,8 @@
     if (lr && lr.status === 'stop') return {st: 'stop', title: 'בוטל: לא נכנסים', text: ['המחיר ירד מתחת לסטופ (', P(r.stop), '). העסקה לא רלוונטית היום.'], maxEntry};
     if (lr && (lr.status === 't1' || lr.status === 't2')) return {st: 'stop', title: 'פספסנו: לא נכנסים', text: ['המחיר כבר ליד היעד. מי שבפנים: מוכרים חצי ב-', P(r.t1), ' ואת השאר ב-', P(r.t2), '.'], maxEntry};
     if (lr && lr.status === 'failed') return {st: 'stop', title: 'פרץ ונכשל', text: ['היום הגיע ל-', P(lr.day_high), ', מעל הטריגר, וחזר מתחת. נכנסים רק אם הוא חוזר מעל ', P(r.trigger), ' והשוק ירוק.'], maxEntry};
-    if (m < 575) return {st: 'caution', title: 'חכה לפתיחה', text: ['אחרי 09:35 (' + hm(575 + window.mcNow().offset) + ' ישראל), קנה רק אם המחיר עולה מעל ', P(r.trigger), '.'], maxEntry};
-    if (m >= 930) return {st: 'stop', title: 'מאוחר מדי היום', text: ['לא פותחים עסקה יומית חדשה אחרי 15:30. מי שבפנים: סוגרים עד 15:55.'], maxEntry};
+    if (m < 575) return {st: 'caution', title: 'חכה לפתיחה', text: ['אחרי ' + il(575) + ' (09:35 NY), קנה רק אם המחיר עולה מעל ', P(r.trigger), '.'], maxEntry};
+    if (m >= 930) return {st: 'stop', title: 'מאוחר מדי היום', text: ['לא פותחים עסקה יומית חדשה אחרי ' + il(930) + ' (15:30 NY). מי שבפנים: סוגרים עד ' + il(955) + '.'], maxEntry};
     if (lr && lr.status === 'in') {
       if (lr.price <= maxEntry) return {st: 'go', title: 'אפשר לקנות עכשיו', text: ['המחיר מעל הטריגר. קנה עד ', P(maxEntry), ' ולא מעל. סטופ מיד ב-', P(r.stop), '.'], maxEntry};
       return {st: 'caution', title: 'אל תרדוף', text: ['המחיר ברח מעל ', P(maxEntry), '. קונים רק אם הוא חוזר לטווח ', P(r.trigger), '–', P(maxEntry), '.'], maxEntry};
@@ -761,7 +781,7 @@
       const m = nyMin();
       if (lr && lr.price >= r.pivot && (lr.range_pos ?? 100) >= 50) {
         if (m >= 945 && m < 960) return {st: 'go', title: 'קנה עכשיו (לקראת סגירה)', text: ['המחיר מעל ', P(r.pivot), ' ובחצי העליון של הטווח. זה התנאי, אפשר לקנות.']};
-        return {st: 'caution', title: 'נראה טוב, חכה לסגירה', text: ['כרגע מעל ', P(r.pivot), '. קונים רק ב-15:45–16:00 (' + hm(945 + window.mcNow().offset) + ' ישראל), אם זה עדיין כך.']};
+        return {st: 'caution', title: 'נראה טוב, חכה לסגירה', text: ['כרגע מעל ', P(r.pivot), '. קונים רק ב-' + il(945) + '–' + il(960) + ' (15:45–16:00 NY), אם זה עדיין כך.']};
       }
       return {st: 'caution', title: 'חכה לסגירה', text: ['קונים רק אם המניה נסגרת מעל ', P(r.pivot), ' ובחצי העליון של הטווח היומי. כרגע התנאי לא מתקיים.']};
     }
@@ -896,12 +916,12 @@
         {v: r.t2, c: 'var(--color-ok)', label: 'TP2', top: false}
       ], (quote(r.symbol) || {}).price ?? r.pm_price, [[r.stop, r.trigger, 'var(--color-bad)', 20], [r.trigger, r.t1, 'var(--color-ok)', 18], [r.t1, r.t2, 'var(--color-ok)', 36]]);
       mark(bar, 'daytrade', null, null);
-      const rules = el('p', 'mc-thesis'); rules.append(el('b', null, 'איך מנהלים: '), 'ביעד 1 מוכרים חצי ומזיזים את הסטופ למחיר הכניסה. את השאר מוכרים ביעד 2, או עד 15:55 לכל המאוחר.');
+      const rules = el('p', 'mc-thesis'); rules.append(el('b', null, 'איך מנהלים: '), 'ביעד 1 מוכרים חצי ומזיזים את הסטופ למחיר הכניסה. את השאר מוכרים ביעד 2, או עד ' + il(955) + ' (15:55 NY) לכל המאוחר.');
       const cat = el('p', 'mc-thesis'); cat.append(el('b', null, 'למה המניה: '), mark(el('span', null, r.catalyst), 'daytrade', 'catalyst', w));
       const plan = el('p', 'mc-thesis'); plan.append(el('b', null, 'התוכנית המלאה: '), mark(el('span', null, r.plan), 'daytrade', 'plan', w));
       const av = el('p', 'mc-thesis'); av.append(el('b', null, 'לא נכנסים אם: '), mark(el('span', null, r.avoid), 'daytrade', 'avoid', w));
       const q = quote(r.symbol);
-      const meta = el('p', 'mc-note', (q ? 'מחיר מ-' + (q.time_ny || '').slice(11, 16) + ' NY · טווח היום ' + fmtP(q.low) + '–' + fmtP(q.high) + ' · ' : '') + 'גאפ בפרה-מרקט ' + fmtPct(r.gap_pct, 1) + ' · סיכוי/סיכון 1:' + r.r_t1 + ' / 1:' + r.r_t2);
+      const meta = el('p', 'mc-note', (q ? 'מחיר מ-' + qil(q.time_ny) + ' · טווח היום ' + fmtP(q.low) + '–' + fmtP(q.high) + ' · ' : '') + 'גאפ בפרה-מרקט ' + fmtPct(r.gap_pct, 1) + ' · סיכוי/סיכון 1:' + r.r_t1 + ' / 1:' + r.r_t2);
       const bt = el('button', 'mc-btn-s', 'פתח במחשבון'); bt.type = 'button'; bt.style.alignSelf = 'flex-start';
       bt.addEventListener('click', () => fillCalc(r.trigger, r.stop, r.t2, r.symbol));
       c.append(head, doBox(ins), ...[pulse('day', r)].filter(Boolean), n, pos, moreBox('day-' + r.symbol, [bar, cat, rules, plan, av, checks, meta, bt]));
