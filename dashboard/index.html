@@ -93,6 +93,21 @@
 .mc-more[open]>summary::after{transform:rotate(180deg)}
 .mc-more-body{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 
+/* day range on ladders */
+.mc-rng{position:absolute;top:16px;height:16px;border-radius:8px;background:color-mix(in srgb,var(--color-fg) 9%,transparent);border:1px dashed color-mix(in srgb,var(--color-fg) 28%,transparent)}
+/* learn tab */
+.mc-kpis{display:grid;gap:var(--cds-gap-sm);grid-template-columns:repeat(auto-fit,minmax(min(100%,9.5rem),1fr))}
+.mc-kpi{padding:var(--cds-pad-md);border-radius:var(--cds-radius);background:var(--color-panel);border:1px solid var(--color-border-line)}
+.mc-kpi small{display:block;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.mc-kpi b{font-family:var(--font-anthropic-serif);font-weight:400;font-size:1.7rem;line-height:1.2;direction:ltr;display:inline-block}
+.mc-kpi span{display:block;font-size:11px;color:var(--color-fg-muted)}
+.mc-res{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;white-space:nowrap;color:var(--st);background:color-mix(in srgb,var(--st) 14%,transparent)}
+.mc-lesson{padding:var(--cds-pad-md);border-radius:var(--cds-radius);border:1px solid var(--color-border-line);border-inline-start:4px solid var(--st);background:var(--color-panel);display:flex;flex-direction:column;gap:4px}
+.mc-lesson p{margin:0;line-height:1.55}
+.mc-lesson small{color:var(--color-fg-muted);font-size:var(--cds-font-size-caption);line-height:1.45}
+.mc-loop{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:var(--cds-font-size-caption)}
+.mc-loop span{padding:5px 10px;border-radius:999px;border:1px solid var(--color-border-line);background:var(--color-panel)}
+.mc-loop i{font-style:normal;color:var(--color-fg-muted)}
 /* status colors */
 [data-st=go]{--st:var(--color-ok)}[data-st=caution]{--st:var(--color-warn)}[data-st=stop]{--st:var(--color-bad)}
 .mc-pill{display:inline-flex;align-items:center;gap:6px;font-size:var(--cds-font-size-caption);font-weight:600;padding:2px 10px;border-radius:999px;color:var(--st,var(--color-fg-muted));border:1px solid color-mix(in srgb,var(--st,var(--color-fg-muted)) 45%,transparent);background:color-mix(in srgb,var(--st,var(--color-fg-muted)) 10%,transparent);white-space:nowrap}
@@ -266,6 +281,7 @@
     <button class="mc-tab" role="tab" data-page="decide" aria-selected="true">ההחלטה עכשיו</button>
     <button class="mc-tab" role="tab" data-page="day" aria-selected="false">מסחר יומי</button>
     <button class="mc-tab" role="tab" data-page="swing" aria-selected="false">סווינג</button>
+    <button class="mc-tab" role="tab" data-page="learn" aria-selected="false">מה המוח למד</button>
     <button class="mc-tab" role="tab" data-page="market" aria-selected="false">שוק ומאקרו</button>
   </nav>
 
@@ -346,6 +362,37 @@
       </div>
     </div>
     <div class="mc-cards" id="swingcards" data-source="swing_setups"></div>
+  </section>
+
+  <!-- ===================== LEARN ===================== -->
+  <section class="mc-page" id="learn" hidden>
+    <div class="mc-card" id="loop-card">
+      <div class="mc-h"><h2>לולאת הלמידה</h2><p class="mc-note" id="review-next"></p></div>
+      <div class="mc-loop"><span>סוף יום: בודק כל איתות מול מה שהמניה עשתה בפועל</span><i>←</i><span>לומד: מה עבד, מה נכשל ולמה</span><i>←</i><span>כללים חדשים נכנסים לבחירת המניות של מחר</span><i>↺</i></div>
+    </div>
+    <div class="mc-kpis" id="kpis" data-source="scorecard"></div>
+    <div class="mc-grid2">
+      <div class="mc-card" id="lessons-card">
+        <div class="mc-h"><h2>מה המוח למד</h2><p class="mc-note">כללים פעילים משפיעים על הבחירות של מחר</p></div>
+        <div id="lessons" data-source="lessons" style="display:grid;gap:var(--cds-gap-sm)"></div>
+      </div>
+      <div class="mc-card" id="grades-card">
+        <div class="mc-h"><h2>ביצועים לפי ציון</h2><p class="mc-note">רק עסקאות שהתוצאה שלהן ודאית</p></div>
+        <table class="mc-tbl" id="by_grade" data-source="by_grade" data-row-key="group">
+          <thead><tr><th data-field="group">קבוצה</th><th data-field="trades">עסקאות</th><th data-field="win_rate">הצלחה</th><th data-field="avg_r">ממוצע R</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="mc-card" id="journal-card">
+      <div class="mc-h"><h2>יומן האיתותים</h2><p class="mc-note">כל איתות שניתן, ומה קרה איתו בפועל</p></div>
+      <div style="max-height:30rem;overflow:auto">
+        <table class="mc-tbl" id="journal" data-source="journal" data-row-key="id">
+          <thead><tr><th data-field="date">תאריך</th><th data-field="symbol">מניה</th><th data-field="grade">ציון</th><th data-field="result">תוצאה</th><th data-field="r">R</th><th data-field="note">מה קרה</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </section>
 
   <!-- ===================== MARKET ===================== -->
@@ -540,7 +587,7 @@
       return t;
     }));
   }
-  const RUNS = [525, 717]; // 08:45 and 11:57 New York, weekdays
+  const RUNS = [525, 717, 980]; // 08:45, 11:57 analysis and 16:20 end-of-day review, New York, weekdays
   const DOW = {Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6};
   function nextRun() {
     const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', {timeZone: 'America/New_York', weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'}).formatToParts(new Date()).map((x) => [x.type, x.value]));
@@ -589,7 +636,7 @@
   };
 
   /* ---------- tabs ---------- */
-  const PAGES = ['decide', 'day', 'swing', 'market'];
+  const PAGES = ['decide', 'day', 'swing', 'learn', 'market'];
   function show(id, link = true) {
     if (!PAGES.includes(id)) id = 'decide';
     document.querySelectorAll('#tabs .mc-tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.page === id)));
@@ -606,7 +653,7 @@
   }
 
   /* ---------- analyze ---------- */
-  const ALL = ['quotes', 'brief', 'regime', 'timing', 'daytrade', 'swing_setups', 'sectors', 'outlook', 'indices', 'macro', 'social', 'chatter', 'methods', 'sources', 'calendar'];
+  const ALL = ['quotes', 'journal', 'lessons', 'brief', 'regime', 'timing', 'daytrade', 'swing_setups', 'sectors', 'outlook', 'indices', 'macro', 'social', 'chatter', 'methods', 'sources', 'calendar'];
   $('#analyze').addEventListener('click', () => {
     ALL.forEach((id) => dash.refresh(id));
     const t = $('#analyze-tip'); t.hidden = false;
@@ -867,12 +914,17 @@
   }
 
   /* ---------- price ladder ---------- */
-  function ladder(levels, cur, zone) {
-    const vals = levels.map((l) => l.v).concat(cur != null ? [cur] : []);
+  function ladder(levels, cur, zone, range) {
+    const vals = levels.map((l) => l.v).concat(cur != null ? [cur] : []).concat(range && range[0] != null && range[1] != null ? range : []);
     const lo = Math.min(...vals), hi = Math.max(...vals), pad = (hi - lo) * 0.05 || 1;
     const x = d3.scaleLinear([lo - pad, hi + pad], [0, 100]).clamp(true);
     const bar = el('div', 'mc-bar'), track = el('div', 'mc-track');
     zone.forEach(([a, b, c, o]) => { const z = el('div', 'mc-zone'); z.style.left = x(Math.min(a, b)) + '%'; z.style.width = Math.abs(x(b) - x(a)) + '%'; z.style.background = `color-mix(in srgb, ${c} ${o}%, transparent)`; track.append(z); });
+    if (range && range[0] != null && range[1] != null && range[1] >= range[0]) {
+      const rg = el('div', 'mc-rng'); rg.style.left = x(range[0]) + '%'; rg.style.width = Math.max(0.6, x(range[1]) - x(range[0])) + '%';
+      rg.title = 'טווח היום: ' + fmtP(range[0]) + ' – ' + fmtP(range[1]);
+      bar.append(rg);
+    }
     bar.append(track);
     let flip = false;
     levels.forEach((l) => {
@@ -914,7 +966,7 @@
         {v: r.trigger, c: 'var(--color-fg)', label: 'כניסה', top: false},
         {v: r.t1, c: 'var(--color-ok)', label: 'TP1', top: true},
         {v: r.t2, c: 'var(--color-ok)', label: 'TP2', top: false}
-      ], (quote(r.symbol) || {}).price ?? r.pm_price, [[r.stop, r.trigger, 'var(--color-bad)', 20], [r.trigger, r.t1, 'var(--color-ok)', 18], [r.t1, r.t2, 'var(--color-ok)', 36]]);
+      ], (quote(r.symbol) || {}).price ?? r.pm_price, [[r.stop, r.trigger, 'var(--color-bad)', 20], [r.trigger, r.t1, 'var(--color-ok)', 18], [r.t1, r.t2, 'var(--color-ok)', 36]], quote(r.symbol) ? [quote(r.symbol).low, quote(r.symbol).high] : null);
       mark(bar, 'daytrade', null, null);
       const rules = el('p', 'mc-thesis'); rules.append(el('b', null, 'איך מנהלים: '), 'ביעד 1 מוכרים חצי ומזיזים את הסטופ למחיר הכניסה. את השאר מוכרים ביעד 2, או עד ' + il(955) + ' (15:55 NY) לכל המאוחר.');
       const cat = el('p', 'mc-thesis'); cat.append(el('b', null, 'למה המניה: '), mark(el('span', null, r.catalyst), 'daytrade', 'catalyst', w));
@@ -985,7 +1037,7 @@
         {v: r.pivot, c: 'var(--color-fg)', label: 'כניסה', top: true},
         {v: r.zone_top, c: 'var(--color-ok)', label: 'קנה עד', top: false},
         {v: r.target, c: 'var(--color-ok)', label: 'TP', top: true}
-      ], (quote(r.symbol) || {}).price ?? r.last, [[r.stop, r.pivot, 'var(--color-bad)', 18], [r.pivot, r.zone_top, 'var(--color-ok)', 40], [r.zone_top, r.target, 'var(--color-ok)', 12]]);
+      ], (quote(r.symbol) || {}).price ?? r.last, [[r.stop, r.pivot, 'var(--color-bad)', 18], [r.pivot, r.zone_top, 'var(--color-ok)', 40], [r.zone_top, r.target, 'var(--color-ok)', 12]], quote(r.symbol) ? [quote(r.symbol).low, quote(r.symbol).high] : null);
       mark(bar, 'swing_setups', null, null);
       const rules = el('p', 'mc-thesis'); rules.append(el('b', null, 'איך מנהלים: '), 'מוכרים הכול אם המחיר נסגר מתחת לסטופ. ביעד מוכרים חצי, ואת השאר מחזיקים כל עוד המניה מעל ממוצע 21 יום.');
       const why = el('p', 'mc-thesis'); why.append(el('b', null, r.action === 'avoid' ? 'למה לא: ' : 'למה המניה: '), mark(el('span', null, r.reason), 'swing_setups', 'reason', w));
@@ -1026,6 +1078,85 @@
     g.append('text').attr('x', width - 2).attr('y', 17).attr('text-anchor', 'end').style('font-size', '11px').style('fill', 'var(--color-fg-muted)')
       .text((r) => r.ytd_pct == null ? '' : fmtPct(r.ytd_pct, 1)).attr('data-source', 'sectors').attr('data-field', 'ytd_pct').attr('data-where', (r) => W('etf', r.etf));
     box.replaceChildren(svg.node());
+  }
+
+  /* ---------- learning loop ---------- */
+  dash.calc('scorecard', {
+    title: 'תוצאות האיתותים',
+    description: 'סיכום היומן: כמה איתותים, כמה הופעלו, אחוז הצלחה וממוצע R. רק עסקאות שהתוצאה שלהן ודאית נספרות.',
+    inputs: ['journal'],
+    fn: (journal) => {
+      const scored = journal.filter((r) => r.scored && r.r != null);
+      const wins = scored.filter((r) => r.r > 0);
+      const sum = scored.reduce((a, r) => a + r.r, 0);
+      return [
+        {key: 'signals', label: 'איתותים', value: journal.length},
+        {key: 'scored', label: 'עסקאות שנמדדו', value: scored.length},
+        {key: 'win_rate', label: 'אחוז הצלחה', value: scored.length ? wins.length / scored.length : null},
+        {key: 'avg_r', label: 'ממוצע לעסקה (R)', value: scored.length ? Math.round((sum / scored.length) * 100) / 100 : null},
+        {key: 'total_r', label: 'סה״כ (R)', value: Math.round(sum * 100) / 100},
+        {key: 'unscored', label: 'לא ודאי / לא הופעל / פתוח', value: journal.length - scored.length}
+      ];
+    }
+  });
+  dash.calc('by_grade', {
+    title: 'ביצועים לפי ציון',
+    description: 'אחוז הצלחה וממוצע R לכל סוג (יומי/סווינג) וציון, רק מעסקאות שהתוצאה שלהן ודאית.',
+    inputs: ['journal'],
+    fn: (journal) => {
+      const g = {};
+      journal.filter((r) => r.scored && r.r != null).forEach((r) => {
+        const k = (r.kind === 'day' ? 'יומי' : 'סווינג') + ' · ציון ' + r.grade;
+        (g[k] = g[k] || []).push(r.r);
+      });
+      return Object.entries(g).map(([group, rs]) => ({group, trades: rs.length, win_rate: rs.filter((x) => x > 0).length / rs.length, avg_r: Math.round((rs.reduce((a, b) => a + b, 0) / rs.length) * 100) / 100}));
+    }
+  });
+  const RES = {stop: ['סטופ', 'stop'], t1: ['יעד 1', 'go'], t2: ['יעד 2', 'go'], eod: ['נסגר בסוף יום', 'caution'], no_trigger: ['לא הופעל', 'caution'], ambiguous: ['לא ודאי', 'caution'], open: ['פתוח', 'caution']};
+  function drawLearn() {
+    const n = nextRun();
+    const rn = $('#review-next');
+    const reviewSecs = (() => { const p = nextRun(); return p; })();
+    rn.textContent = 'הסקירה הבאה: ' + il(980) + ' (16:20 NY) בכל יום מסחר';
+    const sc = dash.data('scorecard'), kp = $('#kpis');
+    if (sc.status === 'ok') {
+      kp.replaceChildren(...sc.data.map((r) => {
+        const c = el('div', 'mc-kpi'); const w = 'key=' + r.key;
+        let v = r.value == null ? '—' : r.key === 'win_rate' ? d3.format('.0%')(r.value) : (r.key === 'avg_r' || r.key === 'total_r') ? (r.value > 0 ? '+' : '') + d3.format('.2f')(r.value) + 'R' : d3.format(',')(r.value);
+        const b = mark(el('b', (r.key === 'avg_r' || r.key === 'total_r') ? cls(r.value) : null, v), 'scorecard', 'value', w);
+        c.append(mark(el('small', null, r.label), 'scorecard', 'label', w), b);
+        if (r.key === 'total_r' && r.value != null) c.append(el('span', null, '≈ ' + (r.value >= 0 ? '+' : '−') + usd(Math.abs(r.value * acct() * riskPct() / 100)) + ' לפי התיק שלך'));
+        return c;
+      }));
+    } else if (sc.status === 'error') fail(kp); else skel(kp, 6, '5rem');
+    const ls = dash.data('lessons'), lb = $('#lessons');
+    if (ls.status === 'ok') {
+      const order = (r) => (r.status === 'active' ? 0 : 1) * 10 + (r.type === 'rule' ? 0 : 1);
+      lb.replaceChildren(...[...ls.data].sort((a, b) => order(a) - order(b) || String(b.date).localeCompare(a.date)).map((r) => {
+        const w = W('id', r.id);
+        const c = el('div', 'mc-lesson'); c.dataset.st = r.status !== 'active' ? 'caution' : r.type === 'rule' ? 'go' : 'caution';
+        if (r.status !== 'active') c.style.opacity = '.6';
+        const top = el('div'); top.style.display = 'flex'; top.style.justifyContent = 'space-between'; top.style.gap = '8px';
+        const badge = el('span', 'mc-res', r.status !== 'active' ? 'בוטל' : r.type === 'rule' ? 'כלל פעיל' : 'תצפית'); badge.dataset.st = c.dataset.st;
+        top.append(badge, el('small', null, new Intl.DateTimeFormat('he-IL', {day: 'numeric', month: 'numeric', timeZone: 'UTC'}).format(new Date(r.date + 'T12:00:00Z'))));
+        const ev = el('small'); ev.append(el('b', null, 'על סמך: '), mark(el('span', null, r.evidence), 'lessons', 'evidence', w));
+        c.append(top, mark(el('p', null, r.text), 'lessons', 'text', w), ev);
+        return c;
+      }));
+    } else if (ls.status === 'error') fail(lb); else skel(lb, 3, '5rem');
+    fillTable('by_grade', 4, (r) => { const tr = el('tr'); tr.dataset.key = r.group; tr.append(td(r.group), td(d3.format(',')(r.trades)), td(d3.format('.0%')(r.win_rate)), td((r.avg_r > 0 ? '+' : '') + d3.format('.2f')(r.avg_r) + 'R', 'mc-ltr ' + cls(r.avg_r))); return tr; });
+    const bg = dash.data('by_grade');
+    if (bg.status === 'ok' && !bg.data.length) { const tb = $('#by_grade tbody'); const tr = el('tr'); const t = el('td', 'mc-muted', 'עוד אין מספיק עסקאות שנמדדו. הטבלה מתמלאת אחרי כל סקירת סוף יום.'); t.colSpan = 4; tr.append(t); tb.replaceChildren(tr); }
+    fillTable('journal', 6, (r) => {
+      const tr = el('tr'); tr.dataset.key = r.id;
+      const dt = new Intl.DateTimeFormat('he-IL', {day: 'numeric', month: 'numeric', timeZone: 'UTC'}).format(new Date(r.date + 'T12:00:00Z'));
+      const sym = td(null); sym.style.fontWeight = '700'; sym.append(r.symbol + ' ', el('span', 'mc-muted', r.kind === 'day' ? 'יומי' : 'סווינג'));
+      const [rt, rs] = RES[r.result] || [r.result, 'caution'];
+      const res = td(null); const pill = el('span', 'mc-res', rt); pill.dataset.st = rs; res.append(pill);
+      const rr = td(r.r == null ? '—' : (r.r > 0 ? '+' : '') + d3.format('.2f')(r.r), 'mc-ltr ' + cls(r.r));
+      tr.append(td(dt), sym, td(r.grade), res, rr, td(r.note, 'mc-muted'));
+      return tr;
+    });
   }
 
   /* ---------- market tab ---------- */
@@ -1154,6 +1285,7 @@
     if (p === 'decide') { drawRegime(); drawNow(); drawDecisions(); }
     if (p === 'day') { drawDay(); calc(); }
     if (p === 'swing') { drawSectors(); drawSwing(); }
+    if (p === 'learn') drawLearn();
     if (p === 'market') { drawBrief(); drawGauges(); drawIndices(); drawSocial(); drawMacro(); drawTables(); }
   }
 

@@ -54,3 +54,14 @@ In Hebrew, at most 5 lines:
 - The market light (רמזור) and why.
 - The top 2–3 decisions (symbol, trigger, stop).
 - Anything that changed since the last run.
+
+## Learning loop (journal + lessons)
+- **Morning and midday runs:** read `datasets/lessons` first and apply every lesson with `status: "active"` to selection, grades, triggers and sizing. Say in `brief.today` which lesson changed the picks. Never write `journal` or `lessons`.
+- **End-of-day review (16:20 NY):**
+  - Grades every `daytrade` and `swing_setups` signal against the day's open/high/low/close (Finnhub), and appends the result to `journal.json`.
+  - Result values: `no_trigger`, `stop`, `t1`, `t2`, `eod`, `ambiguous`, `open`.
+  - R is computed with the exit plan: half at t1, then the stop moves to the entry, the rest at t2 or the close.
+  - `ambiguous` = both the stop and t1 were hit the same day and the order can't be proven. It is not scored.
+  - Then writes 1–3 lessons to `lessons.json`: `{id, date, type: rule|observation, status: active|retired, text, evidence, applies_to}`.
+    - An observation becomes a rule only with ≥3 scored cases, or one extremely clear-cut case.
+    - At most 8 active rules.

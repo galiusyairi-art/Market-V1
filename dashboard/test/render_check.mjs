@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 const D = '/tmp/claude-0/-home-user-Market-V1/3ac42b4a-496c-5a7a-93b5-649a669f647c/scratchpad/dash/';
 const page_html = fs.readFileSync(D + 'index.html', 'utf8');
-const files = ['brief','outlook','indices','regime','timing','daytrade','swing_setups','sectors','macro','social','chatter','methods','sources','calendar'];
+const files = ['journal','lessons','brief','outlook','indices','regime','timing','daytrade','swing_setups','sectors','macro','social','chatter','methods','sources','calendar'];
 const data = Object.fromEntries(files.map((f) => [f, JSON.parse(fs.readFileSync(D + f + '.json', 'utf8'))]));
 data.quotes = JSON.parse(fs.readFileSync('quotes.json', 'utf8'));
 const d3src = fs.readFileSync('node_modules/d3/dist/d3.min.js', 'utf8');
@@ -42,10 +42,10 @@ for (const [w, h, tag] of [[1400, 900, 'desk'], [400, 860, 'mob']]) {
     for (const s of scripts) { try { (new Function(s.textContent))(); } catch (e) { console.error('script: ' + e.message + ' ' + e.stack); } }
   }, page_html);
   await page.waitForTimeout(600);
-  for (const tab of ['decide', 'day', 'swing', 'market']) {
+  for (const tab of ['decide', 'day', 'swing', 'learn', 'market']) {
     await page.click(`#tabs [data-page=${tab}]`);
     await page.waitForTimeout(300);
-    if (tab === 'day') { await page.click('#day-HUM summary'); await page.waitForTimeout(200); }
+    if (tab === 'day') { const s = await page.$('#daycards summary'); if (s) { await s.click(); await page.waitForTimeout(200); } }
     await page.screenshot({ path: `${tag}-${tab}.png`, fullPage: tab !== 'market' });
   }
   if (tag === 'desk') {
