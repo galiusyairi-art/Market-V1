@@ -1,0 +1,44 @@
+[
+ {
+  "sector": "אנרגיה",
+  "etf": "XLE",
+  "week_pct": 1.06,
+  "ytd_pct": 48.81,
+  "view": "lead"
+ },
+ {
+  "sector": "טכנולוגיה",
+  "etf": "XLK",
+  "week_pct": null,
+  "ytd_pct": 37.86,
+  "view": "lead"
+ },
+ {
+  "sector": "תשתיות",
+  "etf": "XLU",
+  "week_pct": 0.43,
+  "ytd_pct": null,
+  "view": "neutral"
+ },
+ {
+  "sector": "צריכה מחזורית",
+  "etf": "XLY",
+  "week_pct": -0.47,
+  "ytd_pct": null,
+  "view": "neutral"
+ },
+ {
+  "sector": "חומרי גלם",
+  "etf": "XLB",
+  "week_pct": -2.53,
+  "ytd_pct": null,
+  "view": "lag"
+ },
+ {
+  "sector": "בריאות",
+  "etf": "XLV",
+  "week_pct": -2.65,
+  "ytd_pct": 9.97,
+  "view": "lag"
+ }
+]

@@ -1,0 +1,52 @@
+[
+ {
+  "group": "חדשות ונתונים",
+  "name": "CNBC · Bloomberg · Reuters · Yahoo Finance",
+  "signal": "OpenAI ‏50B, עסקת SpaceX, דירוגי CMS"
+ },
+ {
+  "group": "חדשות ונתונים",
+  "name": "Benzinga · Investing.com · TheStreet · 24/7 Wall St",
+  "signal": "מניות שזזות בפרה-מרקט, חוזים"
+ },
+ {
+  "group": "מאקרו רשמי",
+  "name": "Federal Reserve · BLS · BEA · EIA · מישיגן",
+  "signal": "ריבית, CPI, תעסוקה, תוצר, נפט"
+ },
+ {
+  "group": "שוק אג״ח וסחורות",
+  "name": "Schwab · BabyPips · Trading Economics",
+  "signal": "10Y ‏5.23%, ברנט 104$, זהב"
+ },
+ {
+  "group": "רשתות ופורומים",
+  "name": "r/wallstreetbets (AltIndex, Tradestie)",
+  "signal": "MU, ADBE, NVDA בולשיות · PLTR דובית · SBUX קפצה באזכורים"
+ },
+ {
+  "group": "רשתות ופורומים",
+  "name": "Reddit-wide (AltIndex)",
+  "signal": "GME ‏679, META ‏210 אזכורים"
+ },
+ {
+  "group": "רשתות ופורומים",
+  "name": "Stocktwits (טרנד + חדשות)",
+  "signal": "ASTS, HUM, LITE, DAL בטרנד · SPY/QQQ בולשי מאוד"
+ },
+ {
+  "group": "רשתות ופורומים",
+  "name": "X / FinTwit (AltIndex, Substack)",
+  "signal": "ASTS, ‏CMG, ‏GME ו-NVDA בדיון"
+ },
+ {
+  "group": "שווקי תחזית",
+  "name": "Polymarket",
+  "signal": "94% לפתיחה גבוהה יותר"
+ },
+ {
+  "group": "אנליסטים",
+  "name": "Baird · Evercore · Morgan Stanley · JPMorgan · Bernstein",
+  "signal": "HUM יעד 596$, מגדלים חיובי"
+ }
+]

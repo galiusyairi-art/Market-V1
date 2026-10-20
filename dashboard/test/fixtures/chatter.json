@@ -1,0 +1,68 @@
+[
+ {
+  "symbol": "HUM",
+  "platforms": "Stocktwits · Reddit · X",
+  "sentiment": "bullish",
+  "theme": "דירוגי כוכבים 2027, ‎+15% בפרה-מרקט"
+ },
+ {
+  "symbol": "ASTS",
+  "platforms": "Stocktwits #1 · X · Reddit",
+  "sentiment": "bearish",
+  "theme": "SpaceX חטפה את ספקטרום Grain; B. Riley הורידה ל-Neutral"
+ },
+ {
+  "symbol": "MU",
+  "platforms": "WSB · Reddit · Stocktwits",
+  "sentiment": "bullish",
+  "theme": "המניה הבולשית ביותר ב-WSB, ריבאונד בשבבים"
+ },
+ {
+  "symbol": "SBUX / CMG",
+  "platforms": "WSB · X",
+  "sentiment": "neutral",
+  "theme": "שמועת רכישה של Chipotle ‏(FT), קפיצה של 1,920% באזכורים"
+ },
+ {
+  "symbol": "SPCX",
+  "platforms": "Stocktwits · WSB · X",
+  "sentiment": "neutral",
+  "theme": "עסקת ספקטרום 8B$, נכנסת לסלולר"
+ },
+ {
+  "symbol": "LITE",
+  "platforms": "Stocktwits · X",
+  "sentiment": "bullish",
+  "theme": "מכורה עד 2029, קרובה לשיא"
+ },
+ {
+  "symbol": "DAL",
+  "platforms": "Stocktwits",
+  "sentiment": "bearish",
+  "theme": "פספוס בדוח, קיצוץ תחזית בגלל הדלק"
+ },
+ {
+  "symbol": "GME",
+  "platforms": "Reddit",
+  "sentiment": "neutral",
+  "theme": "עדיין הכי מוזכרת ב-Reddit ‏(679 אזכורים)"
+ },
+ {
+  "symbol": "PLTR",
+  "platforms": "WSB",
+  "sentiment": "bearish",
+  "theme": "המניה הדובית ביותר ב-WSB"
+ },
+ {
+  "symbol": "RVMD · VSTM · NOK",
+  "platforms": "Stocktwits",
+  "sentiment": "neutral",
+  "theme": "בטרנד הבוקר; ל-RVMD יש ספקות של ה-FDA"
+ },
+ {
+  "symbol": "SPY / QQQ",
+  "platforms": "Stocktwits",
+  "sentiment": "bullish",
+  "theme": "סנטימנט קמעונאי 'בולשי מאוד'"
+ }
+]

@@ -9,6 +9,18 @@ Check the New York date and time. If it is a weekend or a NYSE holiday, stop and
 
 ## 1. Research
 **Prices come from the Finnhub connector** (tools `mcp__Finhub__get_quotes`, `get_company_news`, `get_earnings_calendar`, `get_market_status`; load them with ToolSearch "finnhub"). It gives real-time quotes: use it for every price, prev close, day high/low and earnings date. Use WebSearch for news, catalysts, macro and social (WebFetch usually can't reach finance sites from this environment). If Finnhub is unavailable, fall back to dated web sources.
+**`get_quotes` is session-aware** (connector v2). Read `session` and `price_session` before using any number:
+- **Pre-market:** `price` is the latest pre-market trade, and `change_pct` is that trade vs yesterday's close.
+  - Use it for `pm_price` and `gap_pct`.
+  - `pm_high`/`pm_low` give the pre-market range.
+  - `high`/`low`/`open` are null until 09:30.
+- **No trades yet:** `price_session: "prev_close"` means no trade yet today. `change_pct` is then null: never treat it as 0%.
+- **After the close:** `day_change_pct` is the regular-session move, and `ext_change_pct` is the after-hours move.
+- **Finnhub-only rows** (`source: "finnhub"` while `session` is `pre` or `post`) have no extended-hours data. Their price is the last regular close.
+  - Never write it as a pre-market price.
+  - Find the pre-market price from a dated web source, or leave the field out and say so.
+- **`check: "mismatch"`** means the two sources disagree. Verify against a third source before using the number.
+
 Gather only numbers you can confirm from a dated source. If you can't confirm a number, leave it out or keep the previous value and say how old it is. Never invent prices.
 - Index futures or levels (S&P 500, Nasdaq, Dow), the previous close, and closes for the start of the week and the start of the month.
 - Premarket / intraday movers with catalysts (CNBC "stocks making the biggest moves", Benzinga movers, Reuters, Yahoo).

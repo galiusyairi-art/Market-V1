@@ -1,4 +1,4 @@
-import worker from './finnhub-worker.js';
+const { default: worker } = await import(process.env.W || "./finnhub-worker.js");
 const env = { FINNHUB_KEY: 'k', ACCESS_TOKEN: 'tok' };
 let calls = [];
 globalThis.fetch = async (u) => {
@@ -45,5 +45,5 @@ assert(j.error && j.error.code === -32602, 'unknown tool');
 assert(Array.isArray(j) && j.length === 1, 'batch');
 const g = await worker.fetch(new Request('https://w.dev/mcp/tok'), env);
 assert(g.status === 405, 'GET 405');
-assert(!calls.some((c) => !c.includes('token=k')), 'api key sent');
+assert(calls.filter((c) => c.includes('finnhub.io')).every((c) => c.includes('token=k')) && !calls.some((c) => c.includes('yahoo') && c.includes('token=')), 'api key sent to Finnhub only');
 console.log('all worker tests passed');
