@@ -68,6 +68,7 @@ window.dash = {
   });
   const out = { errors };
   out.decide = await grab();
+  out.decide.body = await page.evaluate(() => document.getElementById('decide').textContent + ' ' + document.getElementById('top').textContent);
   await page.click('#tabs [data-page=day]'); await page.waitForTimeout(150);
   out.day = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('#daycards article')].map((c) => [c.id, { head: c.querySelector('.mc-sc-px')?.textContent.replace(/\s+/g, ' ').trim(), todo: c.querySelector('.mc-do')?.textContent.trim(), notes: [...c.querySelectorAll(':scope > .mc-note')].map((e) => e.textContent).join(' | '), band: c.querySelector('.mc-rng')?.title || null, text: c.textContent }])));
   await page.screenshot({ path: `sess-${name}-day.png`, fullPage: true });
@@ -125,6 +126,44 @@ console.log('S6 old connector, Saturday');
 o = await render('legacy-sat', '2026-10-24T12:00:00-04:00', { ...base, brief: brief('2026-10-23T11:57:00-04:00'), quotes: legacyPre.map((r) => ({ ...r, time_ny: '2026-10-23T16:00:00' })) });
 check(!o.errors.length, 'no JS errors', o.errors);
 check(/סגירה אחרונה/.test(o.day['day-CLF'].head) && !/לא לפעול/.test(o.day['day-CLF'].todo), 'weekend: last close, Friday plan not flagged stale', o.day['day-CLF']);
+
+// ---------- connector v3: daily stats, opening range, earnings ----------
+const SECT = ['XLK', 'XLC', 'XLY', 'XLF', 'XLI', 'XLV', 'XLE', 'XLB', 'XLP', 'XLU', 'XLRE'];
+const dRow = (symbol, close, o = {}) => ({ symbol, as_of: '2026-10-19', close, prev_high: close * 1.01, prev_low: close * 0.99, sma20: close * 0.98, sma50: close * 0.96, sma150: close * 0.92,
+  sma200: close * 0.9, atr14: close * 0.03, atr_pct: 3, avg_vol20: 2e7, high_52w: close * 1.05, low_52w: close * 0.6, high_20d: close * 1.03, low_20d: close * 0.95,
+  ref_week: close * 0.99, ref_month: close * 0.98, ref_year: close * 0.85, chg_5d: 1, chg_20d: 2, rsi14: 55, trend_score: 7, trend_max: 7, bars: 252, source: 'yahoo', error: null, ...o });
+const daily = [...legacyPre.map((r) => dRow(r.symbol, r.price, r.symbol === 'QQQ' ? { chg_20d: 3 } : {})),
+  ...SECT.map((e, i) => dRow(e, 100, { sma50: i < 8 ? 96 : 105, chg_20d: e === 'XLY' ? 3 : e === 'XLP' ? 1 : 2 })),
+  dRow('^VIX', 16, { sma50: null }), dRow('^TNX', 4.2, { chg_20d: 1 })];
+const earnings = [{ symbol: 'MU', date: '2026-10-23', hour: 'amc', eps_estimate: null, revenue_estimate: null }];
+const v3 = (session) => v2(session).map((r) => (r.symbol === 'CLF' && session === 'regular' ? { ...r, or_high: 14.05, or_low: 13.8, vwap: 13.95, volume: 2e7 } : { ...r, or_high: null, or_low: null, vwap: null }));
+const near2 = (txt, v) => txt.includes('$' + v.toFixed(2));
+
+console.log('S7 connector v3, 10:30 NY regular: computed levels, light, indices, sectors, earnings');
+o = await render('v3-reg', '2026-10-20T10:30:00-04:00', { ...base, swing_setups: base.swing_setups.map((r) => (r.symbol === 'MU' ? { ...r, stop: 800 } : r)), brief: brief('2026-10-20T08:45:00-04:00'), quotes: v3('regular'), daily, earnings });
+check(!o.errors.length, 'no JS errors', o.errors);
+let clf = o.day['day-CLF'];
+check(near2(clf.text, 14.05) && near2(clf.text, 13.84) && near2(clf.text, 14.37) && near2(clf.text, 14.68), 'CLF levels = opening range 14.05, stop 13.84 (½ ATR), T1 14.37, T2 14.68', clf.text.slice(0, 400));
+check(/רמות מחושבות מהמסחר החי/.test(clf.text), 'CLF says its levels are computed from live trading');
+check(/פרץ ונכשל/.test(clf.todo), 'CLF: traded above the opening range and fell back = failed breakout', clf.todo);
+check(/רמות הניתוח של הבוקר/.test(clf.text) && /נזילות/.test(clf.text) && /VWAP/.test(clf.text), 'see-more shows the analysis levels and live checks');
+check(/מחושב מנתונים חיים/.test(o.decide.body) && /ירוק/.test(o.decide.body) && /75%/.test(o.decide.body), 'light computed live: green, 75% day exposure');
+check(/8 מתוך 11 סקטורים/.test(o.decide.body) && /VIX 16\.0/.test(o.decide.body) && /4\.20%/.test(o.decide.body), 'factors: breadth 8/11, VIX 16.0, 10-year 4.20%');
+check(/פרשנות הניתוח/.test(o.decide.body), 'the analysis regime is shown as commentary');
+check(/דוח ב-ו׳ 23\.10/.test(o.swing['swing-MU'].todo), 'MU swing blocked: earnings Fri 23.10', o.swing['swing-MU'].todo);
+
+console.log('S8 connector v3, 08:00 NY pre-market: provisional levels from the pre-market range');
+o = await render('v3-pre', '2026-10-20T08:00:00-04:00', { ...base, brief: brief('2026-10-20T07:45:00-04:00'), quotes: v3('pre'), daily, earnings });
+check(!o.errors.length, 'no JS errors', o.errors);
+clf = o.day['day-CLF'];
+check(near2(clf.text, 14.18) && near2(clf.text, 13.97) && /רמות זמניות לפי הפרה-מרקט/.test(clf.text), 'CLF entry = pre-market high 14.18, stop 13.97, marked provisional', clf.text.slice(0, 400));
+
+console.log('S9 01:32 Israel on 21.10 = 18:32 New York on 20.10 (the reported date confusion)');
+o = await render('v3-night', '2026-10-20T18:32:00-04:00', { ...base, brief: brief('2026-10-20T08:45:00-04:00'), quotes: v3('post'), daily, earnings });
+check(!o.errors.length, 'no JS errors', o.errors);
+check(/ד׳ 21\.10/.test(o.decide.body) && /ג׳ 20\.10/.test(o.decide.body), 'header shows Israel Wed 21.10 and New York Tue 20.10', '');
+check(/לפני הסגירה של ג׳ 20\.10/.test(o.decide.body), 'the morning analysis is stamped as written before the 20.10 close');
+check(!/לא לפעול/.test(o.day['day-CLF'].todo), 'the 20.10 plan is not called stale on the evening of 20.10 NY');
 
 await browser.close();
 console.log(fails ? `${fails} check(s) failed` : 'all session checks passed');

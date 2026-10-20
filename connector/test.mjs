@@ -27,7 +27,7 @@ assert(st === 200 && j.result.protocolVersion === '2025-06-18' && j.result.capab
 [st, j] = await show(await post('/mcp/tok', { jsonrpc: '2.0', method: 'notifications/initialized' }));
 assert(st === 202, 'notification 202');
 [st, j] = await show(await post('/mcp/tok', { jsonrpc: '2.0', id: 2, method: 'tools/list' }));
-assert(j.result.tools.length === 4, 'tools/list');
+assert(j.result.tools.length === 5, 'tools/list');
 [st, j] = await show(await post('/mcp/tok', { jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'get_quotes', arguments: { symbols: 'hum, lite,ZZZZ,bad$' } } }));
 const rows = j.result.structuredContent.rows;
 assert(rows.length === 3 && rows[0].symbol === 'HUM' && rows[0].price === 450.5 && rows[2].error === 'unknown symbol', 'quotes');

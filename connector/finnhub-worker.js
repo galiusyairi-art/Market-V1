@@ -23,11 +23,25 @@ const TOOLS = [
       "and which session the price comes from. price = latest trade in any session; change_pct = price vs the previous regular close " +
       "(null when there has been no trade yet today); day_change_pct = regular-session change; ext_price / ext_change_pct = pre-market " +
       "or after-hours trade vs its reference close; high/low/open = today's regular session only (null before 09:30); pm_high/pm_low = " +
-      "pre-market range. Primary source Yahoo Finance (includes extended hours), cross-checked with Finnhub; `check` is 'ok', 'mismatch' " +
+      "pre-market range; or_high/or_low = first 5 minutes of the regular session (after 09:35); vwap = regular-session VWAP. Primary source Yahoo Finance (includes extended hours), cross-checked with Finnhub; `check` is 'ok', 'mismatch' " +
       "(sources disagree, see alt_price) or null (not checked).",
     inputSchema: {
       type: "object",
       properties: { symbols: { type: "string", description: "Comma-separated tickers, e.g. \"AAPL,NVDA,SPY\" (max 30)" } },
+      required: ["symbols"],
+    },
+  },
+  {
+    name: "get_daily",
+    description:
+      "Daily statistics from one year of completed sessions (today's bar is left out until the close), per symbol (max 40, " +
+      "indices like ^VIX/^TNX allowed): last completed close and its date, previous day high/low, SMA 20/50/150/200, ATR(14), " +
+      "average volume (20d), 52-week high/low, 20-day high/low, reference closes for week/month/year-to-date changes, 5d/20d % change, " +
+      "RSI(14), and the trend-template score (0-7: price above 150/200-day, 150 above 200, 200-day rising, 50 above 150 and 200, " +
+      "price above 50-day, 30% above the 52-week low, within 25% of the 52-week high). Source: Yahoo Finance.",
+    inputSchema: {
+      type: "object",
+      properties: { symbols: { type: "string", description: "Comma-separated tickers, e.g. \"SPY,QQQ,^VIX,NVDA\" (max 40)" } },
       required: ["symbols"],
     },
   },
@@ -69,8 +83,10 @@ const clamp = (v, lo, hi, dflt) => {
   const n = Number(v);
   return Number.isFinite(n) ? Math.min(hi, Math.max(lo, Math.round(n))) : dflt;
 };
+// plain tickers, Yahoo indices (^VIX, ^TNX) and futures (ES=F)
 const tickers = (s, max = 30) =>
-  [...new Set(String(s || "").toUpperCase().split(/[\s,]+/).filter((t) => /^[A-Z][A-Z0-9.\-]{0,9}$/.test(t)))].slice(0, max);
+  [...new Set(String(s || "").toUpperCase().split(/[\s,]+/).filter((t) => /^\^?[A-Z][A-Z0-9.\-]{0,9}(=F)?$/.test(t)))].slice(0, max);
+const yahooOnly = (s) => s.startsWith("^") || s.endsWith("=F");
 
 async function finnhub(env, path, params) {
   const url = new URL(FINNHUB + path);
@@ -149,6 +165,9 @@ function fromYahoo(symbol, res, nowUnix) {
   const prev = regToday ? (m.previousClose ?? m.chartPreviousClose ?? null) : (m.regularMarketPrice ?? m.previousClose ?? m.chartPreviousClose ?? null);
   const regPrice = regToday ? m.regularMarketPrice : null;
   const regBars = bars.filter((b) => inP(b, reg));
+  const orBars = reg.start != null ? regBars.filter((b) => b.t < reg.start + 300) : []; // first 5 minutes
+  const vSum = regBars.reduce((a, b) => a + b.v, 0);
+  const vwap = vSum > 0 ? regBars.reduce((a, b) => a + ((b.h ?? b.c) + (b.l ?? b.c) + b.c) / 3 * b.v, 0) / vSum : null;
 
   // extended-hours trade that matters now: pre-market before the open, after-hours once the regular session is over
   let ext = null, extSession = null, extRef = null;
@@ -174,6 +193,9 @@ function fromYahoo(symbol, res, nowUnix) {
     high: regToday ? r2(m.regularMarketDayHigh ?? hi(regBars)) : null,
     low: regToday ? r2(m.regularMarketDayLow ?? lo(regBars)) : null,
     volume: regToday ? (m.regularMarketVolume ?? null) : null,
+    or_high: regToday && orBars.length && nowUnix >= reg.start + 300 ? r2(hi(orBars)) : null,
+    or_low: regToday && orBars.length && nowUnix >= reg.start + 300 ? r2(lo(orBars)) : null,
+    vwap: regToday ? r2(vwap) : null,
     ext_session: extSession,
     ext_price: ext ? r2(ext.c) : null,
     ext_change_pct: ext ? pct(ext.c, extRef) : null,
@@ -198,7 +220,7 @@ function fromFinnhub(symbol, q, nowUnix, marketSession) {
   const base = {
     symbol, session, trade_date: q.t ? nyDate(q.t) : null, source: "finnhub", check: null, alt_price: null,
     ext_session: null, ext_price: null, ext_change_pct: null, ext_time_ny: null, pm_high: null, pm_low: null, pm_volume: null, ah_high: null, ah_low: null,
-    volume: null, error: null,
+    or_high: null, or_low: null, vwap: null, volume: null, error: null,
   };
   if (isToday) {
     return { ...base, price: q.c, price_session: "regular", time_ny: nyTime(q.t), change: q.d, change_pct: q.dp, prev_close: q.pc,
@@ -214,7 +236,8 @@ function fromFinnhub(symbol, q, nowUnix, marketSession) {
 const emptyRow = (symbol, error) => ({
   symbol, session: null, trade_date: null, price: null, price_session: null, time_ny: null, change: null, change_pct: null, prev_close: null,
   reg_price: null, day_change_pct: null, open: null, high: null, low: null, volume: null, ext_session: null, ext_price: null, ext_change_pct: null,
-  ext_time_ny: null, pm_high: null, pm_low: null, pm_volume: null, ah_high: null, ah_low: null, source: null, check: null, alt_price: null, error,
+  ext_time_ny: null, pm_high: null, pm_low: null, pm_volume: null, ah_high: null, ah_low: null, or_high: null, or_low: null, vwap: null,
+  source: null, check: null, alt_price: null, error,
 });
 
 async function finnhubQuote(env, symbol) {
@@ -251,11 +274,12 @@ async function sessionQuotes(env, list) {
     catch { /* clock fallback */ }
   }
   await Promise.all(missing.map(async (s) => {
+    if (yahooOnly(s)) { out.set(s, emptyRow(s, `no quote (${(yahooErr.get(s) || {}).message || "Yahoo unavailable"})`)); return; }
     if (!budget.take()) { out.set(s, emptyRow(s, "too many symbols in one call")); return; }
     try { out.set(s, fromFinnhub(s, await finnhubQuote(env, s), nowUnix, marketSession)); }
     catch (e) { out.set(s, emptyRow(s, e.unknown ? "unknown symbol" : `no quote (${[(yahooErr.get(s) || {}).message, e.message].filter(Boolean).join("; ")})`)); }
   }));
-  const toCheck = [...list].reverse().filter((s) => out.get(s) && out.get(s).source === "yahoo");
+  const toCheck = [...list].reverse().filter((s) => !yahooOnly(s) && out.get(s) && out.get(s).source === "yahoo");
   await Promise.all(toCheck.map(async (s) => {
     if (!budget.take()) return;
     const row = out.get(s);
@@ -273,11 +297,109 @@ async function sessionQuotes(env, list) {
   return list.map((s) => out.get(s) || emptyRow(s, "not fetched"));
 }
 
+// ---------- daily statistics ----------
+async function yahooDaily(host, symbol) {
+  const url = `${host}/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1y`;
+  const r = await fetch(url, { headers: { "user-agent": UA, accept: "application/json" } });
+  let j = null;
+  try { j = await r.json(); } catch { /* not JSON */ }
+  const res = j && j.chart && j.chart.result && j.chart.result[0];
+  if (r.ok && res && res.meta) return res;
+  const desc = j && j.chart && j.chart.error && (j.chart.error.description || j.chart.error.code);
+  const e = new Error(desc ? `Yahoo: ${desc}` : `Yahoo HTTP ${r.status}`);
+  e.unknown = r.status === 404 || /no data found|delisted/i.test(desc || "");
+  throw e;
+}
+
+const mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
+const smaAt = (closes, n, end = closes.length) => (end >= n ? mean(closes.slice(end - n, end)) : null);
+const addDays = (ymdStr, d) => { const t = new Date(ymdStr + "T12:00:00Z"); t.setUTCDate(t.getUTCDate() + d); return t.toISOString().slice(0, 10); };
+
+function fromDaily(symbol, res, nowUnix) {
+  const m = res.meta;
+  const reg = (m.currentTradingPeriod && m.currentTradingPeriod.regular) || {};
+  const q = (res.indicators && res.indicators.quote && res.indicators.quote[0]) || {};
+  const sessionDate = reg.start ? nyDate(reg.start) : nyDate(nowUnix);
+  const sessionDone = reg.end ? nowUnix >= reg.end : true;
+  // completed sessions only: today's bar is still forming until 16:00 New York
+  const bars = (res.timestamp || [])
+    .map((t, i) => ({ d: nyDate(t), o: q.open && q.open[i], h: q.high && q.high[i], l: q.low && q.low[i], c: q.close && q.close[i], v: (q.volume && q.volume[i]) || 0 }))
+    .filter((b) => b.c != null && Number.isFinite(b.c) && b.h != null && b.l != null)
+    .filter((b) => !(b.d >= sessionDate && !sessionDone));
+  const n = bars.length;
+  if (!n) return { ...emptyDaily(symbol), error: "no completed sessions" };
+  const C = bars.map((b) => b.c), last = bars[n - 1];
+  // the session these references belong to: today while it trades, the next one once it closed is not known, so use the session date
+  const refDay = sessionDone ? addDays(last.d, 1) : sessionDate;
+  const wd = new Date(refDay + "T12:00:00Z").getUTCDay(); // 0 Sunday
+  const monday = addDays(refDay, -((wd + 6) % 7));
+  const lastBefore = (day) => { for (let i = n - 1; i >= 0; i--) if (bars[i].d < day) return bars[i].c; return null; };
+  const tr = bars.map((b, i) => (i ? Math.max(b.h - b.l, Math.abs(b.h - bars[i - 1].c), Math.abs(b.l - bars[i - 1].c)) : b.h - b.l));
+  const atr = n >= 15 ? mean(tr.slice(n - 14)) : null;
+  let rsi = null;
+  if (n >= 15) { // Wilder RSI(14)
+    let g = 0, l = 0;
+    for (let i = 1; i <= 14; i++) { const d = C[i] - C[i - 1]; if (d > 0) g += d; else l -= d; }
+    g /= 14; l /= 14;
+    for (let i = 15; i < n; i++) { const d = C[i] - C[i - 1]; g = (g * 13 + Math.max(d, 0)) / 14; l = (l * 13 + Math.max(-d, 0)) / 14; }
+    rsi = l === 0 ? 100 : 100 - 100 / (1 + g / l);
+  }
+  const s50 = smaAt(C, 50), s150 = smaAt(C, 150), s200 = smaAt(C, 200), s200prev = smaAt(C, 200, n - 20);
+  const hi52 = Math.max(...bars.map((b) => b.h)), lo52 = Math.min(...bars.map((b) => b.l));
+  const last20 = bars.slice(-20);
+  const c = last.c;
+  const tt = s200 == null || s150 == null || s50 == null ? null : [
+    c > s150 && c > s200, s150 > s200, s200prev != null && s200 > s200prev, s50 > s150 && s50 > s200, c > s50, c >= lo52 * 1.3, c >= hi52 * 0.75,
+  ].filter(Boolean).length;
+  const vols = bars.slice(-20).map((b) => b.v).filter((v) => v > 0);
+  return {
+    symbol, as_of: last.d, close: r2(c), prev_high: r2(last.h), prev_low: r2(last.l),
+    sma20: r2(smaAt(C, 20)), sma50: r2(s50), sma150: r2(s150), sma200: r2(s200),
+    atr14: r2(atr), atr_pct: atr != null ? Math.round((atr / c) * 1e4) / 100 : null,
+    avg_vol20: vols.length ? Math.round(mean(vols)) : null,
+    high_52w: r2(hi52), low_52w: r2(lo52), high_20d: r2(Math.max(...last20.map((b) => b.h))), low_20d: r2(Math.min(...last20.map((b) => b.l))),
+    ref_week: r2(lastBefore(monday)), ref_month: r2(lastBefore(refDay.slice(0, 8) + "01")), ref_year: r2(lastBefore(refDay.slice(0, 5) + "01-01")),
+    chg_5d: n > 5 ? pct(c, C[n - 6]) : null, chg_20d: n > 20 ? pct(c, C[n - 21]) : null,
+    rsi14: rsi != null ? Math.round(rsi * 10) / 10 : null, trend_score: tt, trend_max: 7, bars: n, source: "yahoo", error: null,
+  };
+}
+const emptyDaily = (symbol, error = null) => ({
+  symbol, as_of: null, close: null, prev_high: null, prev_low: null, sma20: null, sma50: null, sma150: null, sma200: null, atr14: null, atr_pct: null,
+  avg_vol20: null, high_52w: null, low_52w: null, high_20d: null, low_20d: null, ref_week: null, ref_month: null, ref_year: null, chg_5d: null,
+  chg_20d: null, rsi14: null, trend_score: null, trend_max: 7, bars: 0, source: null, error,
+});
+
+async function dailyStats(list) {
+  const budget = makeBudget(SUBREQUEST_BUDGET);
+  const nowUnix = Math.floor(Date.now() / 1000);
+  const out = new Map();
+  let host = null, probeErr = null;
+  for (const h of YAHOO) {
+    if (!budget.take()) break;
+    try { out.set(list[0], fromDaily(list[0], await yahooDaily(h, list[0]), nowUnix)); host = h; break; }
+    catch (e) { probeErr = e; if (e.unknown) { out.set(list[0], emptyDaily(list[0], "unknown symbol")); host = h; break; } }
+  }
+  if (host) {
+    await Promise.all(list.slice(1).map(async (s) => {
+      if (!budget.take()) { out.set(s, emptyDaily(s, "too many symbols in one call")); return; }
+      try { out.set(s, fromDaily(s, await yahooDaily(host, s), nowUnix)); }
+      catch (e) { out.set(s, emptyDaily(s, e.unknown ? "unknown symbol" : e.message)); }
+    }));
+  }
+  return list.map((s) => out.get(s) || emptyDaily(s, `no data (${probeErr ? probeErr.message : "Yahoo unavailable"})`));
+}
+
 const TOOL_IMPL = {
   async get_quotes(env, args) {
     const list = tickers(args.symbols);
     if (!list.length) throw new Error("Give at least one ticker in `symbols`.");
     return { rows: await sessionQuotes(env, list) };
+  },
+
+  async get_daily(env, args) {
+    const list = tickers(args.symbols, 40);
+    if (!list.length) throw new Error("Give at least one ticker in `symbols`.");
+    return { rows: await dailyStats(list) };
   },
 
   async get_company_news(env, args) {
@@ -330,8 +452,8 @@ async function handleMessage(env, msg) {
       return rpc(id, {
         protocolVersion: PROTOCOLS.includes(asked) ? asked : PROTOCOLS[0],
         capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: "finnhub-market-data", version: "2.0.0" },
-        instructions: "US stock market data: session-aware quotes with pre-market and after-hours (Yahoo Finance, cross-checked with Finnhub), company news, earnings calendar, market status (Finnhub).",
+        serverInfo: { name: "finnhub-market-data", version: "3.0.0" },
+        instructions: "US stock market data: session-aware quotes with pre-market and after-hours (Yahoo Finance, cross-checked with Finnhub), one-year daily statistics (get_daily), company news, earnings calendar, market status (Finnhub).",
       });
     }
     case "ping":

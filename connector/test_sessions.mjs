@@ -9,6 +9,7 @@ const T = (hhmm, day = '2026-10-20') => Date.parse(`${day}T${hhmm}:00-04:00`) / 
 const period = (day) => ({ pre: { start: T('04:00', day), end: T('09:30', day) }, regular: { start: T('09:30', day), end: T('16:00', day) }, post: { start: T('16:00', day), end: T('20:00', day) } });
 
 let yahoo = {};        // symbol -> chart result | 'down' | 'unknown'
+let yahooD = {};       // symbol -> daily chart result
 let fin = {};          // symbol -> finnhub quote
 let finStatus = { isOpen: false, session: 'pre-market', holiday: null, t: 0 };
 let calls = [];
@@ -18,7 +19,7 @@ globalThis.fetch = async (u) => {
   const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'content-type': 'application/json' } });
   if (url.hostname.endsWith('yahoo.com')) {
     const s = decodeURIComponent(url.pathname.split('/').pop());
-    const y = yahoo[s];
+    const y = url.searchParams.get('interval') === '1d' ? (yahooD[s] ?? (yahoo.__down ? 'down' : undefined)) : yahoo[s];
     if (y === 'down' || yahoo.__down) return new Response('blocked', { status: 403 });
     if (!y || y === 'unknown') return json({ chart: { result: null, error: { code: 'Not Found', description: 'No data found, symbol may be delisted' } } }, 404);
     return json({ chart: { result: [y], error: null } });
@@ -134,6 +135,56 @@ delete yahoo.__down;
 yahoo = {}; fin = {};
 [r] = await quotes('ZZZZ');
 assert(r.error === 'unknown symbol' && r.price === null, 'I unknown', r);
+
+// J. opening range (first 5 minutes) and VWAP during the regular session
+at(T('11:00'));
+yahoo = { CLF: chart({ regPrice: 14.5, regTime: T('10:59'), prevClose: 14.1, open: 13.9, high: 14.62, low: 13.71, bars: [
+  [T('09:30'), 13.9, 14.0, 13.85, 13.95, 1000], [T('09:32'), 13.95, 14.05, 13.8, 14.0, 1000], [T('09:34'), 14.0, 14.02, 13.9, 13.92, 1000], [T('09:35'), 13.9, 14.3, 13.9, 14.25, 1000], [T('10:59'), 14.4, 14.62, 14.4, 14.5, 2000]] }) };
+fin = { CLF: { c: 14.5, d: 0.4, dp: 2.84, h: 14.62, l: 13.71, o: 13.9, pc: 14.1, t: T('10:59') } };
+[r] = await quotes('CLF');
+assert(r.or_high === 14.05 && r.or_low === 13.8, 'J opening range = first 5 minutes only', r);
+const tp = (h, l, c) => (h + l + c) / 3;
+const vw = (tp(14, 13.85, 13.95) + tp(14.05, 13.8, 14) + tp(14.02, 13.9, 13.92) + tp(14.3, 13.9, 14.25) + 2 * tp(14.62, 14.4, 14.5)) * 1000 / 6000;
+assert(near(r.vwap, vw, 1e-3), 'J VWAP', [r.vwap, vw]);
+at(T('09:33')); [r] = await quotes('CLF');
+assert(r.or_high === null, 'J no opening range before 09:35', r);
+
+// K. get_daily: one year of synthetic sessions, today's forming bar excluded
+function dailyChart(days, todayBar, regDay = '2026-10-20') {
+  const ts = [], o = [], h = [], l = [], c = [], v = [];
+  days.forEach((d) => { ts.push(T('09:30', d.d)); o.push(d.c); h.push(d.h ?? d.c + 1); l.push(d.l ?? d.c - 1); c.push(d.c); v.push(d.v ?? 1e6); });
+  if (todayBar) { ts.push(T('09:30', regDay)); o.push(todayBar); h.push(todayBar + 50); l.push(todayBar - 50); c.push(todayBar); v.push(5e6); }
+  return { meta: { currentTradingPeriod: period(regDay) }, timestamp: ts, indicators: { quote: [{ open: o, high: h, low: l, close: c, volume: v }] } };
+}
+// 252 weekdays ending Mon 2026-10-19, closes rising 1 per day from 100
+const days = []; { let d = new Date('2026-10-19T12:00:00Z'); const tmp = []; while (tmp.length < 252) { const w = d.getUTCDay(); if (w && w < 6) tmp.push(d.toISOString().slice(0, 10)); d.setUTCDate(d.getUTCDate() - 1); } tmp.reverse().forEach((dd, i) => days.push({ d: dd, c: 100 + i })); }
+yahooD = { NVDA: dailyChart(days, 999), '^VIX': dailyChart(days.map((x) => ({ ...x, c: 20, h: 21, l: 19 }))) };
+yahoo = {};
+const daily = async (symbols) => {
+  const res = await worker.fetch(new Request('https://w.dev/mcp/tok', { method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'get_daily', arguments: { symbols } } }) }), env);
+  const j = await res.json(); assert(!j.result.isError, 'daily tool error', j); return j.result.structuredContent.rows;
+};
+at(T('11:00'));
+let [dn, dv] = await daily('NVDA,^vix');
+assert(dn.as_of === '2026-10-19' && dn.close === 351 && dn.bars === 252, 'K today\'s forming bar is excluded', dn);
+assert(dn.sma20 === 341.5 && dn.sma50 === 326.5 && dn.sma200 === 251.5 && dn.atr14 === 2 && dn.prev_high === 352, 'K SMA / ATR / prev high', dn);
+assert(dn.ref_week === 350 && dn.ref_month === 338 && dn.ref_year === 143, 'K week ref = Fri 16.10 close, month ref = 30.9 close, year ref = 31.12', dn);   // 16.10 is index 250, 30.9 index 238, 31.12.2025 index 43
+assert(dn.trend_score === 7 && dn.chg_5d === pct5(dn) && dn.rsi14 === 100, 'K trend template + RSI', dn);
+assert(dv.symbol === '^VIX' && dv.close === 20 && dv.atr14 === 2, 'K ^VIX accepted', dv);
+at(T('17:00'));
+yahooD.NVDA = dailyChart(days, 999);
+[dn] = await daily('NVDA');
+assert(dn.as_of === '2026-10-20' && dn.close === 999 && dn.ref_week === 350, 'K after the close today counts as completed; week ref still last Friday', dn);
+at(T('12:00', '2026-10-24'));
+yahooD.NVDA = dailyChart(days.concat([{ d: '2026-10-20', c: 352 }, { d: '2026-10-21', c: 353 }, { d: '2026-10-22', c: 354 }, { d: '2026-10-23', c: 355 }]), null, '2026-10-23');
+[dn] = await daily('NVDA');
+assert(dn.as_of === '2026-10-23' && dn.ref_week === 350, 'K weekend: week-to-date is the week that just ended (ref = previous Friday)', dn);
+yahooD = {}; yahoo = { __down: true };
+[dn] = await daily('NVDA');
+assert(dn.close === null && /Yahoo/.test(dn.error), 'K Yahoo down -> explicit error row', dn);
+delete yahoo.__down;
+function pct5(r) { return Math.round((351 / 346 - 1) * 1e6) / 1e4; }
 
 Date.now = realNow;
 console.log('all session tests passed');

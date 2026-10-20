@@ -206,6 +206,8 @@
 /* data honesty: stale plan / missing extended-hours data / sources disagree */
 .mc-alert{display:flex;flex-direction:column;gap:4px;padding:10px 14px;border-radius:var(--cds-radius);border:1px solid color-mix(in srgb,var(--color-warn) 55%,transparent);background:color-mix(in srgb,var(--color-warn) 12%,transparent);font-size:var(--cds-font-size-caption);line-height:1.55}
 .mc-alert[hidden]{display:none}
+.mc-stamp.mc-warn{color:var(--color-warn);font-weight:600}
+#regime-ai{margin-top:6px}
 .mc-alert p{margin:0}
 .mc-alert b{font-size:var(--cds-font-size-body);font-weight:600}
 .mc-sc-px i{font-style:normal}
@@ -304,6 +306,7 @@
           <span class="mc-note" id="regime-label">—</span>
           <h3 class="dash-skeleton" id="regime-title">—</h3>
           <p class="dash-skeleton" id="regime-text">—</p>
+          <p class="mc-note" id="regime-ai"></p>
           <div class="mc-expo">
             <div><div class="mc-expo-l"><span>חשיפה למסחר יומי</span><b class="mc-ltr" id="expo-day">—</b></div><div class="mc-meter"><i id="expo-day-bar" style="width:0"></i></div><span class="mc-money" id="expo-day-usd"></span></div>
             <div><div class="mc-expo-l"><span>חשיפה לסווינג</span><b class="mc-ltr" id="expo-swing">—</b></div><div class="mc-meter"><i id="expo-swing-bar" style="width:0"></i></div><span class="mc-money" id="expo-swing-usd"></span></div>
@@ -330,7 +333,7 @@
 
   <!-- ===================== DAY ===================== -->
   <section class="mc-page" id="day" hidden>
-    <div class="mc-sec"><h2>מניות במשחק: תוכנית מסחר יומית</h2><p class="mc-note">ציון A–C לפי קטליזטור, נפח, גאפ, נזילות, סקטור ו-VWAP · הרמות מתמונת הפרה-מרקט</p></div>
+    <div class="mc-sec"><h2>מניות במשחק: תוכנית מסחר יומית</h2><p class="mc-note">המניות והקטליזטור מהניתוח · הרמות מחושבות ממחירים חיים: שיא הפרה-מרקט עד 09:35 NY, ואחר כך טווח 5 הדקות הראשונות ו-ATR</p></div>
     <div class="mc-cards" id="daycards" data-source="daytrade"></div>
     <div class="mc-card" id="calc-card">
       <div class="mc-h"><h2>מחשבון פוזיציה</h2><p class="mc-note">לחיצה על "חשב פוזיציה" בכרטיס ממלאת את הנתונים</p></div>
@@ -362,13 +365,13 @@
     </div>
     <div class="mc-grid2">
       <div class="mc-card" id="sectors-card">
-        <div class="mc-h"><h2>חוזק סקטורים</h2><p class="mc-note">שבוע אחרון (עמודה) · מתחילת השנה (מספר)</p></div>
-        <div id="sectors" data-source="sectors" style="min-height:200px"></div>
+        <div class="mc-h"><h2>חוזק סקטורים</h2><p class="mc-note" id="sectors-note">מתחילת השבוע (עמודה) · מתחילת השנה (מספר)</p></div>
+        <div id="sectors" data-source="sectors_live sectors" style="min-height:200px"></div>
       </div>
       <div class="mc-card" id="swing-summary">
         <div class="mc-h"><h2>איך לקרוא את הכרטיסים</h2></div>
         <p class="mc-thesis">הבר מציג את המחיר האחרון (נקודה שחורה) ביחס לסטופ, לנקודת הקנייה, לסוף אזור הקנייה (‎+5%) וליעד. אם הנקודה משמאל לנקודת הקנייה, ממתינים לפריצה. אם היא בתוך האזור הירוק, אפשר לקנות. מימין לאזור כבר מאוחר מדי.</p>
-        <p class="mc-thesis" style="margin-top:8px"><b>תבנית מגמה (X/5):</b> מעל ממוצע 50, מעל ממוצע 150, ממוצע 150 מעל 200, ממוצע 200 עולה, וקרוב לשיא שנתי (Minervini). 5/5 היא מניה מובילה, ומתחת ל-3 לא קונים לסווינג.</p>
+        <p class="mc-thesis" style="margin-top:8px"><b>תבנית מגמה (X/7, מחושב):</b> מעל ממוצע 150 ו-200, ממוצע 150 מעל 200, ממוצע 200 עולה, ממוצע 50 מעל 150 ו-200, מעל ממוצע 50, לפחות 30% מעל השפל השנתי, ועד 25% מתחת לשיא השנתי (Minervini). 7/7 היא מניה מובילה, ומתחת ל-5 לא קונים לסווינג.</p>
       </div>
     </div>
     <div class="mc-cards" id="swingcards" data-source="swing_setups"></div>
@@ -410,6 +413,7 @@
     <div class="mc-grid2">
       <div class="mc-card" id="brief-card">
         <div class="mc-h"><h2>מה קורה בשוק</h2><p class="mc-note">סינתזה של חדשות, מאקרו ורשתות</p></div>
+        <p class="mc-note mc-stamp" data-stamp></p>
         <p class="mc-headline dash-skeleton" id="headline" data-source="brief" data-field="text" data-where="key=headline">—</p>
         <div class="mc-btabs" role="tablist" id="brief-tabs">
           <button class="mc-btab" role="tab" data-k="today" aria-selected="true">היום</button>
@@ -419,14 +423,17 @@
         <p class="mc-brieftext dash-skeleton" id="brieftext" data-source="brief" data-field="text" data-where="key=today">—</p>
       </div>
       <div class="mc-card" id="odds-card">
-        <div class="mc-h"><h2>סבירות לעלייה (S&amp;P 500)</h2><p class="mc-note">מעל 50% = הטיה לעלייה</p></div>
+        <div class="mc-h"><h2>סבירות לעלייה (S&amp;P 500)</h2><p class="mc-note">הערכה של הניתוח · מעל 50% = הטיה לעלייה</p></div>
+        <p class="mc-note mc-stamp" data-stamp></p>
         <div class="mc-gauges" id="gauges" data-source="outlook"></div>
       </div>
     </div>
-    <section class="mc-idx" id="indices" data-source="indices"></section>
+    <div class="mc-sec"><h2>מדדים</h2><p class="mc-note" id="idx-note"></p></div>
+    <section class="mc-idx" id="indices" data-source="market indices"></section>
     <div class="mc-grid2">
       <div class="mc-card" id="social-card">
         <div class="mc-h"><h2>הדופק ברשתות</h2><p class="mc-note">WallStreetBets · Reddit · Stocktwits · X</p></div>
+        <p class="mc-note mc-stamp" data-stamp></p>
         <p class="mc-thesis dash-skeleton" id="social-brief" data-source="brief" data-field="text" data-where="key=social" style="margin-bottom:var(--cds-gap-sm)">—</p>
         <div class="mc-legend" id="social-legend"></div>
         <p class="mc-note" style="margin:6px 0 2px">אזכורים ב-r/wallstreetbets, 24 שעות</p>
@@ -442,7 +449,7 @@
         </div>
       </div>
     </div>
-    <div class="mc-sec"><h2>מאקרו</h2><p class="mc-note">ריבית, אינפלציה, תעסוקה, מסים וסחורות</p></div>
+    <div class="mc-sec"><h2>מאקרו</h2><p class="mc-note">ריבית, אינפלציה, תעסוקה, מסים וסחורות · <span class="mc-stamp" data-stamp></span></p></div>
     <section class="mc-macro" id="macro" data-source="macro"></section>
     <div class="mc-grid3">
       <div class="mc-card" id="calendar-card">
@@ -524,36 +531,158 @@
     if (document.activeElement !== $('#c-risk')) $('#c-risk').value = riskPct();
   }
   $('#theme-btn').addEventListener('click', () => dash.setParams({theme: dash.params().theme === 'light' ? 'dark' : 'light'}));
-  /* ---------- live quotes (Finnhub) ---------- */
-  dash.calc('live', {
-    title: 'מצב חי מול הרמות',
-    description: 'משווה את המחיר העדכני (פרה-מרקט, מסחר רגיל או אפטר-מרקט, לפי השעה) לרמות של כל תוכנית: מעל/מתחת לטריגר, פריצה שנכשלה, יעדים וסטופ ביומי; מתחת/באזור/מעל אזור הקנייה בסווינג; מיקום בטווח (טווח הפרה-מרקט לפני הפתיחה, טווח היום אחריה) ורווח ב-R מהכניסה.',
-    inputs: ['quotes', 'daytrade', 'swing_setups'],
-    fn: (quotes, daytrade, swing_setups) => {
-      const q = Object.fromEntries(quotes.map(normQ).filter((r) => r && r.price != null).map((r) => [r.symbol, r]));
-      const rng = (x) => { const g = activeRange(x); return {range_pos: g && g.hi > g.lo ? Math.round(((x.price - g.lo) / (g.hi - g.lo)) * 100) : null, range_label: g ? g.label : null}; };
-      const day = daytrade.filter((r) => q[r.symbol]).map((r) => {
-        const x = q[r.symbol], p = x.price;
-        // "failed" needs today's regular-session high; before the open there is none
-        const status = p <= r.stop ? 'stop' : p >= r.t2 ? 't2' : p >= r.t1 ? 't1' : p >= r.trigger ? 'in' : (x.high != null && x.high >= r.trigger ? 'failed' : 'wait');
-        return {key: 'day:' + r.symbol, symbol: r.symbol, kind: 'day', price: p, price_session: x.price_session, change_pct: x.change_pct, status,
-          dist_pct: Math.round((p / r.trigger - 1) * 1000) / 10, r_now: Math.round(((p - r.trigger) / (r.trigger - r.stop)) * 100) / 100,
-          day_high: x.high, day_low: x.low, ...rng(x), hit_stop_today: x.low != null && x.low <= r.stop, above_open: x.open != null ? p >= x.open : null};
-      });
-      const sw = swing_setups.filter((r) => q[r.symbol]).map((r) => {
-        const x = q[r.symbol], p = x.price;
-        const status = p <= r.stop ? 'below_stop' : p < r.pivot ? 'wait' : p <= r.zone_top ? 'zone' : 'extended';
-        return {key: 'swing:' + r.symbol, symbol: r.symbol, kind: 'swing', price: p, price_session: x.price_session, change_pct: x.change_pct, status,
-          dist_pct: Math.round((p / r.pivot - 1) * 1000) / 10, day_high: x.high, day_low: x.low, ...rng(x), above_open: x.open != null ? p >= x.open : null};
-      });
-      return day.concat(sw);
+  /* ---------- numbers computed from live data (connector: quotes + one-year daily stats) ---------- */
+  // Day-trade levels follow one fixed rule so they can be checked: entry = high of the first 5 minutes (after 09:35 NY;
+  // before that the pre-market high), stop = low of that range but never more than ½ ATR(14) below the entry and never
+  // less than 0.15 ATR, targets at 1.5R and 3R. The analysis' own levels are used only when that data is missing.
+  dash.calc('levels', {
+    title: 'רמות מסחר יומי מחושבות',
+    description: 'כניסה = שיא 5 הדקות הראשונות (לפני 09:35 NY: שיא הפרה-מרקט); סטופ = שפל אותו טווח, לכל היותר ½ ATR(14) מתחת לכניסה ולפחות 0.15 ATR; יעדים 1.5R ו-3R. בלי נתונים: רמות הניתוח.',
+    inputs: ['daytrade', 'quotes', 'daily'],
+    fn: (daytrade, quotes, daily) => daytrade.map((r) => {
+      const q = quotes.find((x) => x.symbol === r.symbol && x.price != null), d = daily.find((x) => x.symbol === r.symbol && x.atr14 != null);
+      const rd = (v) => Math.round(v * (v < 1 ? 1e4 : 100)) / (v < 1 ? 1e4 : 100);
+      const ai = {ai_trigger: r.trigger, ai_stop: r.stop, ai_t1: r.t1, ai_t2: r.t2};
+      let trigger = null, floor = null, src = 'ai';
+      if (q && d && r.side !== -1) {
+        if (q.or_high != null) { trigger = q.or_high; floor = q.or_low; src = 'or'; }
+        else if (q.pm_high != null && q.reg_price == null) { trigger = q.pm_high; floor = q.pm_low; src = 'pm'; }
+      }
+      if (trigger == null) return {...r, ...ai, level_src: 'ai', atr: d ? d.atr14 : null};
+      let stop = Math.max(floor ?? -Infinity, trigger - 0.5 * d.atr14);
+      if (trigger - stop < 0.15 * d.atr14) stop = trigger - 0.15 * d.atr14;
+      const R = trigger - stop;
+      return {...r, ...ai, trigger: rd(trigger), stop: rd(stop), t1: rd(trigger + 1.5 * R), t2: rd(trigger + 3 * R), r_t1: 1.5, r_t2: 3, level_src: src, atr: d.atr14};
+    })
+  });
+  dash.calc('market', {
+    title: 'מדדים: מחיר חי ושינוי',
+    description: 'מחיר אחרון לפי סשן ושינוי היום (Yahoo); שינוי מתחילת השבוע, החודש והשנה, מרחק מממוצע 50/200 ומהשיא השנתי, מול סגירות יומיות של שנה.',
+    inputs: ['quotes', 'daily'],
+    fn: (quotes, daily) => {
+      const IDX = [['SPY', 'S&P 500'], ['QQQ', 'נאסד״ק 100'], ['DIA', 'דאו ג׳ונס'], ['IWM', 'ראסל 2000']];
+      const pct = (a, b) => (a != null && b ? Math.round((a / b - 1) * 10000) / 100 : null);
+      return IDX.map(([symbol, name]) => {
+        const q = quotes.find((r) => r.symbol === symbol && r.price != null) || {}, d = daily.find((r) => r.symbol === symbol && r.close != null) || {};
+        const price = q.price ?? d.close ?? null;
+        return {symbol, name, price, price_session: q.price_session || null, time_ny: q.time_ny || null, today_pct: q.change_pct ?? null,
+          day_pct: q.day_change_pct ?? null, ext_pct: q.ext_change_pct ?? null, wtd_pct: pct(price, d.ref_week), mtd_pct: pct(price, d.ref_month),
+          ytd_pct: pct(price, d.ref_year), vs_sma50: pct(price, d.sma50), vs_sma200: pct(price, d.sma200), off_high: pct(price, d.high_52w), daily_as_of: d.as_of || null};
+      }).filter((r) => r.price != null);
     }
   });
+  dash.calc('sectors_live', {
+    title: 'סקטורים: שינוי שבועי ומגמה',
+    description: 'קרנות הסקטורים (SPDR): מחיר אחרון מול סגירת השבוע הקודם ותחילת השנה, ומעל/מתחת לממוצע 50.',
+    inputs: ['quotes', 'daily'],
+    fn: (quotes, daily) => {
+      const SECT = [['XLK', 'טכנולוגיה'], ['XLC', 'תקשורת'], ['XLY', 'צריכה מחזורית'], ['XLF', 'פיננסים'], ['XLI', 'תעשייה'], ['XLV', 'בריאות'], ['XLE', 'אנרגיה'], ['XLB', 'חומרים'], ['XLP', 'צריכה בסיסית'], ['XLU', 'תשתיות'], ['XLRE', 'נדל״ן']];
+      const pct = (a, b) => (a != null && b ? Math.round((a / b - 1) * 10000) / 100 : null);
+      return SECT.map(([etf, sector]) => {
+        const q = quotes.find((r) => r.symbol === etf && r.price != null) || {}, d = daily.find((r) => r.symbol === etf && r.close != null);
+        if (!d) return null;
+        const price = q.price ?? d.close;
+        return {etf, sector, week_pct: pct(price, d.ref_week), ytd_pct: pct(price, d.ref_year), chg_20d: d.chg_20d, above_sma50: d.sma50 != null ? price > d.sma50 : null};
+      }).filter(Boolean);
+    }
+  });
+  // The market light: six measurable factors, each go / caution / stop, from SPY, QQQ, IWM, sector funds, VIX and the 10-year yield.
+  dash.calc('regime_live', {
+    title: 'רמזור השוק (מחושב)',
+    description: 'מגמה (SPY/QQQ מול ממוצע 50 ו-200), השוק היום, רוחב (כמה מ-11 הסקטורים מעל ממוצע 50), VIX, תשואת 10 שנים ב-20 יום, והובלה (QQQ מול SPY, צריכה מחזורית מול בסיסית). ציון: ירוק 2, צהוב 1, אדום 0.',
+    inputs: ['quotes', 'daily'],
+    fn: (quotes, daily) => {
+      const Q = (s) => quotes.find((r) => r.symbol === s && r.price != null), D = (s) => daily.find((r) => r.symbol === s && r.close != null);
+      const px = (s) => (Q(s) || {}).price ?? (D(s) || {}).close;
+      const f2 = (v) => (v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1) + '%');
+      const vs = (s, k) => { const d = D(s), p = px(s); return d && d[k] && p != null ? (p / d[k] - 1) * 100 : null; };
+      const rows = [];
+      const t = ['SPY', 'QQQ'].map((s) => ({s, a50: vs(s, 'sma50'), a200: vs(s, 'sma200')}));
+      if (t.every((x) => x.a50 != null && x.a200 != null)) {
+        const st = t.every((x) => x.a50 > 0 && x.a200 > 0) ? 'go' : t.every((x) => x.a200 > 0) ? 'caution' : 'stop';
+        rows.push({key: 'trend', label: 'מגמה', status: st, title: {go: 'S&P ונאסד״ק מעל ממוצע 50 ו-200', caution: 'מעל ממוצע 200, אבל מתחת לממוצע 50', stop: 'מתחת לממוצע 200: מגמת ירידה'}[st],
+          text: t.map((x) => x.s + ': ' + f2(x.a50) + ' מממוצע 50, ' + f2(x.a200) + ' מממוצע 200').join(' · ')});
+      }
+      const today = ['SPY', 'QQQ'].map((s) => (Q(s) || {}).change_pct).filter((v) => v != null);
+      if (today.length) {
+        const w = Math.min(...today), st = w >= -0.3 ? 'go' : w >= -1 ? 'caution' : 'stop', ses = (Q('SPY') || {}).price_session;
+        rows.push({key: 'today', label: 'השוק היום', status: st, title: 'S&P ' + f2((Q('SPY') || {}).change_pct) + ' · נאסד״ק ' + f2((Q('QQQ') || {}).change_pct) + (ses === 'pre' ? ' (פרה-מרקט)' : ses === 'post' ? ' (כולל אפטר)' : ''),
+          text: {go: 'אין לחץ מכירות על המדדים.', caution: 'ירידה מתונה: גודל עסקה קטן יותר.', stop: 'ירידה חדה: לא פותחים לונג חדש.'}[st]});
+      }
+      const SECT = ['XLK', 'XLC', 'XLY', 'XLF', 'XLI', 'XLV', 'XLE', 'XLB', 'XLP', 'XLU', 'XLRE'];
+      const above = SECT.map((s) => vs(s, 'sma50')).filter((v) => v != null);
+      if (above.length >= 8) {
+        const n = above.filter((v) => v > 0).length, k = Math.round((n / above.length) * 11), st = k >= 7 ? 'go' : k >= 4 ? 'caution' : 'stop';
+        const iwm = D('IWM'), spy = D('SPY');
+        rows.push({key: 'breadth', label: 'רוחב שוק', status: st, title: n + ' מתוך ' + above.length + ' סקטורים מעל ממוצע 50',
+          text: (iwm && spy && iwm.chg_20d != null && spy.chg_20d != null ? 'מניות קטנות (IWM) ' + f2(iwm.chg_20d) + ' ב-20 יום, מול S&P ' + f2(spy.chg_20d) + '. ' : '') + {go: 'העלייה רחבה.', caution: 'העלייה נשענת על חלק מהשוק.', stop: 'רוב השוק במגמת ירידה.'}[st]});
+      }
+      const vix = px('^VIX');
+      if (vix != null) {
+        const st = vix < 18 ? 'go' : vix <= 25 ? 'caution' : 'stop', vq = Q('^VIX');
+        rows.push({key: 'volatility', label: 'תנודתיות', status: st, title: 'VIX ' + vix.toFixed(1) + (vq && vq.change_pct != null ? ' (' + f2(vq.change_pct) + ' היום)' : ''),
+          text: {go: 'פחד נמוך: מתחת ל-18.', caution: 'פחד מוגבר: 18–25. סטופים רחבים יותר, גודל קטן יותר.', stop: 'פחד גבוה: מעל 25. תנודות חדות.'}[st]});
+      }
+      const tnx = D('^TNX');
+      if (tnx && tnx.chg_20d != null) {
+        const lvl = tnx.close > 20 ? tnx.close / 10 : tnx.close, prev = lvl / (1 + tnx.chg_20d / 100), bp = Math.round((lvl - prev) * 100);
+        const st = bp <= 15 ? 'go' : bp <= 35 ? 'caution' : 'stop';
+        rows.push({key: 'rates', label: 'ריבית', status: st, title: 'תשואת 10 שנים ' + lvl.toFixed(2) + '% (' + (bp > 0 ? '+' : bp < 0 ? '−' : '') + Math.abs(bp) + ' נ״ב ב-20 יום)',
+          text: {go: 'התשואות יציבות או יורדות.', caution: 'התשואות עולות: לחץ על מניות צמיחה.', stop: 'זינוק בתשואות: לחץ חזק על מניות.'}[st]});
+      }
+      const qq = D('QQQ'), sp = D('SPY'), xly = D('XLY'), xlp = D('XLP');
+      if (qq && sp && xly && xlp && [qq, sp, xly, xlp].every((d) => d.chg_20d != null)) {
+        const a = qq.chg_20d - sp.chg_20d, b = xly.chg_20d - xlp.chg_20d, n = (a > 0) + (b > 0), st = n === 2 ? 'go' : n === 1 ? 'caution' : 'stop';
+        rows.push({key: 'leadership', label: 'תיאבון לסיכון', status: st, title: {go: 'צמיחה ומחזוריות מובילות', caution: 'הובלה מעורבת', stop: 'כסף בורח למגננה'}[st],
+          text: 'נאסד״ק מול S&P ב-20 יום: ' + f2(a) + ' · צריכה מחזורית מול בסיסית: ' + f2(b)});
+      }
+      if (rows.length < 3) return [];
+      const PTS = {go: 2, caution: 1, stop: 0}, share = rows.reduce((x, r) => x + PTS[r.status], 0) / (2 * rows.length);
+      const trend = (rows.find((r) => r.key === 'trend') || {}).status, td = (rows.find((r) => r.key === 'today') || {}).status;
+      const st = share >= 0.75 && trend !== 'stop' && td !== 'stop' ? 'go' : share < 0.45 || (trend === 'stop' && td === 'stop') ? 'stop' : 'caution';
+      const EX = {go: [0.75, 0.6], caution: [0.4, 0.25], stop: [0.15, 0]}[st];
+      rows.unshift({key: 'overall', label: 'מצב השוק · מחושב מנתונים חיים', status: st, score: Math.round(share * 100),
+        title: {go: 'ירוק: אפשר לסחור בגודל מלא', caution: 'צהוב: סוחרים בזהירות ובגודל מופחת', stop: 'אדום: כמעט לא סוחרים'}[st],
+        text: rows.filter((r) => r.status !== 'go').map((r) => r.label + ': ' + r.title).join(' · ') || 'כל הגורמים תומכים.', day_exposure: EX[0], swing_exposure: EX[1]});
+      return rows;
+    }
+  });
+  // live status of each plan against its levels (plain function: also works while the daily stats are missing)
+  function computeLive(quotes, plans, swing_setups) {
+    const q = Object.fromEntries(quotes.map(normQ).filter((r) => r && r.price != null).map((r) => [r.symbol, r]));
+    const rng = (x) => { const g = activeRange(x); return {range_pos: g && g.hi > g.lo ? Math.round(((x.price - g.lo) / (g.hi - g.lo)) * 100) : null, range_label: g ? g.label : null}; };
+    const day = plans.filter((r) => q[r.symbol]).map((r) => {
+      const x = q[r.symbol], p = x.price;
+      // "failed": traded above the entry after it was set (strictly above: the opening-range high is itself the day's high at first)
+      const status = p <= r.stop ? 'stop' : p >= r.t2 ? 't2' : p >= r.t1 ? 't1' : p >= r.trigger ? 'in' : (x.high != null && x.high > r.trigger ? 'failed' : 'wait');
+      return {key: 'day:' + r.symbol, symbol: r.symbol, kind: 'day', price: p, price_session: x.price_session, change_pct: x.change_pct, status,
+        dist_pct: Math.round((p / r.trigger - 1) * 1000) / 10, r_now: Math.round(((p - r.trigger) / (r.trigger - r.stop)) * 100) / 100,
+        day_high: x.high, day_low: x.low, ...rng(x), hit_stop_today: x.low != null && x.low <= r.stop, above_open: x.open != null ? p >= x.open : null};
+    });
+    const sw = swing_setups.filter((r) => q[r.symbol]).map((r) => {
+      const x = q[r.symbol], p = x.price;
+      const status = p <= r.stop ? 'below_stop' : p < r.pivot ? 'wait' : p <= r.zone_top ? 'zone' : 'extended';
+      return {key: 'swing:' + r.symbol, symbol: r.symbol, kind: 'swing', price: p, price_session: x.price_session, change_pct: x.change_pct, status,
+        dist_pct: Math.round((p / r.pivot - 1) * 1000) / 10, day_high: x.high, day_low: x.low, ...rng(x), above_open: x.open != null ? p >= x.open : null};
+    });
+    return day.concat(sw);
+  }
+  // today's day-trade plans with the computed levels when available, otherwise the analysis' levels
+  function dayPlans() {
+    const L = dash.data('levels'), d = dash.data('daytrade');
+    if (L.status === 'ok' && (L.data || []).length) return L.data;
+    return d.status === 'ok' ? d.data.map((r) => ({...r, level_src: 'ai'})) : [];
+  }
+  const dailyRow = (sym) => { const d = dash.data('daily'); return d.status === 'ok' ? (d.data || []).find((r) => r.symbol === sym && r.close != null) : null; };
   const LIVE_TXT = {stop: ['מתחת לסטופ', 'stop'], t2: ['הגיע ליעד 2', 'go'], t1: ['מעל יעד 1', 'go'], in: ['מעל הטריגר', 'go'], wait: ['מתחת לטריגר', 'caution'],
     below_stop: ['מתחת לסטופ', 'stop'], zone: ['באזור הקנייה', 'go'], extended: ['מתוח: לא לרדוף', 'stop'], failed: ['פרץ ונכשל', 'stop']};
   const SWING_WAIT = ['ממתין לפריצה', 'caution'];
   const qil = (t, sec) => { if (!t) return ''; const m = (+t.slice(11, 13)) * 60 + (+t.slice(14, 16)); return hm(m + window.mcNow().offset) + (sec ? t.slice(16, 19) : '') + ' ישראל'; };
-  const liveRow = (kind, sym) => { const l = dash.data('live'); return l.status === 'ok' ? (l.data || []).find((r) => r.key === kind + ':' + sym) : null; };
+  const liveRow = (kind, sym) => {
+    const qd = dash.data('quotes'), sw = dash.data('swing_setups');
+    if (qd.status !== 'ok') return null;
+    return computeLive(qd.data || [], kind === 'day' ? dayPlans() : [], kind === 'swing' && sw.status === 'ok' ? sw.data : []).find((r) => r.key === kind + ':' + sym) || null;
+  };
   /* ---------- quote model: every price says which session it belongs to ---------- */
   // Connector v2 rows carry session fields. Rows from the old Finnhub-only connector are mapped here: a quote stamped
   // before today's 09:30 New York is the last regular close, never today's move.
@@ -600,11 +729,19 @@
     if (q.session === 'regular' && q.price_session === 'regular' && age != null && age > 10) f.push('עסקה אחרונה לפני ' + age + ' דק׳');
     return f;
   }
+  const SECT_ETF = ['XLK', 'XLC', 'XLY', 'XLF', 'XLI', 'XLV', 'XLE', 'XLB', 'XLP', 'XLU', 'XLRE'];
   function syncSymbols() {
     const dd = dash.data('daytrade'), sw = dash.data('swing_setups');
     if (dd.status !== 'ok' || sw.status !== 'ok') return;
-    const want = [...new Set([...STRIP.map((x) => x[0]), ...dd.data.map((r) => r.symbol), ...sw.data.map((r) => r.symbol)])].slice(0, 30).join(',');
-    if (dash.params().symbols !== want) dash.setParams({symbols: want});
+    const cards = [...dd.data.map((r) => r.symbol), ...sw.data.map((r) => r.symbol)];
+    // quotes: header strip, then the cards, then sector funds while room is left (max 30)
+    const want = [...new Set([...STRIP.map((x) => x[0]), ...cards, ...SECT_ETF])].slice(0, 30).join(',');
+    // daily stats: indices, VIX, 10-year yield, sectors, cards (max 40)
+    const wantD = [...new Set(['SPY', 'QQQ', 'DIA', 'IWM', '^VIX', '^TNX', ...SECT_ETF, ...cards])].slice(0, 40).join(',');
+    const p = dash.params(), ch = {};
+    if (p.symbols !== want) ch.symbols = want;
+    if (p.daily_symbols !== wantD) ch.daily_symbols = wantD;
+    if (Object.keys(ch).length) dash.setParams(ch);
   }
   function drawQuotesTime() {
     const d = dash.data('quotes'), e = $('#quotes-time');
@@ -615,7 +752,7 @@
       e.textContent = ts ? 'מחירים · ' + src + ' · עסקה אחרונה ' + qil(ts, true) + (d.refreshing ? ' · מתעדכן…' : '') : '';
     } else e.textContent = d.status === 'loading' ? 'טוען מחירים…' : d.status === 'connect' || d.status === 'error' ? 'מחירים חיים: לא מחובר' : '';
   }
-  const STRIP = [['SPY', 'S&P 500'], ['QQQ', 'נאסד״ק'], ['DIA', 'דאו'], ['IWM', 'ראסל 2000'], ['IBIT', 'ביטקוין'], ['GLD', 'זהב'], ['USO', 'נפט'], ['TLT', 'אג״ח 20ש׳']];
+  const STRIP = [['SPY', 'S&P 500'], ['QQQ', 'נאסד״ק'], ['DIA', 'דאו'], ['IWM', 'ראסל 2000'], ['^VIX', 'VIX'], ['IBIT', 'ביטקוין'], ['GLD', 'זהב'], ['USO', 'נפט'], ['TLT', 'אג״ח 20ש׳']];
   function drawStrip() {
     const box = $('#strip'), d = dash.data('quotes');
     box.replaceChildren(...STRIP.map(([sym, name]) => {
@@ -660,13 +797,16 @@
   const fmtNY = new Intl.DateTimeFormat('en-US', {timeZone: 'America/New_York', weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'});
   const fmtIL = new Intl.DateTimeFormat('en-US', {timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'});
   const fmtNYd = new Intl.DateTimeFormat('en-CA', {timeZone: 'America/New_York'});
+  const fmtILd = new Intl.DateTimeFormat('en-CA', {timeZone: 'Asia/Jerusalem'});
+  const DOWH = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
+  const dayName = (ymdStr) => DOWH[new Date(ymdStr + 'T12:00:00Z').getUTCDay()] + ' ' + (+ymdStr.slice(8, 10)) + '.' + (+ymdStr.slice(5, 7));
   window.mcNow = () => {
     const d = new Date();
     const p = Object.fromEntries(fmtNY.formatToParts(d).map((x) => [x.type, x.value]));
     const q = Object.fromEntries(fmtIL.formatToParts(d).map((x) => [x.type, x.value]));
     const ny = (+p.hour) * 60 + (+p.minute) + (+p.second) / 60;
     const il = (+q.hour) * 60 + (+q.minute);
-    return {ny, wk: p.weekday === 'Sat' || p.weekday === 'Sun', date: fmtNYd.format(d), clock: p.hour + ':' + p.minute, ilClock: q.hour + ':' + q.minute, offset: ((il - Math.floor(ny)) % 1440 + 1440) % 1440};
+    return {ny, wk: p.weekday === 'Sat' || p.weekday === 'Sun', date: fmtNYd.format(d), ilDate: fmtILd.format(d), clock: p.hour + ':' + p.minute, ilClock: q.hour + ':' + q.minute, offset: ((il - Math.floor(ny)) % 1440 + 1440) % 1440};
   };
   function phaseNow() {
     const n = window.mcNow();
@@ -681,7 +821,9 @@
     const ph = phaseNow();
     $('#session').dataset.phase = ph === 'post' ? 'after' : ph;
     $('#sess-name').textContent = {pre: 'פרה-מרקט', regular: 'מסחר פעיל', post: 'אפטר-מרקט', closed: 'השוק סגור'}[ph];
-    const sc = $('#sess-clock'); sc.classList.add('mc-clk'); sc.replaceChildren('ישראל ' + n.ilClock + ' ', el('small', null, '· NY ' + n.clock));
+    const sc = $('#sess-clock'); sc.classList.add('mc-clk');
+    sc.replaceChildren('ישראל ' + dayName(n.ilDate) + ' ' + n.ilClock + ' ', el('small', null, '· ניו יורק ' + dayName(n.date) + ' ' + n.clock));
+    sc.title = 'יום המסחר בניו יורק: ' + dayName(n.date) + '. בערב בישראל זה עדיין אותו יום מסחר בניו יורק.';
     drawNext();
     const mins = Math.floor(n.ny);
     if (window.mcLastMin !== mins) { window.mcLastMin = mins; drawNow(); drawAlert(); if (window.mcPage === 'day' || window.mcPage === 'swing' || window.mcPage === 'decide') drawAll(); }
@@ -705,7 +847,7 @@
   }
 
   /* ---------- analyze ---------- */
-  const ALL = ['quotes', 'journal', 'lessons', 'brief', 'regime', 'timing', 'daytrade', 'swing_setups', 'sectors', 'outlook', 'indices', 'macro', 'social', 'chatter', 'methods', 'sources', 'calendar'];
+  const ALL = ['quotes', 'daily', 'earnings', 'journal', 'lessons', 'brief', 'regime', 'timing', 'daytrade', 'swing_setups', 'sectors', 'outlook', 'indices', 'macro', 'social', 'chatter', 'methods', 'sources', 'calendar'];
   $('#analyze').addEventListener('click', () => {
     ALL.forEach((id) => dash.refresh(id));
     const t = $('#analyze-tip'); t.hidden = false;
@@ -748,6 +890,8 @@
         if (rows.length && no.length === rows.length) msgs.push(['אין נתוני ' + SESS[ph] + '.', (rows.some((r) => r.legacy) ? ' המחבר בגרסה הישנה (Finnhub בלבד) נותן רק את המסחר הרגיל.' : ' Yahoo לא זמין כרגע.') + ' מוצג מחיר הסגירה האחרון, בלי אחוז שינוי. בדוק את הפרה-מרקט בפלטפורמה שלך.']);
         else if (no.length) msgs.push(['בלי נתוני ' + SESS[ph] + ':', ' ' + no.map((r) => r.symbol).join(', ') + '. מוצג מחיר הסגירה האחרון שלהן.']);
       }
+      const dl = dash.data('daily');
+      if (dl.status === 'error' || dl.status === 'connect') msgs.push(['אין נתוני היסטוריה מהמחבר.', ' הרמזור, המדדים ורמות המסחר היומי מוצגים לפי הניתוח ולא מחושבים. בדוק שהמחבר מעודכן לגרסה 3.']);
       const mm = rows.filter((r) => r.check === 'mismatch');
       if (mm.length) msgs.push(['פער בין מקורות המחיר:', ' ' + mm.map((r) => r.symbol + ' (Yahoo ' + fmtP(r.reg_price ?? r.prev_close) + ', Finnhub ' + fmtP(r.alt_price) + ')').join(' · ') + '. בדוק בפלטפורמה לפני כניסה.']);
     }
@@ -755,35 +899,72 @@
     box.replaceChildren(...msgs.map(([b, t]) => { const p = el('p'); p.append(el('b', null, '⚠ ' + b), t); return p; }));
   }
 
+  /* ---------- when was the analysis written, and on what prices ---------- */
+  function lastCloseNY() {
+    const n = window.mcNow();
+    let d = n.date;
+    const back = (x) => { const t = new Date(x + 'T12:00:00Z'); t.setUTCDate(t.getUTCDate() - 1); return t.toISOString().slice(0, 10); };
+    if (n.wk || n.ny < 960) d = back(d);
+    while ([0, 6].includes(new Date(d + 'T12:00:00Z').getUTCDay())) d = back(d);
+    const off = Date.parse(n.date + 'T' + n.clock + ':00Z') - Math.floor(Date.now() / 60000) * 60000; // New York offset from UTC, in ms
+    return {date: d, ms: Date.parse(d + 'T16:00:00Z') - off};
+  }
+  function aiStamp() {
+    const d = dash.data('brief');
+    if (d.status !== 'ok') return null;
+    const get = (k) => (d.data.find((r) => r.key === k) || {}).text;
+    const v = get('as_of');
+    if (!v || isNaN(new Date(v))) return null;
+    const dt = new Date(v), mins = Math.round((Date.now() - dt) / 60000);
+    const ps = get('price_source') || (/אין Finnhub|ללא Finnhub|בלי מחירים/.test(get('today') || '') ? 'web' : null);
+    const PS = {feed: 'מחירים מאומתים', web: 'מחירים מחיפוש ברשת, לא מאומתים', none: 'בלי נתוני מחיר'};
+    const ilTxt = new Intl.DateTimeFormat('he-IL', {timeZone: 'Asia/Jerusalem', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit'}).format(dt);
+    const age = mins < 60 ? 'לפני ' + Math.max(0, mins) + ' דק׳' : mins < 2880 ? 'לפני ' + Math.round(mins / 60) + ' שע׳' : 'לפני ' + Math.round(mins / 1440) + ' ימים';
+    const lc = lastCloseNY(), before = dt.getTime() < lc.ms;
+    return {text: 'הניתוח נכתב ' + ilTxt + ' (ישראל), ' + age + (before ? ', לפני הסגירה של ' + dayName(lc.date) : '') + (PS[ps] ? ' · ' + PS[ps] : ''), warn: before || ps === 'web' || ps === 'none'};
+  }
+  function drawStamps() {
+    const st = aiStamp();
+    document.querySelectorAll('[data-stamp]').forEach((e) => { e.textContent = st ? st.text : ''; e.classList.toggle('mc-warn', !!(st && st.warn)); });
+  }
+
   /* ---------- regime ---------- */
   function drawRegime() {
-    const d = dash.data('regime'), f = $('#factors');
+    const L = dash.data('regime_live'), A = dash.data('regime'), f = $('#factors');
+    const live = L.status === 'ok' && (L.data || []).length ? L.data : null;
     const ids = ['#regime-title', '#regime-text'];
-    if (d.status !== 'ok') {
-      ids.forEach((i) => $(i).classList.toggle('dash-skeleton', d.status !== 'error'));
-      if (d.status === 'error') fail(f); else skel(f, 6, '5.5rem');
+    if (!live && A.status !== 'ok') {
+      ids.forEach((i) => $(i).classList.toggle('dash-skeleton', A.status !== 'error'));
+      if (A.status === 'error') fail(f); else skel(f, 6, '5.5rem');
       return;
     }
-    const o = d.data.find((r) => r.key === 'overall');
+    const src = live ? 'regime_live' : 'regime', rows = live || A.data;
+    const o = rows.find((r) => r.key === 'overall');
     const w = W('key', 'overall');
     ids.forEach((i) => $(i).classList.remove('dash-skeleton'));
     $('#light').dataset.st = ST[o.status] || 'caution';
-    mark($('#regime-label'), 'regime', 'label', w).textContent = o.label;
-    mark($('#regime-title'), 'regime', 'title', w).textContent = o.title;
-    mark($('#regime-text'), 'regime', 'text', w).textContent = o.text;
-    mark($('#expo-day'), 'regime', 'day_exposure', w).textContent = d3.format('.0%')(o.day_exposure);
-    mark($('#expo-swing'), 'regime', 'swing_exposure', w).textContent = d3.format('.0%')(o.swing_exposure);
+    $('#regime-hero').setAttribute('data-source', src);
+    mark($('#regime-label'), src, 'label', w).textContent = live ? o.label : 'מצב השוק · לפי הניתוח (נתוני היסטוריה לא זמינים לחישוב)';
+    mark($('#regime-title'), src, 'title', w).textContent = o.title;
+    mark($('#regime-text'), src, 'text', w).textContent = o.text;
+    const ai = A.status === 'ok' ? A.data.find((r) => r.key === 'overall') : null, stp = aiStamp(), ra = $('#regime-ai');
+    ra.replaceChildren();
+    if (live && ai) { ra.append(el('b', null, 'פרשנות הניתוח: '), ai.title + '. ' + ai.text, stp ? el('span', stp.warn ? 'mc-warn' : null, ' (' + stp.text + ')') : ''); }
+    else if (!live && stp) ra.append(el('span', stp.warn ? 'mc-warn' : null, stp.text));
+    mark($('#expo-day'), src, 'day_exposure', w).textContent = d3.format('.0%')(o.day_exposure);
+    mark($('#expo-swing'), src, 'swing_exposure', w).textContent = d3.format('.0%')(o.swing_exposure);
     $('#expo-day-bar').style.width = (o.day_exposure * 100) + '%';
     $('#expo-day-usd').replaceChildren('≈ ', el('b', null, usd(acct() * o.day_exposure)), ' מתוך תיק של ' + usd(acct()) + ' · עד 3 עסקאות במקביל');
     $('#expo-swing-usd').replaceChildren('≈ ', el('b', null, usd(acct() * o.swing_exposure)), ' בפוזיציות סווינג פתוחות · השאר במזומן');
     $('#expo-swing-bar').style.width = (o.swing_exposure * 100) + '%';
-    f.replaceChildren(...d.data.filter((r) => r.key !== 'overall').map((r) => {
+    $('#factors').setAttribute('data-source', src);
+    f.replaceChildren(...rows.filter((r) => r.key !== 'overall').map((r) => {
       const ww = W('key', r.key);
       const c = el('div', 'mc-factor'); c.dataset.st = ST[r.status] || 'caution'; c.id = 'factor-' + r.key;
       const top = el('div'); top.style.display = 'flex'; top.style.justifyContent = 'space-between'; top.style.gap = '6px';
       const pill = el('span', 'mc-pill', {go: 'תומך', caution: 'זהירות', stop: 'נגד'}[r.status] || r.status);
-      top.append(mark(el('small', null, r.label), 'regime', 'label', ww), pill);
-      c.append(top, mark(el('b', null, r.title), 'regime', 'title', ww), mark(el('span', null, r.text), 'regime', 'text', ww));
+      top.append(mark(el('small', null, r.label), src, 'label', ww), pill);
+      c.append(top, mark(el('b', null, r.title), src, 'title', ww), mark(el('span', null, r.text), src, 'text', ww));
       return c;
     }));
   }
@@ -913,6 +1094,8 @@
     const lr = liveRow('swing', r.symbol), P = fmtP;
     if (r.action === 'avoid') return {st: 'stop', title: 'לא לקנות', text: [String(r.reason).split('.')[0] + '.']};
     if (lr && lr.status === 'below_stop') return {st: 'stop', title: 'בוטל', text: ['המחיר מתחת לסטופ (', P(r.stop), '). לא נכנסים.']};
+    const ne = nextEarnings(r.symbol);
+    if (ne && daysTo(ne.date) <= 7) return {st: 'caution', title: 'דוח ב-' + dayName(ne.date) + ': לא נכנסים לפני', text: ['לא פותחים סווינג כשיש דוח בעוד ', daysTo(ne.date) + ' ימים', '. חוזרים לזה אחרי הדוח.']};
     if (r.action === 'buy_close') {
       const m = nyMin();
       if (lr && lr.price >= r.pivot && (lr.range_pos ?? 100) >= 50) {
@@ -971,7 +1154,7 @@
 
   /* ---------- decisions ---------- */
   function drawDecisions() {
-    const dd = dash.data('daytrade'), sw = dash.data('swing_setups');
+    const dd0 = dash.data('daytrade'), dd = {status: dd0.status, data: dayPlans()}, sw = dash.data('swing_setups');
     const buy = $('#dec-buy-list'), wait = $('#dec-wait-list'), avoid = $('#dec-avoid-list');
     const row = (sym, ins, line2, onClick, src) => {
       const r = el('div', 'mc-drow'); r.tabIndex = 0;
@@ -1035,13 +1218,55 @@
     p.append(g.label + ' (מסגרת מקווקוות): ', el('b', 'mc-ltr', fmtP(g.lo) + ' – ' + fmtP(g.hi)), pos != null ? ' · המחיר ב-' + pos + '% מהטווח' : '');
     return p;
   }
+  /* ---------- live checks, earnings, level source ---------- */
+  function nextEarnings(sym) {
+    const e = dash.data('earnings');
+    if (e.status !== 'ok') return null;
+    const today = window.mcNow().date;
+    return (e.data || []).filter((r) => r.symbol === sym && r.date >= today).sort((a, b) => a.date.localeCompare(b.date))[0] || null;
+  }
+  const daysTo = (ymdStr) => Math.round((Date.parse(ymdStr + 'T12:00:00Z') - Date.parse(window.mcNow().date + 'T12:00:00Z')) / 864e5);
+  function earnNote(sym) {
+    const ne = nextEarnings(sym);
+    if (!ne || daysTo(ne.date) > 14) return null;
+    const n = daysTo(ne.date), p = el('p', 'mc-note');
+    p.style.margin = '-4px 2px 0';
+    if (n <= 7) p.classList.add('mc-warn');
+    p.textContent = 'דוח: ' + dayName(ne.date) + (ne.hour === 'bmo' ? ' לפני הפתיחה' : ne.hour === 'amc' ? ' אחרי הסגירה' : '') + (n === 0 ? ' (היום)' : ' (בעוד ' + n + ' ימים)');
+    return p;
+  }
+  function levelNote(r) {
+    const p = el('p', 'mc-note');
+    p.style.margin = '-4px 2px 0';
+    if (r.level_src === 'or') p.textContent = 'רמות מחושבות מהמסחר החי: כניסה בשיא 5 הדקות הראשונות (' + il(570) + '–' + il(575) + '), סטופ בשפל הטווח ולכל היותר ½ ATR, יעדים 1.5R ו-3R.';
+    else if (r.level_src === 'pm') p.textContent = 'רמות זמניות לפי הפרה-מרקט (שיא ' + fmtP(r.trigger) + '). ב-' + il(575) + ' הן מתעדכנות לפי טווח הפתיחה.';
+    else { p.classList.add('mc-warn'); p.textContent = 'רמות הניתוח, לא חושבו ממחירים חיים' + (dash.data('daily').status === 'ok' ? '.' : ' (אין עדיין נתוני היסטוריה מהמחבר).'); }
+    return p;
+  }
+  function liveChecks(r) {
+    const q = quote(r.symbol), d = dailyRow(r.symbol), out = [];
+    const px = q ? q.price : d ? d.close : null;
+    if (d && d.avg_vol20 && d.close) { const dv = d.avg_vol20 * d.close; out.push(['נזילות', dv >= 5e7, '$' + d3.format('.2~s')(dv).replace('G', 'B') + ' ביום']); }
+    if (q && q.price_session === 'pre' && q.change_pct != null) out.push(['גאפ 4%+', Math.abs(q.change_pct) >= 4, fmtPct(q.change_pct, 1) + ' בפרה']);
+    else if (q && q.open != null && q.prev_close) { const g = pctFrom(q.open, q.prev_close); out.push(['גאפ 4%+', Math.abs(g) >= 4, fmtPct(g, 1) + ' בפתיחה']); }
+    if (q && q.volume != null && d && d.avg_vol20 && (q.session === 'regular' || q.session === 'post')) {
+      const mins = Math.max(15, Math.min(390, nyMin() - 570)), rv = q.volume / (d.avg_vol20 * mins / 390);
+      out.push(['נפח חריג', rv >= 1.5, 'RVOL ‎' + rv.toFixed(1) + ' (מוערך)']);
+    }
+    if (q && q.vwap != null && q.price_session === 'regular') out.push(['מעל VWAP', q.price >= q.vwap, 'VWAP ' + fmtP(q.vwap)]);
+    if (d && d.sma50 && px != null) out.push(['מעל ממוצע 50', px > d.sma50, fmtPct(pctFrom(px, d.sma50), 1)]);
+    if (d && d.atr14) out.push(['ATR(14)', null, fmtP(d.atr14) + ' (' + d.atr_pct + '%)']);
+    const box = el('div', 'mc-checks');
+    out.forEach(([k, ok, v]) => { const ch = el('span', 'mc-chk', (ok == null ? '' : ok ? '✓ ' : '✗ ') + k + ' · ' + v); ch.dataset.v = ok == null ? '' : ok ? '1' : '0'; box.append(ch); });
+    return out.length ? box : null;
+  }
   /* ---------- day cards ---------- */
   const GRADE_ST = {A: 'go', B: 'caution', C: 'stop'};
   function drawDay() {
-    const d = dash.data('daytrade'), box = $('#daycards');
-    if (d.status === 'error') return fail(box);
-    if (d.status !== 'ok') return skel(box, 3, '20rem');
-    box.replaceChildren(...d.data.map((r) => {
+    const d0 = dash.data('daytrade'), box = $('#daycards');
+    if (d0.status === 'error') return fail(box);
+    if (d0.status !== 'ok') return skel(box, 3, '20rem');
+    box.replaceChildren(...dayPlans().map((r) => {
       const w = W('symbol', r.symbol);
       const c = el('article', 'mc-card mc-sc'); c.id = 'day-' + r.symbol;
       const head = el('div', 'mc-sc-head');
@@ -1077,7 +1302,12 @@
       const meta = el('p', 'mc-note', (q ? 'מחיר: ' + qWhen(q) + (rg ? ' · ' + rg.label + ' ' + fmtP(rg.lo) + '–' + fmtP(rg.hi) : '') + ' · ' : '') + 'גאפ בפרה-מרקט בזמן הניתוח ' + fmtPct(r.gap_pct, 1) + ' · סיכוי/סיכון 1:' + r.r_t1 + ' / 1:' + r.r_t2);
       const bt = el('button', 'mc-btn-s', 'פתח במחשבון'); bt.type = 'button'; bt.style.alignSelf = 'flex-start';
       bt.addEventListener('click', () => fillCalc(r.trigger, r.stop, r.t2, r.symbol));
-      c.append(head, doBox(ins), ...[pulse('day', r)].filter(Boolean), n, bar, rangeNote(r.symbol), pos, moreBox('day-' + r.symbol, [cat, rules, plan, av, checks, meta, bt]));
+      const lc = liveChecks(r);
+      const lcT = lc ? el('p', 'mc-thesis') : null; if (lcT) lcT.append(el('b', null, 'בדיקות חיות: '), 'מחושבות ממחירים ומנפח של היום ושל השנה האחרונה.');
+      const aiLv = r.level_src !== 'ai' && r.ai_trigger != null ? el('p', 'mc-note', 'רמות הניתוח של הבוקר (לעיון): כניסה ' + fmtP(r.ai_trigger) + ' · סטופ ' + fmtP(r.ai_stop) + ' · יעדים ' + fmtP(r.ai_t1) + ' / ' + fmtP(r.ai_t2)) : null;
+      const chT = el('p', 'mc-thesis'); chT.append(el('b', null, 'בדיקות הניתוח: '));
+      c.append(head, doBox(ins), ...[pulse('day', r), earnNote(r.symbol)].filter(Boolean), n, levelNote(r), bar, rangeNote(r.symbol), pos,
+        moreBox('day-' + r.symbol, [cat, rules, ...(lc ? [lcT, lc] : []), chT, checks, plan, av, ...(aiLv ? [aiLv] : []), meta, bt]));
       return c;
     }));
   }
@@ -1127,7 +1357,7 @@
       idb.append(mark(el('div', 'mc-sym', r.symbol), 'swing_setups', 'symbol', w), mark(el('div', 'mc-name', r.name), 'swing_setups', 'name', w));
       head.append(idb, headPrice(r.symbol));
       const ins = swingInstruction(r);
-      const kids = [head, doBox(ins), ...[r.action === 'avoid' ? null : pulse('swing', r)].filter(Boolean)];
+      const kids = [head, doBox(ins), ...[r.action === 'avoid' ? null : pulse('swing', r), earnNote(r.symbol)].filter(Boolean)];
       let swPos = null;
       if (r.action !== 'avoid') {
         const n = nums('כניסה', r.pivot, [['קנה עד', r.zone_top, r.pivot, '', ['swing_setups', 'zone_top', w]], ['סטופ (SL)', r.stop, r.pivot, 'sl', ['swing_setups', 'stop', w]], ['יעד (TP)', r.target, r.pivot, 'tp', ['swing_setups', 'target', w]]]);
@@ -1144,7 +1374,10 @@
       const rules = el('p', 'mc-thesis'); rules.append(el('b', null, 'איך מנהלים: '), 'מוכרים הכול אם המחיר נסגר מתחת לסטופ. ביעד מוכרים חצי, ואת השאר מחזיקים כל עוד המניה מעל ממוצע 21 יום.');
       const why = el('p', 'mc-thesis'); why.append(el('b', null, r.action === 'avoid' ? 'למה לא: ' : 'למה המניה: '), mark(el('span', null, r.reason), 'swing_setups', 'reason', w));
       const meta = el('dl', 'mc-meta');
-      [['מצב', 'status'], ['תבנית מגמה', 'trend'], ['דוח', 'earnings']].forEach(([l, f]) => { meta.append(el('dt', null, l), mark(el('dd', null, r[f]), 'swing_setups', f, w)); });
+      const dl = dailyRow(r.symbol), ne = nextEarnings(r.symbol);
+      if (dl && dl.trend_score != null) meta.append(el('dt', null, 'תבנית מגמה (חי)'), mark(el('dd', null, dl.trend_score + '/7 · ממוצע 50 ' + fmtP(dl.sma50) + ' · ממוצע 200 ' + fmtP(dl.sma200) + ' · שיא שנתי ' + fmtP(dl.high_52w) + ' · RSI ' + dl.rsi14), 'daily', 'trend_score', W('symbol', r.symbol)));
+      if (ne) meta.append(el('dt', null, 'דוח (חי)'), mark(el('dd', null, dayName(ne.date) + (ne.hour === 'bmo' ? ' לפני הפתיחה' : ne.hour === 'amc' ? ' אחרי הסגירה' : '')), 'earnings', 'date', W('symbol', r.symbol)));
+      [['מצב', 'status'], ['תבנית מגמה (ניתוח)', 'trend'], ['דוח (ניתוח)', 'earnings']].forEach(([l, f]) => { meta.append(el('dt', null, l), mark(el('dd', null, r[f]), 'swing_setups', f, w)); });
       kids.push(bar, rangeNote(r.symbol)); if (swPos) kids.push(swPos);
       const more = [why];
       if (r.action !== 'avoid') more.push(rules);
@@ -1158,7 +1391,11 @@
 
   /* ---------- sectors ---------- */
   function drawSectors() {
-    const d = dash.data('sectors'), box = $('#sectors');
+    const Ls = dash.data('sectors_live'), live = Ls.status === 'ok' && (Ls.data || []).length >= 6;
+    const d = live ? Ls : dash.data('sectors'), box = $('#sectors'), SRC = live ? 'sectors_live' : 'sectors';
+    const sn = $('#sectors-note'), stp = aiStamp();
+    sn.textContent = 'מתחילת השבוע (עמודה) · מתחילת השנה (מספר) · ' + (live ? 'מחושב ממחירים חיים' : 'מהניתוח' + (stp ? ', ' + stp.text : ''));
+    sn.classList.toggle('mc-warn', !live);
     if (d.status === 'error') return fail(box);
     if (d.status !== 'ok') { box.classList.add('dash-skeleton'); box.replaceChildren(); return; }
     box.classList.remove('dash-skeleton');
@@ -1171,15 +1408,15 @@
     svg.append('line').attr('x1', x(0)).attr('x2', x(0)).attr('y1', 0).attr('y2', h).style('stroke', 'var(--cds-chart-axis)');
     const g = svg.selectAll('g').data(rows).join('g').attr('transform', (r, i) => `translate(0,${i * rowH + 3})`);
     g.append('text').attr('x', labW - 4).attr('y', 17).attr('text-anchor', 'end').style('font-size', '12px').style('fill', 'var(--color-fg)')
-      .text((r) => r.sector + ' · ' + r.etf).attr('data-source', 'sectors').attr('data-field', 'sector').attr('data-where', (r) => W('etf', r.etf));
+      .text((r) => r.sector + ' · ' + r.etf).attr('data-source', SRC).attr('data-field', 'sector').attr('data-where', (r) => W('etf', r.etf));
     g.filter((r) => r.week_pct != null).append('rect').attr('y', 6).attr('height', 16).attr('rx', 4)
       .attr('x', (r) => Math.min(x(0), x(r.week_pct))).attr('width', (r) => Math.max(2, Math.abs(x(r.week_pct) - x(0))))
       .style('fill', (r) => r.week_pct >= 0 ? 'var(--color-ok)' : 'var(--color-bad)').style('opacity', .8)
-      .attr('data-source', 'sectors').attr('data-field', 'week_pct').attr('data-where', (r) => W('etf', r.etf))
+      .attr('data-source', SRC).attr('data-field', 'week_pct').attr('data-where', (r) => W('etf', r.etf))
       .append('title').text((r) => 'שבוע: ' + fmtPct(r.week_pct));
     g.filter((r) => r.week_pct == null).append('text').attr('x', x(0) + 6).attr('y', 17).style('font-size', '11px').style('fill', 'var(--color-fg-muted)').text('אין נתון שבועי');
     g.append('text').attr('x', width - 2).attr('y', 17).attr('text-anchor', 'end').style('font-size', '11px').style('fill', 'var(--color-fg-muted)')
-      .text((r) => r.ytd_pct == null ? '' : fmtPct(r.ytd_pct, 1)).attr('data-source', 'sectors').attr('data-field', 'ytd_pct').attr('data-where', (r) => W('etf', r.etf));
+      .text((r) => r.ytd_pct == null ? '' : fmtPct(r.ytd_pct, 1)).attr('data-source', SRC).attr('data-field', 'ytd_pct').attr('data-where', (r) => W('etf', r.etf));
     box.replaceChildren(svg.node());
   }
 
@@ -1302,17 +1539,37 @@
     }));
   }
   function drawIndices() {
-    const d = dash.data('indices'), box = $('#indices');
-    if (d.status === 'error') return fail(box);
-    if (d.status !== 'ok') return skel(box, 3, '7.5rem');
-    box.replaceChildren(...d.data.map((r) => {
+    const L = dash.data('market'), A = dash.data('indices'), box = $('#indices'), note = $('#idx-note');
+    if (L.status === 'ok' && (L.data || []).length) {
+      note.classList.remove('mc-warn');
+      note.textContent = 'קרנות הסל על המדדים · מחיר חי לפי הסשן, ושינוי מול סגירות יומיות';
+      box.replaceChildren(...L.data.map((r) => {
+        const c = el('div', 'mc-card'), w = W('symbol', r.symbol);
+        const nm = el('div', 'mc-ixname'); nm.append(mark(el('span', null, r.name + ' (' + r.symbol + ')'), 'market', 'name', w), el('span', null, (SESS[r.price_session] || '') + (r.time_ny ? ' · ' + qil(r.time_ny) : '')));
+        const chips = el('div', 'mc-chips');
+        const tl = r.price_session === 'pre' ? 'פרה-מרקט' : r.price_session === 'post' ? 'היום כולל אפטר' : 'היום';
+        [['today_pct', tl], ['wtd_pct', 'מתחילת שבוע'], ['mtd_pct', 'מתחילת חודש'], ['ytd_pct', 'מתחילת שנה']].forEach(([f, l]) => {
+          const ch = el('div', 'mc-chip'); ch.append(el('small', null, l), mark(el('span', 'mc-ltr ' + cls(r[f]), fmtPct(r[f])), 'market', f, w)); chips.append(ch);
+        });
+        c.append(nm, mark(el('div', 'mc-ixval mc-ltr', fmtP(r.price)), 'market', 'price', w), chips,
+          el('p', 'mc-note', 'מממוצע 50: ' + fmtPct(r.vs_sma50, 1) + ' · מממוצע 200: ' + fmtPct(r.vs_sma200, 1) + ' · מהשיא השנתי: ' + fmtPct(r.off_high, 1)));
+        return c;
+      }));
+      return;
+    }
+    const stp = aiStamp();
+    note.textContent = 'מהניתוח, לא מחושב ממחירים חיים' + (stp ? ' · ' + stp.text : '');
+    note.classList.toggle('mc-warn', true);
+    if (A.status === 'error') return fail(box);
+    if (A.status !== 'ok') return skel(box, 3, '7.5rem');
+    box.replaceChildren(...A.data.map((r) => {
       const c = el('div', 'mc-card'), w = W('symbol', r.symbol);
-      const nm = el('div', 'mc-ixname'); nm.append(mark(el('span', null, r.name), 'indices', 'name', w), el('span', null, 'סגירה אחרונה'));
+      const nm = el('div', 'mc-ixname'); nm.append(mark(el('span', null, r.name), 'indices', 'name', w), el('span', null, 'סגירה אחרונה לפי הניתוח'));
       const chips = el('div', 'mc-chips');
-      [['pre_pct', 'חוזים בבוקר'], ['day_pct', 'אתמול'], ['wtd_pct', 'מתחילת שבוע'], ['mtd_pct', 'מתחילת חודש']].forEach(([f, l]) => {
+      [['pre_pct', 'חוזים בבוקר'], ['day_pct', 'יום קודם'], ['wtd_pct', 'מתחילת שבוע'], ['mtd_pct', 'מתחילת חודש']].forEach(([f, l]) => {
         const ch = el('div', 'mc-chip'); ch.append(el('small', null, l), mark(el('span', 'mc-ltr ' + cls(r[f]), fmtPct(r[f])), 'indices', f, w)); chips.append(ch);
       });
-      c.prepend(nm, mark(el('div', 'mc-ixval mc-ltr', d3.format(',.2f')(r.last_close)), 'indices', 'last_close', w), chips);
+      c.append(nm, mark(el('div', 'mc-ixval mc-ltr', d3.format(',.2f')(r.last_close)), 'indices', 'last_close', w), chips);
       return c;
     }));
   }
@@ -1384,6 +1641,7 @@
     drawQuotesTime();
     drawStrip();
     drawAlert();
+    drawStamps();
     drawAsOf();
     const p = window.mcPage || 'decide';
     if (p === 'decide') { drawRegime(); drawNow(); drawDecisions(); }
