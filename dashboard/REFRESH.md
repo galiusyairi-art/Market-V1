@@ -48,7 +48,9 @@ How to read the quote fields:
 
 ## 2. The day-trade level formula (the page and the review use exactly this)
 Let ATR be `daily.atr14`.
-- **Before 09:35 NY:** entry = `pm_high`, and the floor = `pm_low` (provisional levels).
+- **Before 09:35 NY** (provisional levels):
+  - On a gap of 2% or more (`|change_pct|` ≥ 2): entry = `pm_high`, and the floor = `pm_low`.
+  - Otherwise: entry = max(`daily.prev_high`, `pm_high`), and the floor = `pm_low` (or `daily.prev_low` with no pre-market trades).
 - **From 09:35:** entry = `or_high` (high of 09:30–09:35), and the floor = `or_low`.
 - stop = max(floor, entry − 0.5·ATR). If entry − stop < 0.15·ATR, then stop = entry − 0.15·ATR.
 - R = entry − stop. T1 = entry + 1.5R, and T2 = entry + 3R.

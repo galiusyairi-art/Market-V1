@@ -125,7 +125,7 @@ yahoo = Object.fromEntries(syms.map((s) => [s, chart({ regPrice: 10, regTime: T(
 fin = Object.fromEntries(syms.map((s) => [s, { c: 10, d: 0.5, dp: 5.26, h: 10.2, l: 9.4, o: 9.6, pc: 9.5, t: T('10:59') }]));
 rows = await quotes(syms.join(','));
 assert(rows.length === 30 && rows.every((x) => x.price === 10 && x.source === 'yahoo') && calls.length <= 46, 'H 30 via Yahoo', calls.length);
-assert(rows[29].check === 'ok' && rows.filter((x) => x.check).length === 16, 'H cross-check covers the end of the list (cards) first', rows.map((x) => x.check));
+assert(rows[29].check === 'ok' && rows.filter((x) => x.check).length === 12, 'H cross-check: 12 at most, the end of the list (cards) first', rows.map((x) => x.check));
 yahoo.__down = true;
 rows = await quotes(syms.join(','));
 assert(rows.every((x) => x.price === 10 && x.source === 'finnhub') && calls.length <= 46, 'H 30 via Finnhub fallback', calls.length);

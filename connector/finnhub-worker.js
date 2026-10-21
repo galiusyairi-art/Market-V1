@@ -105,6 +105,7 @@ const SUBREQUEST_BUDGET = 46;
 const YAHOO = ["https://query1.finance.yahoo.com", "https://query2.finance.yahoo.com"];
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36";
 const MISMATCH_PCT = 0.75; // sources further apart than this are flagged
+const CROSS_CHECKS = 12;
 
 const r2 = (v) => (v == null || !Number.isFinite(v) ? null : Math.round(v * 10000) / 10000);
 const pct = (a, b) => (a == null || b == null || !b ? null : Math.round((a / b - 1) * 1e6) / 1e4);
@@ -279,7 +280,8 @@ async function sessionQuotes(env, list) {
     try { out.set(s, fromFinnhub(s, await finnhubQuote(env, s), nowUnix, marketSession)); }
     catch (e) { out.set(s, emptyRow(s, e.unknown ? "unknown symbol" : `no quote (${[(yahooErr.get(s) || {}).message, e.message].filter(Boolean).join("; ")})`)); }
   }));
-  const toCheck = [...list].reverse().filter((s) => !yahooOnly(s) && out.get(s) && out.get(s).source === "yahoo");
+  // at most 12 cross-checks per call, cards first (the list ends with them): Finnhub's free plan allows ~60 calls a minute
+  const toCheck = [...list].reverse().filter((s) => !yahooOnly(s) && out.get(s) && out.get(s).source === "yahoo").slice(0, CROSS_CHECKS);
   await Promise.all(toCheck.map(async (s) => {
     if (!budget.take()) return;
     const row = out.get(s);
@@ -420,14 +422,14 @@ const TOOL_IMPL = {
     const days = clamp(args.days, 1, 60, 21);
     const from = new Date();
     const to = new Date(from.getTime() + days * 864e5);
-    const only = tickers(args.symbols, 100);
-    const fetchOne = (symbol) => finnhub(env, "/calendar/earnings", { from: ymd(from), to: ymd(to), symbol });
-    const parts = only.length ? await Promise.all(only.map(fetchOne)) : [await fetchOne(undefined)];
-    const rows = parts
-      .flatMap((p) => (p && p.earningsCalendar) || [])
+    const only = new Set(tickers(args.symbols, 100).filter((s) => !yahooOnly(s)));
+    // one call for the whole range, filtered here: a call per symbol trips Finnhub's rate limit
+    const cal = await finnhub(env, "/calendar/earnings", { from: ymd(from), to: ymd(to) });
+    const rows = ((cal && cal.earningsCalendar) || [])
+      .filter((e) => !only.size || only.has(e.symbol))
       .map((e) => ({ symbol: e.symbol, date: e.date, hour: e.hour || null, eps_estimate: e.epsEstimate ?? null, revenue_estimate: e.revenueEstimate ?? null }))
-      .sort((a, b) => a.date.localeCompare(b.date));
-    return { rows: only.length ? rows : rows.slice(0, 300) };
+      .sort((a, b) => a.date.localeCompare(b.date) || a.symbol.localeCompare(b.symbol));
+    return { rows: only.size ? rows : rows.slice(0, 300) };
   },
 
   async get_market_status(env) {
@@ -452,7 +454,7 @@ async function handleMessage(env, msg) {
       return rpc(id, {
         protocolVersion: PROTOCOLS.includes(asked) ? asked : PROTOCOLS[0],
         capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: "finnhub-market-data", version: "3.0.0" },
+        serverInfo: { name: "finnhub-market-data", version: "3.1.0" },
         instructions: "US stock market data: session-aware quotes with pre-market and after-hours (Yahoo Finance, cross-checked with Finnhub), one-year daily statistics (get_daily), company news, earnings calendar, market status (Finnhub).",
       });
     }

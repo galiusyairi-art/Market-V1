@@ -12,7 +12,7 @@ globalThis.fetch = async (u) => {
     return json({ c: 450.5, d: 63.38, dp: 16.37, h: 452, l: 440, o: 447, pc: 387.12, t: 1791560000 });
   }
   if (p.endsWith('/company-news')) return json([{ datetime: 1791550000, headline: 'H', source: 'Reuters', summary: 'S', url: 'https://x' }]);
-  if (p.endsWith('/calendar/earnings')) return json({ earningsCalendar: [{ symbol: 'AMT', date: '2026-10-27', hour: 'bmo', epsEstimate: 2.5, revenueEstimate: 1e9 }] });
+  if (p.endsWith('/calendar/earnings')) return json({ earningsCalendar: [{ symbol: 'ZZZ', date: '2026-10-22', hour: 'amc' }, { symbol: 'AMT', date: '2026-10-27', hour: 'bmo', epsEstimate: 2.5, revenueEstimate: 1e9 }, { symbol: 'MU', date: '2026-10-23', hour: 'amc' }] });
   if (p.endsWith('/stock/market-status')) return json({ isOpen: true, session: 'regular', holiday: null, t: 1791560000 });
   return json({}, 404);
 };
@@ -36,7 +36,11 @@ console.log('quote row:', rows[0]);
 [st, j] = await show(await post('/mcp/tok', { jsonrpc: '2.0', id: 4, method: 'tools/call', params: { name: 'get_company_news', arguments: { symbol: 'HUM' } } }));
 assert(j.result.structuredContent.rows[0].headline === 'H', 'news');
 [st, j] = await show(await post('/mcp/tok', { jsonrpc: '2.0', id: 5, method: 'tools/call', params: { name: 'get_earnings_calendar', arguments: { symbols: 'AMT' } } }));
-assert(j.result.structuredContent.rows[0].date === '2026-10-27', 'earnings');
+assert(j.result.structuredContent.rows.length === 1 && j.result.structuredContent.rows[0].date === '2026-10-27', 'earnings');
+calls = [];
+[st, j] = await show(await post('/mcp/tok', { jsonrpc: '2.0', id: 9, method: 'tools/call', params: { name: 'get_earnings_calendar', arguments: { symbols: 'SPY,QQQ,^VIX,IBIT,GLD,USO,TLT,RTX,LITE,MU,HUM,AMT,XLK,XLC,XLY,XLF,XLI,XLV,XLE,XLB,XLP,XLU,XLRE,DIA,IWM', days: 30 } } }));
+const er = j.result.structuredContent.rows;
+assert(calls.length === 1 && !calls[0].includes('symbol=') && er.map((r) => r.symbol).join() === 'MU,AMT', 'earnings: 25 symbols = one Finnhub call, filtered and sorted', { calls, er });
 [st, j] = await show(await post('/mcp/tok', { jsonrpc: '2.0', id: 6, method: 'tools/call', params: { name: 'get_market_status', arguments: {} } }));
 assert(j.result.structuredContent.rows[0].is_open === true, 'status');
 [st, j] = await show(await post('/mcp/tok', { jsonrpc: '2.0', id: 7, method: 'tools/call', params: { name: 'nope' } }));

@@ -533,11 +533,11 @@
   $('#theme-btn').addEventListener('click', () => dash.setParams({theme: dash.params().theme === 'light' ? 'dark' : 'light'}));
   /* ---------- numbers computed from live data (connector: quotes + one-year daily stats) ---------- */
   // Day-trade levels follow one fixed rule so they can be checked: entry = high of the first 5 minutes (after 09:35 NY;
-  // before that the pre-market high), stop = low of that range but never more than ½ ATR(14) below the entry and never
+  // before that the pre-market high on a 2%+ gap, otherwise yesterday's high), stop = low of that range but never more than ½ ATR(14) below the entry and never
   // less than 0.15 ATR, targets at 1.5R and 3R. The analysis' own levels are used only when that data is missing.
   dash.calc('levels', {
     title: 'רמות מסחר יומי מחושבות',
-    description: 'כניסה = שיא 5 הדקות הראשונות (לפני 09:35 NY: שיא הפרה-מרקט); סטופ = שפל אותו טווח, לכל היותר ½ ATR(14) מתחת לכניסה ולפחות 0.15 ATR; יעדים 1.5R ו-3R. בלי נתונים: רמות הניתוח.',
+    description: 'כניסה = שיא 5 הדקות הראשונות. לפני 09:35 NY: שיא הפרה-מרקט בגאפ של 2% ומעלה, אחרת שיא אתמול. סטופ = שפל אותו טווח, לכל היותר ½ ATR(14) מתחת לכניסה ולפחות 0.15 ATR; יעדים 1.5R ו-3R. בלי נתונים: רמות הניתוח.',
     inputs: ['daytrade', 'quotes', 'daily'],
     fn: (daytrade, quotes, daily) => daytrade.map((r) => {
       const q = quotes.find((x) => x.symbol === r.symbol && x.price != null), d = daily.find((x) => x.symbol === r.symbol && x.atr14 != null);
@@ -546,7 +546,9 @@
       let trigger = null, floor = null, src = 'ai';
       if (q && d && r.side !== -1) {
         if (q.or_high != null) { trigger = q.or_high; floor = q.or_low; src = 'or'; }
-        else if (q.pm_high != null && q.reg_price == null) { trigger = q.pm_high; floor = q.pm_low; src = 'pm'; }
+        // before the open: a real gap (2%+) breaks out of its pre-market high; otherwise the level that matters is yesterday's high
+        else if (q.reg_price == null && q.pm_high != null && Math.abs(q.change_pct ?? 0) >= 2) { trigger = q.pm_high; floor = q.pm_low; src = 'pm'; }
+        else if (q.reg_price == null && d.prev_high != null) { trigger = Math.max(d.prev_high, q.pm_high ?? -Infinity); floor = q.pm_low ?? d.prev_low; src = 'pdh'; }
       }
       if (trigger == null) return {...r, ...ai, level_src: 'ai', atr: d ? d.atr14 : null};
       let stop = Math.max(floor ?? -Infinity, trigger - 0.5 * d.atr14);
@@ -628,7 +630,7 @@
         const lvl = tnx.close > 20 ? tnx.close / 10 : tnx.close, prev = lvl / (1 + tnx.chg_20d / 100), bp = Math.round((lvl - prev) * 100);
         const st = bp <= 15 ? 'go' : bp <= 35 ? 'caution' : 'stop';
         rows.push({key: 'rates', label: 'ריבית', status: st, title: 'תשואת 10 שנים ' + lvl.toFixed(2) + '% (' + (bp > 0 ? '+' : bp < 0 ? '−' : '') + Math.abs(bp) + ' נ״ב ב-20 יום)',
-          text: {go: 'התשואות יציבות או יורדות.', caution: 'התשואות עולות: לחץ על מניות צמיחה.', stop: 'זינוק בתשואות: לחץ חזק על מניות.'}[st]});
+          text: {go: bp < 0 ? 'התשואות יורדות: רוח גבית למניות.' : 'שינוי קטן בתשואות (עד 15 נ״ב ב-20 יום).', caution: 'התשואות עולות: לחץ על מניות צמיחה.', stop: 'זינוק בתשואות: לחץ חזק על מניות.'}[st]});
       }
       const qq = D('QQQ'), sp = D('SPY'), xly = D('XLY'), xlp = D('XLP');
       if (qq && sp && xly && xlp && [qq, sp, xly, xlp].every((d) => d.chg_20d != null)) {
@@ -1239,7 +1241,8 @@
     const p = el('p', 'mc-note');
     p.style.margin = '-4px 2px 0';
     if (r.level_src === 'or') p.textContent = 'רמות מחושבות מהמסחר החי: כניסה בשיא 5 הדקות הראשונות (' + il(570) + '–' + il(575) + '), סטופ בשפל הטווח ולכל היותר ½ ATR, יעדים 1.5R ו-3R.';
-    else if (r.level_src === 'pm') p.textContent = 'רמות זמניות לפי הפרה-מרקט (שיא ' + fmtP(r.trigger) + '). ב-' + il(575) + ' הן מתעדכנות לפי טווח הפתיחה.';
+    else if (r.level_src === 'pm') p.textContent = 'רמות זמניות: גאפ של 2% ומעלה, ולכן כניסה מעל שיא הפרה-מרקט (' + fmtP(r.trigger) + '). ב-' + il(575) + ' הן מתעדכנות לפי טווח הפתיחה.';
+    else if (r.level_src === 'pdh') p.textContent = 'רמות זמניות: בלי גאפ של ממש, ולכן כניסה מעל שיא אתמול (' + fmtP(r.trigger) + '). ב-' + il(575) + ' הן מתעדכנות לפי טווח הפתיחה.';
     else { p.classList.add('mc-warn'); p.textContent = 'רמות הניתוח, לא חושבו ממחירים חיים' + (dash.data('daily').status === 'ok' ? '.' : ' (אין עדיין נתוני היסטוריה מהמחבר).'); }
     return p;
   }

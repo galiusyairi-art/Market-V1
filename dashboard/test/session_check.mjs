@@ -13,7 +13,7 @@ let fails = 0;
 const check = (c, m, extra) => { if (!c) { fails++; console.error('  FAIL', m, extra ?? ''); } else console.log('  ok  ', m); };
 
 // connector-v2 rows derived from yesterday's closes
-const PM = { CLF: -1.99, SPY: -0.30, QQQ: -0.45 };
+const PM = { CLF: -1.99, SPY: -0.30, QQQ: -0.45, NBIS: 2.2 };
 function v2(session, opts = {}) {
   return legacyPre.map((r) => {
     const prev = r.price, chg = PM[r.symbol] ?? 0.2, sym = r.symbol;
@@ -156,7 +156,9 @@ console.log('S8 connector v3, 08:00 NY pre-market: provisional levels from the p
 o = await render('v3-pre', '2026-10-20T08:00:00-04:00', { ...base, brief: brief('2026-10-20T07:45:00-04:00'), quotes: v3('pre'), daily, earnings });
 check(!o.errors.length, 'no JS errors', o.errors);
 clf = o.day['day-CLF'];
-check(near2(clf.text, 14.18) && near2(clf.text, 13.97) && /רמות זמניות לפי הפרה-מרקט/.test(clf.text), 'CLF entry = pre-market high 14.18, stop 13.97, marked provisional', clf.text.slice(0, 400));
+check(near2(clf.text, 14.24) && near2(clf.text, 14.03) && /שיא אתמול/.test(clf.text), 'CLF (gap −1.99%, under 2%): entry = yesterday high 14.24, stop 14.03, provisional', clf.text.slice(0, 400));
+const nb = o.day['day-NBIS'];
+check(/שיא הפרה-מרקט/.test(nb.text) && near2(nb.text, 175.03), 'NBIS (gap +2.2%): entry = pre-market high 175.03', nb.text.slice(0, 400));
 
 console.log('S9 01:32 Israel on 21.10 = 18:32 New York on 20.10 (the reported date confusion)');
 o = await render('v3-night', '2026-10-20T18:32:00-04:00', { ...base, brief: brief('2026-10-20T08:45:00-04:00'), quotes: v3('post'), daily, earnings });
